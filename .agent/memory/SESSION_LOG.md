@@ -19,7 +19,7 @@
     *   **DELETED** Node.js `server/` folder.
     *   Migrated Auth, Database (Targets), and Storage (Assets) to **Supabase**.
     *   Updated `Scanner`, `Admin`, and `Login` to use `supabase-js`.
-    *   Verified `IMAGYNE V.1.05 - Supabase Migration` complete.
+    *   Verified `UAU V.1.05 - Supabase Migration` complete.
 
 **Next Steps / Context for Next Session:**
 - Monitor Vercel deploy.

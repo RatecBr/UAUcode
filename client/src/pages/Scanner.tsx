@@ -19,8 +19,28 @@ interface Target {
 }
 
 export default function Scanner() {
-    const { user } = useAuth();
+    const { user, isAdmin } = useAuth();
     const navigate = useNavigate();
+
+    const [allUsers, setAllUsers] = useState<{ id: string; email: string }[]>([]);
+    const [selectedUserId, setSelectedUserId] = useState<string>('');
+
+    useEffect(() => {
+        if (isAdmin) {
+            fetchUsers();
+        }
+    }, [isAdmin]);
+
+    useEffect(() => {
+        if (user && !selectedUserId) {
+            setSelectedUserId(user.id);
+        }
+    }, [user]);
+
+    const fetchUsers = async () => {
+        const { data } = await supabase.from('profiles').select('id, email');
+        if (data) setAllUsers(data);
+    };
 
     // Promote to Admin (TEMPORARY - REMOVE AFTER USE)
     const promoteToAdmin = async () => {
@@ -77,22 +97,52 @@ export default function Scanner() {
         if (!recognizerRef.current) {
             recognizerRef.current = new ImageRecognizer();
         }
-
-        initializeScanner();
-        return () => stopScan();
     }, []);
+
+    useEffect(() => {
+        if (selectedUserId) {
+            initializeScanner();
+        }
+        return () => stopScan();
+    }, [selectedUserId]);
 
     // Sync state changes to ref for loop access
     useEffect(() => {
         debugModeRef.current = debugMode;
     }, [debugMode]);
 
-    const initializeScanner = async () => {
-        setStatus('Fetching experiences...');
-        try {
-            const { data, error } = await supabase.from('targets').select('*');
+    const isInitializing = useRef(false);
+    const hasInitialized = useRef(false);
 
-            if (error) throw error;
+    const initializeScanner = async () => {
+        if (isInitializing.current || hasInitialized.current) return;
+
+        try {
+            isInitializing.current = true;
+            setStatus('Fetching experiences...');
+
+            if (!user) {
+                setStatus('Not authenticated');
+                return;
+            }
+
+            // Fetch targets: Selected user + Globals, OR just Globals
+            let query = supabase.from('targets').select('*');
+            if (selectedUserId && selectedUserId !== 'none') {
+                query = query.or(`user_id.eq.${selectedUserId},is_global.eq.true`);
+            } else {
+                query = query.eq('is_global', true);
+            }
+
+            const { data, error } = await query;
+
+            if (error) {
+                if (error.message?.includes('abort') || error.code === 'ABORT') {
+                    console.warn('[Scanner] Fetch aborted.');
+                    return;
+                }
+                throw error;
+            }
             if (!data) throw new Error("No data");
 
             // Type assertion and check
@@ -104,9 +154,6 @@ export default function Scanner() {
                 setStatus('No experiences found. Add some in Admin.');
                 return;
             }
-
-            // REMOVED: Mass preloadAssets causing network congestion
-            // We will load Just-In-Time (JIT) when detected.
 
             setStatus('Loading recognition engine...');
 
@@ -133,9 +180,12 @@ export default function Scanner() {
                 }
             }, 500);
 
-        } catch (e) {
+        } catch (e: any) {
+            if (e.message?.includes('abort')) return;
             console.error(e);
             setStatus('Error initializing scanner');
+        } finally {
+            isInitializing.current = false;
         }
     };
 
@@ -388,7 +438,13 @@ export default function Scanner() {
     };
 
     return (
-        <div style={{ position: 'relative', width: '100vw', height: '100vh', background: 'black', overflow: 'hidden' }}>
+        <div style={{
+            position: 'relative',
+            width: '100vw',
+            height: '100dvh',
+            background: 'var(--background)',
+            overflow: 'hidden'
+        }}>
             <video
                 ref={videoRef}
                 className="camera-feed"
@@ -399,69 +455,197 @@ export default function Scanner() {
             <canvas
                 ref={canvasRef}
                 style={{
-                    position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
-                    pointerEvents: 'none', display: 'block'
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    pointerEvents: 'none',
+                    display: 'block'
                 }}
             />
 
             <div ref={overlayContainerRef} className="overlay-container" style={{ zIndex: 10 }}></div>
 
+            {/* UI Overlay */}
             <div style={{
-                position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-                zIndex: 20, pointerEvents: 'none',
-                display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '20px'
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                zIndex: 20,
+                pointerEvents: 'none',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                padding: 'var(--space-md)',
+                paddingTop: 'max(var(--space-md), env(safe-area-inset-top))',
+                paddingBottom: 'max(var(--space-md), env(safe-area-inset-bottom))'
             }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                {/* Top Controls */}
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-start'
+                }}>
                     <button
                         onClick={() => { stopScan(); navigate('/admin'); }}
                         className="glass-card"
-                        style={{ padding: '10px', pointerEvents: 'auto', display: 'flex', gap: '5px' }}
+                        style={{
+                            padding: 'var(--space-sm) var(--space-md)',
+                            pointerEvents: 'auto',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 'var(--space-xs)',
+                            color: 'var(--text)'
+                        }}
                     >
-                        <ArrowLeft size={20} color="white" /> <span style={{ color: 'white' }}>Exit</span>
+                        <ArrowLeft size={18} />
+                        <span>Sair</span>
                     </button>
 
-                    <div style={{ display: 'flex', gap: '10px', flexDirection: 'column', alignItems: 'flex-end' }}>
+                    {isAdmin && allUsers.length > 0 && (
+                        <div style={{ pointerEvents: 'auto', flex: 1, margin: '0 12px' }}>
+                            <select
+                                value={selectedUserId}
+                                onChange={(e) => setSelectedUserId(e.target.value)}
+                                style={{
+                                    width: '100%',
+                                    padding: '10px',
+                                    borderRadius: '12px',
+                                    background: 'rgba(255,255,255,0.1)',
+                                    backdropFilter: 'blur(10px)',
+                                    color: 'white',
+                                    border: '1px solid rgba(255,255,255,0.2)',
+                                    fontSize: '12px',
+                                    outline: 'none'
+                                }}
+                            >
+                                <option value="" disabled style={{ color: '#000' }}>Selecionar Usuário...</option>
+                                <option value="none" style={{ color: '#000' }}>Apenas Globais (UAU)</option>
+                                {allUsers.map(u => (
+                                    <option key={u.id} value={u.id} style={{ color: '#000' }}>
+                                        {u.email} {u.id === user?.id ? '(Você)' : ''}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
+
+                    <div style={{
+                        display: 'flex',
+                        gap: 'var(--space-sm)',
+                        flexDirection: 'column',
+                        alignItems: 'flex-end'
+                    }}>
                         {status && (
-                            <div className="glass-card" style={{ padding: '8px 15px', display: 'flex', gap: '10px', alignItems: 'center' }}>
-                                <Loader2 className="spin" size={16} />
-                                <span>{status}</span>
+                            <div
+                                className="glass-card"
+                                style={{
+                                    padding: 'var(--space-xs) var(--space-sm)',
+                                    display: 'flex',
+                                    gap: 'var(--space-sm)',
+                                    alignItems: 'center',
+                                    fontSize: 'var(--font-size-sm)',
+                                    maxWidth: '200px'
+                                }}
+                            >
+                                <Loader2 className="spin" size={14} />
+                                <span style={{
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap'
+                                }}>
+                                    {status}
+                                </span>
                             </div>
                         )}
+
                         <button
                             onClick={() => { console.log("Debug Click"); setDebugMode(p => !p); }}
                             className="glass-card"
-                            style={{ padding: '8px', pointerEvents: 'auto', background: debugMode ? 'rgba(255,0,0,0.5)' : 'rgba(255,255,255,0.1)' }}
+                            style={{
+                                padding: 'var(--space-sm)',
+                                pointerEvents: 'auto',
+                                background: debugMode ? 'rgba(255, 71, 87, 0.5)' : 'var(--glass-bg)'
+                            }}
                         >
                             <Bug size={16} color="white" />
                         </button>
+
                         {debugMode && (
-                            <div className="glass-card" style={{ padding: '5px', fontSize: '10px', maxWidth: '200px', wordWrap: 'break-word', color: 'white' }}>
+                            <div
+                                className="glass-card animate-enter"
+                                style={{
+                                    padding: 'var(--space-xs)',
+                                    fontSize: 'var(--font-size-xs)',
+                                    maxWidth: '180px',
+                                    wordWrap: 'break-word',
+                                    color: 'var(--text)'
+                                }}
+                            >
                                 {debugInfo}
                             </div>
                         )}
+
                         {/* TEMPORARY: Promote to Admin button - REMOVE AFTER USE */}
                         <button
                             onClick={promoteToAdmin}
                             className="glass-card"
-                            style={{ padding: '8px 12px', pointerEvents: 'auto', background: 'rgba(0,255,157,0.3)', color: 'white', fontSize: '10px' }}
+                            style={{
+                                padding: 'var(--space-xs) var(--space-sm)',
+                                pointerEvents: 'auto',
+                                background: 'rgba(0, 255, 157, 0.25)',
+                                color: 'var(--primary)',
+                                fontSize: 'var(--font-size-xs)',
+                                fontWeight: 600
+                            }}
                         >
-                            Promote to Admin
+                            Promover Admin
                         </button>
                     </div>
                 </div>
 
+                {/* Bottom Detection Card */}
                 {isDetected && activeTarget && (
-                    <div className="glass-card animate-enter" style={{ margin: '0 auto', marginBottom: '20px', padding: '15px', pointerEvents: 'auto', textAlign: 'center' }}>
-                        <div style={{ fontSize: '12px', color: '#00ff9d', marginBottom: '5px' }}>DETECTED</div>
-                        <div style={{ fontWeight: 'bold' }}>{activeTarget.name}</div>
+                    <div
+                        className="glass-card animate-enter"
+                        style={{
+                            alignSelf: 'center',
+                            marginBottom: 'var(--space-md)',
+                            padding: 'var(--space-md)',
+                            pointerEvents: 'auto',
+                            textAlign: 'center',
+                            maxWidth: '280px',
+                            width: '100%'
+                        }}
+                    >
+                        <div style={{
+                            fontSize: 'var(--font-size-xs)',
+                            color: 'var(--primary)',
+                            marginBottom: 'var(--space-xs)',
+                            fontWeight: 600,
+                            letterSpacing: '0.1em'
+                        }}>
+                            DETECTADO
+                        </div>
+                        <div style={{
+                            fontWeight: 700,
+                            fontSize: 'var(--font-size-lg)'
+                        }}>
+                            {activeTarget.name}
+                        </div>
                         <button
                             onClick={() => { resetOverlays(); }}
+                            className="btn-secondary"
                             style={{
-                                marginTop: '10px', background: 'rgba(255,255,255,0.2)', border: 'none',
-                                color: 'white', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer'
+                                marginTop: 'var(--space-sm)',
+                                width: '100%',
+                                fontSize: 'var(--font-size-sm)'
                             }}
                         >
-                            Close Experience
+                            Fechar Experiência
                         </button>
                     </div>
                 )}

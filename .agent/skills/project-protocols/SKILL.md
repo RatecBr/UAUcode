@@ -1,6 +1,6 @@
 ---
 name: project-protocols
-description: Mandatory project standards for IMAGYNE (WebAR, Versioning, Supabase, GitHub Deploy) and Context Memory guidelines.
+description: Mandatory project standards for UAU (WebAR, Versioning, Supabase, GitHub Deploy) and Context Memory guidelines.
 ---
 
 # Project Protocols & Standards
@@ -13,8 +13,8 @@ description: Mandatory project standards for IMAGYNE (WebAR, Versioning, Supabas
 - **Reading:** Upon activation, ALWAYS check the last entries of `SESSION_LOG.md`.
 
 ## 2. Versioning Standard
-- **Format:** `IMAGYNE V.1.XX - "KEYWORD"`
-- **Example:** `IMAGYNE V.1.05 - SUPABASE`
+- **Format:** `UAU V.1.XX - "KEYWORD"`
+- **Example:** `UAU V.1.05 - SUPABASE`
 - **Rule:** Every significant deployment or architecture change must increment the version and update `DOCUMENTATION.md`.
 
 ## 3. WebAR Architecture (Immutable)
@@ -56,11 +56,11 @@ description: Mandatory project standards for IMAGYNE (WebAR, Versioning, Supabas
 ### GitHub Commit Convention
 
 ```
-Format: "IMAGYNE vX.XX - KEYWORD: description"
+Format: "UAU vX.XX - KEYWORD: description"
 
 Examples:
-- "IMAGYNE v1.06 - AUTH: Fixed login flow with single Supabase client"
-- "IMAGYNE v1.07 - SCANNER: Added debug mode for AR tracking"
+- "UAU v1.06 - AUTH: Fixed login flow with single Supabase client"
+- "UAU v1.07 - SCANNER: Added debug mode for AR tracking"
 ```
 
 ### Environment Variables (Vercel Dashboard)

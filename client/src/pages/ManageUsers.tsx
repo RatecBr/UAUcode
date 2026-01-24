@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { supabase } from '../AuthContext';
 import { UserPlus, Shield, User } from 'lucide-react';
 
@@ -13,13 +13,13 @@ export default function ManageUsers() {
     const [loading, setLoading] = useState(false);
     const [newUserEmail, setNewUserEmail] = useState('');
     const [newUserPass, setNewUserPass] = useState('');
+    const [showCreateForm, setShowCreateForm] = useState(false);
 
     useEffect(() => {
         fetchUsers();
     }, []);
 
     const fetchUsers = async () => {
-        // Fetch from 'profiles' table which mirrors auth.users via trigger
         const { data, error } = await supabase.from('profiles').select('*');
         if (error) console.error("Error fetching profiles:", error);
         else setUsers(data as any[] || []);
@@ -29,11 +29,6 @@ export default function ManageUsers() {
         e.preventDefault();
         setLoading(true);
         try {
-            // Note: Creating a user while logged in as another user usually requires
-            // Supabase Admin API (Backend) OR 'supabase.auth.signUp' which logs the current user out by default unless configured.
-            // Using a simple invite work-around or secondary instance for client-side creation isn't standard securely.
-            // But we will try standard signUp. BEWARE: This might change local session.
-
             const { data, error } = await supabase.auth.signUp({
                 email: newUserEmail,
                 password: newUserPass
@@ -43,11 +38,11 @@ export default function ManageUsers() {
 
             alert(`User created! ID: ${data.user?.id}`);
 
-            // Wait for trigger to populate profile
             setTimeout(() => {
                 fetchUsers();
                 setNewUserEmail('');
                 setNewUserPass('');
+                setShowCreateForm(false);
             }, 2000);
 
         } catch (error: any) {
@@ -65,61 +60,174 @@ export default function ManageUsers() {
     };
 
     return (
-        <div className="glass-card" style={{ padding: '30px' }}>
-            <h3 style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <UserPlus size={20} color="var(--primary)" /> User Management
-            </h3>
+        <div className="glass-card" style={{ padding: 'var(--space-lg)' }}>
+            {/* Header */}
+            <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: 'var(--space-lg)',
+                flexWrap: 'wrap',
+                gap: 'var(--space-sm)'
+            }}>
+                <h3 style={{
+                    margin: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 'var(--space-sm)',
+                    fontSize: 'var(--font-size-lg)'
+                }}>
+                    <UserPlus size={20} color="var(--primary)" />
+                    Gerenciar Usuários
+                </h3>
 
-            {/* Create User Form */}
-            <form onSubmit={handleCreateUser} style={{ display: 'flex', gap: '10px', marginBottom: '30px' }}>
-                <input
-                    className="glass-input"
-                    placeholder="New User Email"
-                    value={newUserEmail}
-                    onChange={e => setNewUserEmail(e.target.value)}
-                    required
-                />
-                <input
-                    className="glass-input"
-                    placeholder="Password"
-                    type="password"
-                    value={newUserPass}
-                    onChange={e => setNewUserPass(e.target.value)}
-                    required
-                />
-                <button type="submit" className="btn-primary" disabled={loading}>
-                    {loading ? 'Creating...' : 'Add User'}
-                </button>
-            </form>
+                {!showCreateForm && (
+                    <button
+                        onClick={() => setShowCreateForm(true)}
+                        className="btn-primary"
+                        style={{ fontSize: 'var(--font-size-sm)' }}
+                    >
+                        + Novo Usuário
+                    </button>
+                )}
+            </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {users.map(u => (
-                    <div key={u.id} style={{
-                        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                        padding: '15px', borderBottom: '1px solid var(--glass-border)'
+            {/* Create User Form - Collapsible */}
+            {showCreateForm && (
+                <form
+                    onSubmit={handleCreateUser}
+                    className="animate-enter"
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 'var(--space-md)',
+                        marginBottom: 'var(--space-xl)',
+                        padding: 'var(--space-md)',
+                        background: 'var(--glass-bg)',
+                        borderRadius: 'var(--radius-md)'
+                    }}
+                >
+                    <input
+                        className="glass-input"
+                        placeholder="Email do novo usuário"
+                        type="email"
+                        value={newUserEmail}
+                        onChange={e => setNewUserEmail(e.target.value)}
+                        required
+                        disabled={loading}
+                    />
+                    <input
+                        className="glass-input"
+                        placeholder="Senha"
+                        type="password"
+                        value={newUserPass}
+                        onChange={e => setNewUserPass(e.target.value)}
+                        required
+                        disabled={loading}
+                        minLength={6}
+                    />
+                    <div style={{
+                        display: 'flex',
+                        gap: 'var(--space-sm)',
+                        flexWrap: 'wrap'
                     }}>
-                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                            <span style={{ fontWeight: 'bold' }}>{u.email}</span>
-                            <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>ID: {u.id}</span>
-                        </div>
-
                         <button
-                            onClick={() => toggleRole(u)}
-                            className="glass-card"
-                            style={{
-                                padding: '5px 10px',
-                                display: 'flex', alignItems: 'center', gap: '5px',
-                                background: u.role === 'admin' ? 'rgba(0,255,157,0.1)' : 'transparent',
-                                color: u.role === 'admin' ? '#00ff9d' : 'white',
-                                cursor: 'pointer'
-                            }}
+                            type="submit"
+                            className="btn-primary"
+                            disabled={loading}
+                            style={{ flex: 1, minWidth: '120px' }}
                         >
-                            {u.role === 'admin' ? <Shield size={14} /> : <User size={14} />}
-                            {u.role.toUpperCase()}
+                            {loading ? 'Criando...' : 'Criar Usuário'}
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setShowCreateForm(false);
+                                setNewUserEmail('');
+                                setNewUserPass('');
+                            }}
+                            className="btn-ghost"
+                            style={{ padding: 'var(--space-sm) var(--space-md)' }}
+                        >
+                            Cancelar
                         </button>
                     </div>
-                ))}
-                {users.length === 0 && <div style={{ padding: '20px', textAlign: 'center' }}>No users found (Check 'profiles' table trigger).</div>}
+                </form>
+            )}
+
+            {/* Users List */}
+            <div style={{
+                display: 'flex',
+                flexDirection: 'column'
+            }}>
+                {users.length === 0 ? (
+                    <div style={{
+                        padding: 'var(--space-xl)',
+                        textAlign: 'center',
+                        color: 'var(--text-muted)'
+                    }}>
+                        Nenhum usuário encontrado (Verifique o trigger da tabela 'profiles').
+                    </div>
+                ) : (
+                    users.map(u => (
+                        <div
+                            key={u.id}
+                            style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                padding: 'var(--space-md)',
+                                borderBottom: '1px solid var(--glass-border)',
+                                gap: 'var(--space-sm)',
+                                flexWrap: 'wrap'
+                            }}
+                        >
+                            <div style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                minWidth: 0,
+                                flex: 1
+                            }}>
+                                <span style={{
+                                    fontWeight: 600,
+                                    fontSize: 'var(--font-size-base)',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap'
+                                }}>
+                                    {u.email}
+                                </span>
+                                <span style={{
+                                    fontSize: 'var(--font-size-xs)',
+                                    color: 'var(--text-muted)',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis'
+                                }}>
+                                    {u.id}
+                                </span>
+                            </div>
+
+                            <button
+                                onClick={() => toggleRole(u)}
+                                className="glass-card"
+                                style={{
+                                    padding: 'var(--space-xs) var(--space-sm)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 'var(--space-xs)',
+                                    background: u.role === 'admin' ? 'rgba(0, 255, 157, 0.15)' : 'transparent',
+                                    color: u.role === 'admin' ? 'var(--primary)' : 'var(--text)',
+                                    fontSize: 'var(--font-size-xs)',
+                                    fontWeight: 600,
+                                    flexShrink: 0
+                                }}
+                            >
+                                {u.role === 'admin' ? <Shield size={14} /> : <User size={14} />}
+                                {u.role.toUpperCase()}
+                            </button>
+                        </div>
+                    ))
+                )}
             </div>
         </div>
     );

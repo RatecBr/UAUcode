@@ -1,31 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { LogOut } from 'lucide-react';
-
+import { LogOut, Camera, Plus, X, Edit2, Trash2 } from 'lucide-react';
 import { supabase } from '../AuthContext';
+import ManageUsers from './ManageUsers';
 
 interface Target {
     id: number;
     name: string;
-    target_url: string; // Changed to match snake_case DB or map it
+    target_url: string;
     content_url: string;
     content_type: string;
 }
 
-import ManageUsers from './ManageUsers';
-
 export default function AdminDashboard() {
     const { logout } = useAuth();
     const navigate = useNavigate();
-
     const [tab, setTab] = useState<'targets' | 'users'>('targets');
-
-    // ... (Keep existing fetchTargets, uploading logic, state)
-    // IMPORTANT: I need to preserve the EXISTING logic for targets inside the 'targets' tab condition.
-    // Since I'm replacing the whole component structure effectively, I will rewrite the return block to separate tabs.
-
-    // ... (Re-declaring existing methods for context availability in replacement block)
     const [targets, setTargets] = useState<Target[]>([]);
     const [uploading, setUploading] = useState(false);
     const [name, setName] = useState('');
@@ -33,6 +24,7 @@ export default function AdminDashboard() {
     const [contentFile, setContentFile] = useState<File | null>(null);
     const [contentType, setContentType] = useState('video');
     const [editId, setEditId] = useState<number | null>(null);
+    const [showForm, setShowForm] = useState(false);
 
     useEffect(() => { fetchTargets(); }, []);
 
@@ -52,7 +44,7 @@ export default function AdminDashboard() {
 
     const handleUpload = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!editId && (!targetFile || !contentFile)) { alert("Files required"); return; }
+        if (!editId && (!targetFile || !contentFile)) { alert("Arquivos obrigatórios"); return; }
         setUploading(true);
         try {
             let tUrl = null, cUrl = null;
@@ -70,7 +62,7 @@ export default function AdminDashboard() {
                     name, target_url: tUrl, content_url: cUrl, content_type: contentType
                 });
             }
-            alert('Saved!');
+            alert('Salvo com sucesso!');
             resetForm();
             fetchTargets();
         } catch (e: any) { alert(e.message); }
@@ -78,93 +70,395 @@ export default function AdminDashboard() {
     };
 
     const handleDelete = async (id: number) => {
-        if (!confirm("Delete?")) return;
+        if (!confirm("Deseja excluir esta experiência?")) return;
         await supabase.from('targets').delete().eq('id', id);
         fetchTargets();
     };
 
     const startEdit = (t: Target) => {
-        setEditId(t.id); setName(t.name); setTargetFile(null); setContentFile(null);
+        setEditId(t.id);
+        setName(t.name);
+        setTargetFile(null);
+        setContentFile(null);
+        setShowForm(true);
     };
 
     const resetForm = () => {
-        setName(''); setEditId(null); setTargetFile(null); setContentFile(null);
+        setName('');
+        setEditId(null);
+        setTargetFile(null);
+        setContentFile(null);
+        setShowForm(false);
+    };
+
+    // Styles object for cleaner JSX
+    const styles = {
+        container: {
+            minHeight: '100dvh',
+            padding: '16px',
+            paddingBottom: '100px',
+            backgroundColor: '#0a0a0f',
+            color: 'white',
+            fontFamily: "'Inter', system-ui, sans-serif"
+        } as React.CSSProperties,
+        header: {
+            marginBottom: '20px'
+        } as React.CSSProperties,
+        topRow: {
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '16px'
+        } as React.CSSProperties,
+        logo: {
+            fontSize: '20px',
+            fontWeight: 700,
+            color: '#00ff9d',
+            margin: 0
+        } as React.CSSProperties,
+        headerButtons: {
+            display: 'flex',
+            gap: '8px'
+        } as React.CSSProperties,
+        iconButton: {
+            width: '40px',
+            height: '40px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'rgba(255,255,255,0.1)',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer'
+        } as React.CSSProperties,
+        tabContainer: {
+            display: 'flex',
+            gap: '8px',
+            marginBottom: '20px'
+        } as React.CSSProperties,
+        tab: (isActive: boolean) => ({
+            flex: 1,
+            padding: '12px',
+            fontSize: '14px',
+            fontWeight: 600,
+            textAlign: 'center' as const,
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            backgroundColor: isActive ? '#00ff9d' : 'rgba(255,255,255,0.1)',
+            color: isActive ? '#000' : '#fff',
+            transition: 'all 0.2s ease'
+        }) as React.CSSProperties,
+        card: {
+            backgroundColor: 'rgba(255,255,255,0.05)',
+            borderRadius: '12px',
+            border: '1px solid rgba(255,255,255,0.1)',
+            padding: '16px',
+            marginBottom: '16px'
+        } as React.CSSProperties,
+        cardTitle: {
+            fontSize: '16px',
+            fontWeight: 600,
+            marginBottom: '16px',
+            color: '#fff'
+        } as React.CSSProperties,
+        listItem: {
+            display: 'flex',
+            alignItems: 'center',
+            padding: '12px 0',
+            borderBottom: '1px solid rgba(255,255,255,0.1)',
+            gap: '12px'
+        } as React.CSSProperties,
+        thumbnail: {
+            width: '48px',
+            height: '48px',
+            borderRadius: '8px',
+            objectFit: 'cover' as const,
+            backgroundColor: 'rgba(255,255,255,0.1)',
+            flexShrink: 0
+        } as React.CSSProperties,
+        itemInfo: {
+            flex: 1,
+            minWidth: 0,
+            overflow: 'hidden'
+        } as React.CSSProperties,
+        itemName: {
+            fontSize: '14px',
+            fontWeight: 600,
+            color: '#fff',
+            whiteSpace: 'nowrap' as const,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis'
+        } as React.CSSProperties,
+        itemType: {
+            fontSize: '12px',
+            color: 'rgba(255,255,255,0.5)',
+            textTransform: 'uppercase' as const
+        } as React.CSSProperties,
+        itemActions: {
+            display: 'flex',
+            gap: '4px',
+            flexShrink: 0
+        } as React.CSSProperties,
+        actionButton: {
+            width: '36px',
+            height: '36px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'transparent',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            color: 'rgba(255,255,255,0.6)'
+        } as React.CSSProperties,
+        deleteButton: {
+            width: '36px',
+            height: '36px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'transparent',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            color: '#ff4757'
+        } as React.CSSProperties,
+        fab: {
+            position: 'fixed' as const,
+            bottom: '24px',
+            right: '24px',
+            width: '56px',
+            height: '56px',
+            borderRadius: '50%',
+            backgroundColor: '#00ff9d',
+            border: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            boxShadow: '0 4px 20px rgba(0,255,157,0.4)',
+            zIndex: 100
+        } as React.CSSProperties,
+        formContainer: {
+            backgroundColor: 'rgba(255,255,255,0.05)',
+            borderRadius: '12px',
+            border: '1px solid rgba(255,255,255,0.1)',
+            padding: '16px',
+            marginBottom: '16px'
+        } as React.CSSProperties,
+        formHeader: {
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '16px'
+        } as React.CSSProperties,
+        formTitle: {
+            fontSize: '16px',
+            fontWeight: 600,
+            color: '#fff',
+            margin: 0
+        } as React.CSSProperties,
+        closeButton: {
+            width: '32px',
+            height: '32px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'transparent',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            color: 'rgba(255,255,255,0.6)'
+        } as React.CSSProperties,
+        input: {
+            width: '100%',
+            padding: '12px',
+            fontSize: '14px',
+            backgroundColor: 'rgba(255,255,255,0.1)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            borderRadius: '8px',
+            color: '#fff',
+            marginBottom: '12px',
+            outline: 'none'
+        } as React.CSSProperties,
+        label: {
+            display: 'block',
+            fontSize: '11px',
+            color: 'rgba(255,255,255,0.5)',
+            marginBottom: '4px',
+            textTransform: 'uppercase' as const,
+            letterSpacing: '0.5px'
+        } as React.CSSProperties,
+        submitButton: {
+            width: '100%',
+            padding: '14px',
+            fontSize: '14px',
+            fontWeight: 600,
+            backgroundColor: '#00ff9d',
+            color: '#000',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            marginTop: '8px'
+        } as React.CSSProperties,
+        emptyState: {
+            padding: '40px 20px',
+            textAlign: 'center' as const,
+            color: 'rgba(255,255,255,0.5)'
+        } as React.CSSProperties
     };
 
     return (
-        <div style={{ minHeight: '100vh', padding: '20px' }}>
-            <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                    <h1 style={{ fontSize: '24px', color: 'var(--primary)', margin: 0 }}>ADMIN</h1>
-
-                    <div style={{ display: 'flex', gap: '5px' }}>
+        <div style={styles.container}>
+            {/* Header */}
+            <header style={styles.header}>
+                <div style={styles.topRow}>
+                    <h1 style={styles.logo}>ADMIN</h1>
+                    <div style={styles.headerButtons}>
                         <button
-                            onClick={() => setTab('targets')}
-                            className={tab === 'targets' ? 'btn-primary' : 'glass-card'}
-                            style={{ padding: '5px 15px', border: 'none', cursor: 'pointer' }}
+                            style={styles.iconButton}
+                            onClick={() => navigate('/scanner')}
                         >
-                            Experiences
+                            <Camera size={18} color="#fff" />
                         </button>
                         <button
-                            onClick={() => setTab('users')}
-                            className={tab === 'users' ? 'btn-primary' : 'glass-card'}
-                            style={{ padding: '5px 15px', border: 'none', cursor: 'pointer' }}
+                            style={{ ...styles.iconButton }}
+                            onClick={() => { logout(); navigate('/'); }}
                         >
-                            Users
+                            <LogOut size={18} color="#ff4757" />
                         </button>
                     </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: '10px' }}>
-                    <button onClick={() => navigate('/scanner')} className="glass-card" style={{ padding: '8px 15px', cursor: 'pointer', color: 'white' }}>
-                        Scanner
+                {/* Tabs */}
+                <div style={styles.tabContainer}>
+                    <button
+                        style={styles.tab(tab === 'targets')}
+                        onClick={() => setTab('targets')}
+                    >
+                        EXPERIÊNCIAS
                     </button>
-                    <button onClick={() => { logout(); navigate('/'); }} className="glass-card" style={{ padding: '8px 15px', cursor: 'pointer', color: '#ff4444' }}>
-                        <LogOut size={16} /> Data
+                    <button
+                        style={styles.tab(tab === 'users')}
+                        onClick={() => setTab('users')}
+                    >
+                        Usuários
                     </button>
                 </div>
             </header>
 
+            {/* Content */}
             {tab === 'targets' ? (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '40px' }}>
-                    {/* Upload Card */}
-                    <div className="glass-card" style={{ padding: '30px' }}>
-                        <h3 style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between' }}>
-                            <span>{editId ? 'Edit' : 'New'} Experience</span>
-                            {editId && <button onClick={resetForm} style={{ fontSize: '12px', background: 'none', color: 'white', border: '1px solid white', padding: '2px 5px' }}>Cancel</button>}
-                        </h3>
-                        <form onSubmit={handleUpload} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                            <input className="glass-input" placeholder="Name" value={name} onChange={e => setName(e.target.value)} required />
-                            <div><label style={{ fontSize: '10px' }}>TARGET</label><input type="file" className="glass-input" onChange={e => setTargetFile(e.target.files?.[0] || null)} /></div>
-                            <div><label style={{ fontSize: '10px' }}>CONTENT</label><input type="file" className="glass-input" onChange={e => setContentFile(e.target.files?.[0] || null)} /></div>
-                            <select className="glass-input" value={contentType} onChange={e => setContentType(e.target.value)}>
-                                <option value="video">Video</option>
-                                <option value="audio">Audio</option>
-                                <option value="3d">3D Model</option>
-                            </select>
-                            <button className="btn-primary" disabled={uploading}>{uploading ? 'Saving...' : 'Save'}</button>
-                        </form>
-                    </div>
+                <>
+                    {/* Form */}
+                    {showForm && (
+                        <div style={styles.formContainer}>
+                            <div style={styles.formHeader}>
+                                <h3 style={styles.formTitle}>
+                                    {editId ? 'Editar' : 'Nova'} Experiência
+                                </h3>
+                                <button style={styles.closeButton} onClick={resetForm}>
+                                    <X size={18} />
+                                </button>
+                            </div>
+                            <form onSubmit={handleUpload}>
+                                <input
+                                    type="text"
+                                    placeholder="Nome da experiência"
+                                    value={name}
+                                    onChange={e => setName(e.target.value)}
+                                    style={styles.input}
+                                    required
+                                />
+                                <div style={{ marginBottom: '12px' }}>
+                                    <label style={styles.label}>Imagem Alvo</label>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={e => setTargetFile(e.target.files?.[0] || null)}
+                                        style={{ ...styles.input, marginBottom: 0 }}
+                                    />
+                                </div>
+                                <div style={{ marginBottom: '12px' }}>
+                                    <label style={styles.label}>Arquivo de Conteúdo</label>
+                                    <input
+                                        type="file"
+                                        onChange={e => setContentFile(e.target.files?.[0] || null)}
+                                        style={{ ...styles.input, marginBottom: 0 }}
+                                    />
+                                </div>
+                                <select
+                                    value={contentType}
+                                    onChange={e => setContentType(e.target.value)}
+                                    style={styles.input}
+                                >
+                                    <option value="video">Vídeo</option>
+                                    <option value="audio">Audio</option>
+                                    <option value="3d">Modelo 3D</option>
+                                </select>
+                                <button
+                                    type="submit"
+                                    style={styles.submitButton}
+                                    disabled={uploading}
+                                >
+                                    {uploading ? 'Salvando...' : 'Salvar Experiência'}
+                                </button>
+                            </form>
+                        </div>
+                    )}
 
-                    {/* List Card */}
-                    <div className="glass-card" style={{ padding: '30px' }}>
-                        <h3>Active Experiences</h3>
-                        <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
-                            {targets.map(t => (
-                                <div key={t.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-                                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                                        <img src={t.target_url} style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px' }} />
-                                        <span>{t.name}</span>
+                    {/* Experiences List */}
+                    <div style={styles.card}>
+                        <h3 style={styles.cardTitle}>
+                            Experiências ({targets.length})
+                        </h3>
+
+                        {targets.length === 0 ? (
+                            <div style={styles.emptyState}>
+                                Nenhuma experiência ainda. Toque + para criar.
+                            </div>
+                        ) : (
+                            targets.map(t => (
+                                <div key={t.id} style={styles.listItem}>
+                                    <img
+                                        src={t.target_url}
+                                        alt={t.name}
+                                        style={styles.thumbnail}
+                                    />
+                                    <div style={styles.itemInfo}>
+                                        <div style={styles.itemName}>{t.name}</div>
+                                        <div style={styles.itemType}>{t.content_type}</div>
                                     </div>
-                                    <div style={{ display: 'flex', gap: '5px' }}>
-                                        <button onClick={() => startEdit(t)} style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer' }}>Edit</button>
-                                        <button onClick={() => handleDelete(t.id)} style={{ background: 'none', border: 'none', color: 'red', cursor: 'pointer' }}>Del</button>
+                                    <div style={styles.itemActions}>
+                                        <button
+                                            style={styles.actionButton}
+                                            onClick={() => startEdit(t)}
+                                        >
+                                            <Edit2 size={16} />
+                                        </button>
+                                        <button
+                                            style={styles.deleteButton}
+                                            onClick={() => handleDelete(t.id)}
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
                                     </div>
                                 </div>
-                            ))}
-                        </div>
+                            ))
+                        )}
                     </div>
-                </div>
+
+                    {/* FAB */}
+                    {!showForm && (
+                        <button
+                            style={styles.fab}
+                            onClick={() => setShowForm(true)}
+                        >
+                            <Plus size={24} color="#000" />
+                        </button>
+                    )}
+                </>
             ) : (
                 <ManageUsers />
             )}

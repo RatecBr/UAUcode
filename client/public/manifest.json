@@ -1,6 +1,8 @@
 {
-    "short_name": "IMAGYNE",
-    "name": "IMAGYNE Recognition",
+    "short_name": "UAU",
+    "name": "UAU - Realidade Aumentada",
+    "description": "Escaneie imagens para experiências imersivas em AR",
+    "lang": "pt-BR",
     "icons": [
         {
             "src": "favicon.ico",

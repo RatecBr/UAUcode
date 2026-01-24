@@ -1,5 +1,5 @@
 -- ==========================================
--- IMAGYNE SUPABASE MIGRATION (FULL SETUP)
+-- UAU SUPABASE MIGRATION (FULL SETUP)
 -- ==========================================
 
 -- 1. Create Targets Table (For AR Experiences)

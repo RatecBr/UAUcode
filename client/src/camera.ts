@@ -5,39 +5,60 @@ export interface CameraConfig {
     facingMode?: 'user' | 'environment';
 }
 
+let currentStream: MediaStream | null = null;
+
 export async function initCamera(
     videoElement: HTMLVideoElement,
     config: CameraConfig = {}
 ): Promise<MediaStream> {
+    // Parar stream anterior se existir para evitar conflitos de hardware
+    if (currentStream) {
+        stopCamera(currentStream);
+    }
+
     const constraints: MediaStreamConstraints = {
         audio: false,
         video: {
             facingMode: config.facingMode || 'environment',
-            width: { ideal: config.width || 1280 }, // Lower res for performance? 640x480 might be faster for ORB
+            width: { ideal: config.width || 1280 },
             height: { ideal: config.height || 720 },
             frameRate: { ideal: config.fps || 30 }
         }
     };
 
     try {
+        console.log("[Camera] Solicitando permissão...");
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        console.log("[Camera] Permissão concedida.");
+
+        currentStream = stream;
         videoElement.srcObject = stream;
 
-        // Wait for video to be ready
-        await new Promise<void>((resolve) => {
-            videoElement.onloadedmetadata = () => {
-                videoElement.play().catch(e => console.error("Play error:", e));
-                resolve();
-            };
-        });
+        // Atributos obrigatórios para autoplay em navegadores modernos
+        videoElement.setAttribute('autoplay', 'true');
+        videoElement.setAttribute('muted', 'true');
+        videoElement.setAttribute('playsinline', 'true');
+        videoElement.muted = true;
+
+        // Forçar play imediato após receber o stream
+        try {
+            await videoElement.play();
+            console.log("[Camera] Play automático iniciado.");
+        } catch (e) {
+            console.warn("[Camera] Play automático bloqueado, aguardando clique do usuário.");
+        }
 
         return stream;
     } catch (err) {
-        console.error("Error accessing camera:", err);
-        throw new Error("Could not access camera. Please allow permissions.");
+        console.error("[Camera] Erro fatal ao acessar câmera:", err);
+        throw err;
     }
 }
 
-export function stopCamera(stream: MediaStream) {
-    stream.getTracks().forEach(track => track.stop());
+export function stopCamera(stream?: MediaStream) {
+    const streamToStop = stream || currentStream;
+    if (streamToStop) {
+        streamToStop.getTracks().forEach(track => track.stop());
+    }
+    currentStream = null;
 }

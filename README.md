@@ -1,6 +1,6 @@
-# IMAGYNE - WebAR Image Recognition Platform
+# UAU - WebAR Image Recognition Platform
 
-Imagyne é uma plataforma WebAR (Realidade Aumentada Web) para reconhecimento de imagens utilizando OpenCV.js e React. O sistema permite associar conteúdos multimídia (Vídeo, Áudio, 3D) a uma imagem-alvo impressa e disparar a exibição ao reconhecê-la pela câmera.
+UAU é uma plataforma WebAR (Realidade Aumentada Web) de alta performance para reconhecimento de imagens utilizando OpenCV.js e React. O sistema permite criar experiências imersivas associando conteúdos multimídia (Vídeo, Áudio, 3D) a marcadores físicos (imagens-alvo), com suporte a captura direta de mídia e gerenciamento global de alvos.
 
 ## 🏗️ Arquitetura
 
@@ -45,7 +45,7 @@ Imagyne é uma plataforma WebAR (Realidade Aumentada Web) para reconhecimento de
 ```bash
 # Clone o repositório
 git clone <repo-url>
-cd IMAGYNE
+cd UAU
 
 # Instalar dependências do cliente
 cd client
@@ -56,8 +56,8 @@ npm install
 
 1. **Supabase**: Configure as credenciais em `client/src/AuthContext.tsx`
 2. **Tabelas necessárias**:
-   - `profiles` (id, email, role)
-   - `targets` (id, name, target_url, content_url, content_type)
+   - `profiles`: Gerencia usuários, planos (free, pro, enterprise), roles (admin, user) e slugs personalizados.
+   - `targets`: Armazena os marcadores, URLs de conteúdo, contagem de scans e flag `is_global`.
 
 ### Executar Localmente
 
@@ -70,116 +70,70 @@ Acesse `http://localhost:8080`
 
 ---
 
-## 🛠 Funcionalidades
+## 🛠 Funcionalidades Principais
 
-### Autenticação
-- Login/Signup via Supabase Auth
-- Roles: `admin` e `user`
-- Admins acessam Dashboard, users vão direto ao Scanner
+### Autenticação e Perfis
+- Login/Signup via Supabase Auth.
+- **Roles dinâmicas**: Diferenciação visual e funcional entre Administradores e Usuários.
+- **Slugs Personalizados**: Cada usuário tem sua própria URL de scanner (ex: `uau.app/s/seu-nome`).
 
-### Admin Dashboard
-- Upload de imagens-alvo (targets)
-- Upload de conteúdo (vídeo, áudio, 3D .glb)
-- Gerenciamento de experiências AR
+### Admin Dashboard (Modern UI)
+- **Interface Glassmorphism**: Design premium e responsivo.
+- **Media Capture**: Capture fotos para alvos ou grave vídeos/áudios diretamente do dashboard.
+- **Gestão de Experiências**: Upload, edição e exclusão de conteúdos em tempo real.
+- **Visualização de Admin**: Administradores podem visualizar e gerenciar experiências de todos os usuários da base.
 
-### Scanner (WebAR)
-- Reconhecimento de imagens em tempo real (OpenCV.js ORB + RANSAC)
-- Overlays:
-  - **Vídeo**: Player flutuante autoplay
-  - **Áudio**: Player com controles
-  - **3D**: Renderizador Three.js para GLB/GLTF
-- Debug mode para desenvolvimento
+### Experiências Globais (Marcadores Mestre)
+- Marcadores definidos pelo admin como `is_global` são reconhecidos em **todos os links SLUG** do sistema.
+- Ideal para branding da plataforma, tutoriais de uso ou campanhas transversais.
+
+### Scanner (WebAR Engine)
+- **Reconhecimento Offline-first**: Processamento local via OpenCV.js (ORB + RANSAC).
+- **Sticky Playback**: O conteúdo persiste na tela mesmo se o rastreamento for perdido momentaneamente.
+- **Zero-Latency Switching**: Carregamento JIT (Just-In-Time) em background para trocas instantâneas de conteúdo.
+- **Seletor Admin**: No scanner de testes, admins podem escolher qual usuário simular para otimizar a performance de leitura.
 
 ---
 
 ## 📂 Estrutura do Projeto
 
 ```
-IMAGYNE/
+UAU/
 ├── client/                 # Frontend React + Vite
 │   ├── src/
-│   │   ├── AuthContext.tsx # Auth + Supabase client (SINGLE SOURCE)
-│   │   ├── App.tsx         # Rotas e PrivateRoute
-│   │   ├── pages/
-│   │   │   ├── Login.tsx
-│   │   │   ├── AdminDashboard.tsx
-│   │   │   ├── Scanner.tsx
-│   │   │   └── ManageUsers.tsx
-│   │   ├── recognition.ts  # OpenCV.js image matching
-│   │   ├── overlay*.ts     # Video, Audio, 3D overlays
-│   │   └── camera.ts       # Camera initialization
+│   │   ├── components/     # MediaCapture, QRCodeGenerator, etc.
+│   │   ├── pages/          # Dashboard, Login, Admin, Scanner, PublicScanner
+│   │   ├── recognition.ts  # OpenCV.js image matching core
+│   │   ├── overlay*.ts     # Gerenciadores de Vídeo, Áudio e 3D
+│   │   └── camera.ts       # Inicialização e controle de stream
 │   ├── public/
-│   │   └── opencv.js       # OpenCV WASM
+│   │   └── opencv.js       # Binário WASM OpenCV
 │   └── package.json
-├── .agent/                 # AI Agent skills and workflows
+├── .agent/                 # Instruções e habilidades do Assistente AI
 └── README.md
 ```
 
 ---
 
-## ⚠️ Limitações Conhecidas
+## 🚀 Deploy Automatizado
 
-- **Iluminação**: O detector ORB é sensível a reflexos e baixa luz
-- **Rastreamento**: Não há tracking 6DoF (conteúdo aparece na tela, não "gruda" na imagem)
-- **Performance**: Depende da CPU do dispositivo móvel
-- **Arquivo 3D**: Modelos devem ser leves (<5MB)
+O deploy é configurado via CI/CD (GitHub → Vercel):
 
----
-
-## 🔮 Roadmap
-
-- [ ] Tracking 6DoF com WebXR
-- [ ] Deep Learning (MobileNet/TF.js) para reconhecimento robusto
-- [ ] Processamento híbrido cloud/device
-- [ ] Múltiplos targets simultâneos
-- [ ] PWA com cache offline
+1. Faça o push para a branch `main`.
+2. O Vercel detecta a alteração na pasta `client` e executa o build.
+3. Certifique-se de configurar as Secret Env Vars (`VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY`) no painel da Vercel.
 
 ---
 
-## 🚀 Deploy
+## 📝 Changelog Recente
 
-### GitHub → Vercel (Recomendado)
-
-O deploy é automatizado via GitHub. Quando você faz push para a branch `main`, o Vercel detecta e faz deploy automaticamente.
-
-```bash
-# 1. Verificar se o build passa
-cd client
-npm run build
-
-# 2. Commit e push
-git add .
-git commit -m "IMAGYNE v1.XX - DESCRIPTION"
-git push origin main
-
-# 3. Vercel faz deploy automático
-# Acesse o dashboard Vercel para ver o status
-```
-
-### Variáveis de Ambiente (Vercel Dashboard)
-
-Configure em **Project Settings → Environment Variables**:
-
-```
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key
-```
-
-### Rollback
-
-Via Vercel Dashboard: **Deployments → Versão anterior → Promote to Production**
+### v1.1.0 (2026-01-24)
+- **Rebranding**: Transição completa da marca para **UAU**.
+- **Media Capture**: Implementação de gravação direta de vídeo e áudio no navegador.
+- **Global Targets**: Lógica de reconhecimento de alvos mestres em todos os slugs.
+- **Admin Optimization**: Dashboard com visão macro e seletor de usuário no scanner para performance.
+- **UI/UX**: Redesign completo estilo Glassmorphism com novos feedbacks de carregamento.
 
 ---
 
-## 📝 Changelog
-
-### v1.06 (2026-01-24)
-- Sistema de autenticação completo com Supabase
-- Admin Dashboard para gerenciamento de targets
-- Scanner WebAR com overlays de vídeo, áudio e 3D
-- Fix: Client Supabase único (evita GoTrueClient múltiplos)
-- Fix: AuthContext com loading state robusto
-
----
-
-*Desenvolvido por Antigravity*
+*Desenvolvido pela equipe UAU & Antigravity*

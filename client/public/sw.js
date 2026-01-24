@@ -1,4 +1,4 @@
-const CACHE_NAME = 'imagyne-cache-v1';
+const CACHE_NAME = 'uau-cache-v1';
 const urlsToCache = [
     '/',
     '/index.html',
