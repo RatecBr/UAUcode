@@ -8,7 +8,7 @@ import type { RecognitionResult } from '../recognition';
 import { VideoOverlay } from '../overlayVideo';
 import { AudioOverlay } from '../overlayAudio';
 import { Overlay3D } from '../overlay3D';
-import { supabase } from '../supabaseClient';
+import { supabase } from '../AuthContext';
 
 interface Target {
     id: number;
@@ -19,15 +19,28 @@ interface Target {
 }
 
 export default function Scanner() {
-    const { } = useAuth(); // Token not needed with Supabase client
+    const { user } = useAuth();
     const navigate = useNavigate();
 
+    // Promote to Admin (TEMPORARY - REMOVE AFTER USE)
+    const promoteToAdmin = async () => {
+        if (!user) return;
+        const { error } = await supabase
+            .from('profiles')
+            .upsert({ id: user.id, email: user.email, role: 'admin' });
+        if (error) {
+            alert("Error promoting: " + error.message);
+        } else {
+            alert("Promoted to Admin! Please logout and login again.");
+        }
+    };
+
     // State
-    const [targets, setTargets] = useState<Target[]>([]);
+    const [_targets, setTargets] = useState<Target[]>([]);
     const [status, setStatus] = useState<string>('Initializing...');
     const [isDetected, setIsDetected] = useState(false);
     const [activeTarget, setActiveTarget] = useState<Target | null>(null);
-    const [loadingNewTarget, setLoadingNewTarget] = useState(false); // UI indicator logic if needed
+    const [_loadingNewTarget, setLoadingNewTarget] = useState(false); // UI indicator logic if needed
     const [debugMode, setDebugMode] = useState(false);
     const [debugInfo, setDebugInfo] = useState<string>("");
 
@@ -150,7 +163,7 @@ export default function Scanner() {
     };
 
     // Helper: JIT Fetching
-    const fetchAndPlay = async (url: string, type: 'video' | 'audio', attemptId: number): Promise<string | null> => {
+    const fetchAndPlay = async (url: string, _type: 'video' | 'audio', attemptId: number): Promise<string | null> => {
         try {
             // Check cache first
             if (assetsCacheRef.current.has(attemptId)) {
@@ -426,6 +439,14 @@ export default function Scanner() {
                                 {debugInfo}
                             </div>
                         )}
+                        {/* TEMPORARY: Promote to Admin button - REMOVE AFTER USE */}
+                        <button
+                            onClick={promoteToAdmin}
+                            className="glass-card"
+                            style={{ padding: '8px 12px', pointerEvents: 'auto', background: 'rgba(0,255,157,0.3)', color: 'white', fontSize: '10px' }}
+                        >
+                            Promote to Admin
+                        </button>
                     </div>
                 </div>
 

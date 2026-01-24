@@ -1,36 +1,47 @@
-import React, { useState } from 'react';
-import { useAuth } from '../AuthContext';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Lock, User } from 'lucide-react';
-import { motion } from 'framer-motion';
-
-import { supabase } from '../supabaseClient';
+import { supabase, useAuth } from '../AuthContext';
 
 export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
+    const [status, setStatus] = useState('');
     const navigate = useNavigate();
+    const { user } = useAuth();
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError('');
+    // Redirect if already logged in
+    useEffect(() => {
+        if (user) {
+            navigate('/admin');
+        }
+    }, [user, navigate]);
 
+    const doLogin = async () => {
+        setStatus('Logging in...');
         try {
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email,
-                password
-            });
-
-            if (error) throw error;
-
-            if (data.user) {
-                // Determine redirect based on logic (or just go to Admin for now since roles need DB config)
-                // For now, everyone goes to Scanner, Admin link is there
-                navigate('/admin');
+            const { error } = await supabase.auth.signInWithPassword({ email, password });
+            if (error) {
+                setStatus('ERROR: ' + error.message);
+                return;
             }
-        } catch (err: any) {
-            setError(err.message || 'Login failed');
+            setStatus('SUCCESS! Redirecting...');
+            navigate('/admin');
+        } catch (e: any) {
+            setStatus('EXCEPTION: ' + e.message);
+        }
+    };
+
+    const doSignUp = async () => {
+        setStatus('Creating account...');
+        try {
+            const { error } = await supabase.auth.signUp({ email, password });
+            if (error) {
+                setStatus('ERROR: ' + error.message);
+                return;
+            }
+            setStatus('Account created! Now login.');
+        } catch (e: any) {
+            setStatus('EXCEPTION: ' + e.message);
         }
     };
 
@@ -38,53 +49,75 @@ export default function Login() {
         <div style={{
             height: '100vh',
             display: 'flex',
+            flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundImage: 'radial-gradient(circle at 50% 50%, #1a1a1a 0%, #000 100%)'
+            background: '#000',
+            color: 'white',
+            fontFamily: 'sans-serif'
         }}>
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="glass-card"
-                style={{ padding: '40px', width: '100%', maxWidth: '400px' }}
+            <h1 style={{ color: '#00ff9d', marginBottom: 30 }}>IMAGYNE LOGIN</h1>
+
+            <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                style={{ padding: 15, marginBottom: 15, width: 300, borderRadius: 8, border: 'none', fontSize: 16 }}
+            />
+
+            <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                style={{ padding: 15, marginBottom: 15, width: 300, borderRadius: 8, border: 'none', fontSize: 16 }}
+            />
+
+            <button
+                onClick={doLogin}
+                style={{
+                    padding: '15px 40px',
+                    background: '#00ff9d',
+                    color: '#000',
+                    border: 'none',
+                    borderRadius: 8,
+                    fontSize: 16,
+                    fontWeight: 'bold',
+                    cursor: 'pointer',
+                    marginBottom: 10
+                }}
             >
-                <h1 style={{ textAlign: 'center', marginBottom: '30px', color: 'var(--primary)' }}>IMAGYNE</h1>
+                LOGIN
+            </button>
 
-                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                    <div style={{ position: 'relative' }}>
-                        <User size={20} style={{ position: 'absolute', top: '14px', left: '12px', color: 'var(--text-muted)' }} />
-                        <input
-                            className="glass-input"
-                            style={{ paddingLeft: '45px' }}
-                            placeholder="Email"
-                            value={email}
-                            onChange={e => setEmail(e.target.value)}
-                        />
-                    </div>
+            <button
+                onClick={doSignUp}
+                style={{
+                    padding: '10px 30px',
+                    background: 'transparent',
+                    color: '#00ff9d',
+                    border: '1px solid #00ff9d',
+                    borderRadius: 8,
+                    fontSize: 14,
+                    cursor: 'pointer'
+                }}
+            >
+                Create Account
+            </button>
 
-                    <div style={{ position: 'relative' }}>
-                        <Lock size={20} style={{ position: 'absolute', top: '14px', left: '12px', color: 'var(--text-muted)' }} />
-                        <input
-                            type="password"
-                            className="glass-input"
-                            style={{ paddingLeft: '45px' }}
-                            placeholder="Password"
-                            value={password}
-                            onChange={e => setPassword(e.target.value)}
-                        />
-                    </div>
-
-                    {error && <div style={{ color: '#ff4444', fontSize: '14px', textAlign: 'center' }}>{error}</div>}
-
-                    <button type="submit" className="btn-primary">
-                        ACCESS SYSTEM
-                    </button>
-
-                    <div style={{ textAlign: 'center', fontSize: '12px', color: 'var(--text-muted)', marginTop: '10px' }}>
-                        Default: admin/admin123 or user/user123
-                    </div>
-                </form>
-            </motion.div>
+            {status && (
+                <div style={{
+                    marginTop: 20,
+                    padding: 15,
+                    background: 'rgba(255,255,255,0.1)',
+                    borderRadius: 8,
+                    maxWidth: 300,
+                    textAlign: 'center'
+                }}>
+                    {status}
+                </div>
+            )}
         </div>
     );
 }
