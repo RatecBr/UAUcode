@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Camera, X, Circle, StopCircle, RefreshCw, Check, Video, Mic } from 'lucide-react';
+import { X, Circle, StopCircle, RefreshCw, Check, Video, Mic } from 'lucide-react';
 
 interface MediaCaptureProps {
     mode: 'photo' | 'video' | 'audio';
@@ -118,19 +118,154 @@ export default function MediaCapture({ mode, onCapture, onClose }: MediaCaptureP
         return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     };
 
+    const localStyles = {
+        overlay: {
+            position: 'fixed' as const,
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0,0,0,0.9)',
+            zIndex: 2000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backdropFilter: 'blur(10px)'
+        },
+        container: {
+            width: '100%',
+            maxWidth: '500px',
+            height: '100%',
+            maxHeight: '800px',
+            display: 'flex',
+            flexDirection: 'column' as const,
+            backgroundColor: '#0a0a0f',
+            position: 'relative' as const
+        },
+        header: {
+            padding: '20px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderBottom: '1px solid rgba(255,255,255,0.1)'
+        },
+        title: {
+            margin: 0,
+            fontSize: '18px',
+            fontWeight: 600,
+            color: '#fff'
+        },
+        closeBtn: {
+            background: 'none',
+            border: 'none',
+            color: 'rgba(255,255,255,0.5)',
+            cursor: 'pointer'
+        },
+        previewContainer: {
+            flex: 1,
+            position: 'relative' as const,
+            backgroundColor: '#000',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            overflow: 'hidden'
+        },
+        preview: {
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover' as const
+        },
+        audioPreview: {
+            display: 'flex',
+            flexDirection: 'column' as const,
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#fff'
+        },
+        instructions: {
+            marginTop: '12px',
+            fontSize: '14px',
+            color: 'rgba(255,255,255,0.6)'
+        },
+        timer: {
+            marginTop: '12px',
+            fontSize: '24px',
+            fontWeight: 700,
+            color: '#ff4757',
+            fontFamily: 'monospace'
+        },
+        timerBadge: {
+            position: 'absolute' as const,
+            top: '20px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            backgroundColor: 'rgba(255,71,87,0.8)',
+            padding: '6px 12px',
+            borderRadius: '20px',
+            color: '#fff',
+            fontSize: '14px',
+            fontWeight: 700,
+            fontFamily: 'monospace'
+        },
+        footer: {
+            padding: '30px 20px',
+            display: 'flex',
+            justifyContent: 'space-around',
+            alignItems: 'center',
+            backgroundColor: 'rgba(0,0,0,0.5)'
+        },
+        captureBtn: {
+            background: 'none',
+            border: 'none',
+            color: '#fff',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 0
+        },
+        iconBtn: {
+            background: 'rgba(255,255,255,0.1)',
+            border: 'none',
+            color: '#fff',
+            width: '44px',
+            height: '44px',
+            borderRadius: '50%',
+            display: 'flex',
+            flexDirection: 'column' as const,
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            gap: '4px'
+        },
+        confirmBtn: {
+            backgroundColor: '#00ff9d',
+            color: '#000',
+            border: 'none',
+            padding: '12px 30px',
+            borderRadius: '30px',
+            fontSize: '16px',
+            fontWeight: 700,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            cursor: 'pointer'
+        }
+    };
+
     return (
-        <div style={styles.overlay}>
-            <div style={styles.container}>
-                <div style={styles.header}>
-                    <h3 style={styles.title}>
+        <div style={localStyles.overlay}>
+            <div style={localStyles.container}>
+                <div style={localStyles.header}>
+                    <h3 style={localStyles.title}>
                         {mode === 'photo' ? 'Tirar Foto' : mode === 'video' ? 'Gravar Vídeo' : 'Gravar Áudio'}
                     </h3>
-                    <button onClick={onClose} style={styles.closeBtn}>
+                    <button onClick={onClose} style={localStyles.closeBtn}>
                         <X size={24} />
                     </button>
                 </div>
 
-                <div style={styles.previewContainer}>
+                <div style={localStyles.previewContainer}>
                     {mode !== 'audio' && (
                         <video
                             ref={videoRef}
@@ -138,61 +273,61 @@ export default function MediaCapture({ mode, onCapture, onClose }: MediaCaptureP
                             muted
                             playsInline
                             style={{
-                                ...styles.preview,
+                                ...localStyles.preview,
                                 display: capturedBlob ? 'none' : 'block'
                             }}
                         />
                     )}
 
                     {capturedBlob && mode === 'photo' && (
-                        <img src={URL.createObjectURL(capturedBlob)} style={styles.preview} />
+                        <img src={URL.createObjectURL(capturedBlob)} style={localStyles.preview} />
                     )}
 
                     {capturedBlob && mode === 'video' && (
-                        <video src={URL.createObjectURL(capturedBlob)} controls style={styles.preview} />
+                        <video src={URL.createObjectURL(capturedBlob)} controls style={localStyles.preview} />
                     )}
 
                     {capturedBlob && mode === 'audio' && (
-                        <div style={styles.audioPreview}>
+                        <div style={localStyles.audioPreview}>
                             <Mic size={48} color="#00ff9d" />
                             <audio src={URL.createObjectURL(capturedBlob)} controls style={{ marginTop: '20px' }} />
                         </div>
                     )}
 
                     {mode === 'audio' && !capturedBlob && (
-                        <div style={styles.audioPreview}>
+                        <div style={localStyles.audioPreview}>
                             <Mic size={48} color={isRecording ? '#ff4757' : '#00ff9d'} className={isRecording ? 'pulse' : ''} />
-                            {isRecording && <div style={styles.timer}>{formatTime(timer)}</div>}
-                            {!isRecording && <div style={styles.instructions}>Toque para gravar áudio</div>}
+                            {isRecording && <div style={localStyles.timer}>{formatTime(timer)}</div>}
+                            {!isRecording && <div style={localStyles.instructions}>Toque para gravar áudio</div>}
                         </div>
                     )}
 
                     {isRecording && mode === 'video' && (
-                        <div style={styles.timerBadge}>{formatTime(timer)}</div>
+                        <div style={localStyles.timerBadge}>{formatTime(timer)}</div>
                     )}
                 </div>
 
-                <div style={styles.footer}>
+                <div style={localStyles.footer}>
                     {!capturedBlob ? (
                         <>
                             {mode !== 'audio' && (
                                 <button
                                     onClick={() => setFacingMode(f => f === 'user' ? 'environment' : 'user')}
-                                    style={styles.iconBtn}
+                                    style={localStyles.iconBtn}
                                 >
                                     <RefreshCw size={24} />
                                 </button>
                             )}
 
                             {mode === 'photo' ? (
-                                <button onClick={takePhoto} style={styles.captureBtn}>
+                                <button onClick={takePhoto} style={localStyles.captureBtn}>
                                     <Circle size={48} />
                                 </button>
                             ) : (
                                 <button
                                     onClick={isRecording ? stopRecording : startRecording}
                                     style={{
-                                        ...styles.captureBtn,
+                                        ...localStyles.captureBtn,
                                         color: isRecording ? '#ff4757' : '#00ff9d'
                                     }}
                                 >
@@ -204,11 +339,11 @@ export default function MediaCapture({ mode, onCapture, onClose }: MediaCaptureP
                         </>
                     ) : (
                         <>
-                            <button onClick={() => { setCapturedBlob(null); startStream(); }} style={styles.iconBtn}>
+                            <button onClick={() => { setCapturedBlob(null); startStream(); }} style={localStyles.iconBtn}>
                                 <RefreshCw size={24} />
                                 <span style={{ fontSize: '12px' }}>Refazer</span>
                             </button>
-                            <button onClick={handleConfirm} style={styles.confirmBtn}>
+                            <button onClick={handleConfirm} style={localStyles.confirmBtn}>
                                 <Check size={24} />
                                 Confirmar
                             </button>
@@ -227,138 +362,3 @@ export default function MediaCapture({ mode, onCapture, onClose }: MediaCaptureP
         </div>
     );
 }
-
-const styles = {
-    overlay: {
-        position: 'fixed' as const,
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(0,0,0,0.9)',
-        zIndex: 2000,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backdropFilter: 'blur(10px)'
-    },
-    container: {
-        width: '100%',
-        maxWidth: '500px',
-        height: '100%',
-        maxHeight: '800px',
-        display: 'flex',
-        flexDirection: 'column' as const,
-        backgroundColor: '#0a0a0f',
-        position: 'relative' as const
-    },
-    header: {
-        padding: '20px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        borderBottom: '1px solid rgba(255,255,255,0.1)'
-    },
-    title: {
-        margin: 0,
-        fontSize: '18px',
-        fontWeight: 600,
-        color: '#fff'
-    },
-    closeBtn: {
-        background: 'none',
-        border: 'none',
-        color: 'rgba(255,255,255,0.5)',
-        cursor: 'pointer'
-    },
-    previewContainer: {
-        flex: 1,
-        position: 'relative' as const,
-        backgroundColor: '#000',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        overflow: 'hidden'
-    },
-    preview: {
-        width: '100%',
-        height: '100%',
-        objectFit: 'cover' as const
-    },
-    audioPreview: {
-        display: 'flex',
-        flexDirection: 'column' as const,
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: '#fff'
-    },
-    instructions: {
-        marginTop: '12px',
-        fontSize: '14px',
-        color: 'rgba(255,255,255,0.6)'
-    },
-    timer: {
-        marginTop: '12px',
-        fontSize: '24px',
-        fontWeight: 700,
-        color: '#ff4757',
-        fontFamily: 'monospace'
-    },
-    timerBadge: {
-        position: 'absolute' as const,
-        top: '20px',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        backgroundColor: 'rgba(255,71,87,0.8)',
-        padding: '6px 12px',
-        borderRadius: '20px',
-        color: '#fff',
-        fontSize: '14px',
-        fontWeight: 700,
-        fontFamily: 'monospace'
-    },
-    footer: {
-        padding: '30px 20px',
-        display: 'flex',
-        justifyContent: 'space-around',
-        alignItems: 'center',
-        backgroundColor: 'rgba(0,0,0,0.5)'
-    },
-    captureBtn: {
-        background: 'none',
-        border: 'none',
-        color: '#fff',
-        cursor: 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 0
-    },
-    iconBtn: {
-        background: 'rgba(255,255,255,0.1)',
-        border: 'none',
-        color: '#fff',
-        width: '44px',
-        height: '44px',
-        borderRadius: '50%',
-        display: 'flex',
-        flexDirection: 'column' as const,
-        alignItems: 'center',
-        justifyContent: 'center',
-        cursor: 'pointer',
-        gap: '4px'
-    },
-    confirmBtn: {
-        backgroundColor: '#00ff9d',
-        color: '#000',
-        border: 'none',
-        padding: '12px 30px',
-        borderRadius: '30px',
-        fontSize: '16px',
-        fontWeight: 700,
-        display: 'flex',
-        alignItems: 'center',
-        gap: '8px',
-        cursor: 'pointer'
-    }
-};

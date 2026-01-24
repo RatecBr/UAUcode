@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Loader2, AlertCircle, ArrowLeft, QrCode, Play, Bug } from 'lucide-react';
 import { supabase } from '../AuthContext';
-import { initCamera, stopCamera } from '../camera';
+import { initCamera } from '../camera';
 import { ImageRecognizer } from '../recognition';
 import type { RecognitionResult } from '../recognition';
 import { VideoOverlay } from '../overlayVideo';
@@ -151,7 +151,8 @@ export default function PublicScanner() {
                     clearInterval(checkVideoExist);
                     if (videoRef.current) {
                         try {
-                            await initCamera(videoRef.current);
+                            const stream = await initCamera(videoRef.current);
+                            streamRef.current = stream;
                             console.log('[PublicScanner] Câmera iniciada.');
                             setShowManualStart(false);
                         } catch (camError: any) {
@@ -384,8 +385,11 @@ export default function PublicScanner() {
         if (animationFrameRef.current) {
             cancelAnimationFrame(animationFrameRef.current);
         }
+        if (streamRef.current) {
+            streamRef.current.getTracks().forEach(track => track.stop());
+            streamRef.current = null;
+        }
         resetOverlays();
-        stopCamera();
     };
 
     const styles = {
