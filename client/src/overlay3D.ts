@@ -56,7 +56,7 @@ export class Overlay3D {
             this.loader.load(url, (gltf) => {
                 this.model = gltf.scene;
                 // Center model
-                const box = new THREE.Box3().setFromObject(this.model);
+                const box = new THREE.Box3.setFromObject(this.model);
                 const center = box.getCenter(new THREE.Vector3());
                 this.model.position.sub(center);
 

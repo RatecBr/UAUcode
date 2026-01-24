@@ -8,25 +8,26 @@ import type { RecognitionResult } from '../recognition';
 import { VideoOverlay } from '../overlayVideo';
 import { AudioOverlay } from '../overlayAudio';
 import { Overlay3D } from '../overlay3D';
+import { supabase } from '../supabaseClient';
 
 interface Target {
     id: number;
     name: string;
-    targetUrl: string;
-    contentUrl: string;
-    contentType: 'video' | 'audio' | '3d';
+    target_url: string; // Database column
+    content_url: string; // Database column
+    content_type: 'video' | 'audio' | '3d';
 }
 
 export default function Scanner() {
-    const { token } = useAuth();
+    const { } = useAuth(); // Token not needed with Supabase client
     const navigate = useNavigate();
 
     // State
-    const [, setTargets] = useState<Target[]>([]);
+    const [targets, setTargets] = useState<Target[]>([]);
     const [status, setStatus] = useState<string>('Initializing...');
     const [isDetected, setIsDetected] = useState(false);
     const [activeTarget, setActiveTarget] = useState<Target | null>(null);
-    // const [loadingNewTarget, setLoadingNewTarget] = useState(false); // Removed unused
+    const [loadingNewTarget, setLoadingNewTarget] = useState(false); // UI indicator logic if needed
     const [debugMode, setDebugMode] = useState(false);
     const [debugInfo, setDebugInfo] = useState<string>("");
 
@@ -76,23 +77,17 @@ export default function Scanner() {
     const initializeScanner = async () => {
         setStatus('Fetching experiences...');
         try {
-            const res = await fetch('/api/targets', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            if (!res.ok) throw new Error("Failed to load targets");
-            let data: Target[] = await res.json();
+            const { data, error } = await supabase.from('targets').select('*');
 
-            // Sanitize URLs to force relative paths (Proxied by Vite) to avoid Mixed Content
-            data = data.map(t => ({
-                ...t,
-                targetUrl: t.targetUrl.replace('http://localhost:3000', ''),
-                contentUrl: t.contentUrl.replace('http://localhost:3000', '')
-            }));
+            if (error) throw error;
+            if (!data) throw new Error("No data");
 
-            setTargets(data);
-            targetsRef.current = data;
+            // Type assertion and check
+            const targetsData = data as any[];
+            setTargets(targetsData);
+            targetsRef.current = targetsData;
 
-            if (data.length === 0) {
+            if (targetsData.length === 0) {
                 setStatus('No experiences found. Add some in Admin.');
                 return;
             }
@@ -135,7 +130,8 @@ export default function Scanner() {
         return new Promise((resolve) => {
             const img = new Image();
             img.crossOrigin = "anonymous";
-            img.src = t.targetUrl;
+            // Use Supabase URL directly
+            img.src = t.target_url;
             img.onload = () => {
                 if (recognizerRef.current) {
                     const added = recognizerRef.current.addTarget(t.id, img);
@@ -147,14 +143,14 @@ export default function Scanner() {
                 }
             };
             img.onerror = () => {
-                console.error(`Failed to load image for ${t.name} from ${t.targetUrl}`);
+                console.error(`Failed to load image for ${t.name} from ${t.target_url}`);
                 resolve(false);
             };
         });
     };
 
     // Helper: JIT Fetching
-    const fetchAndPlay = async (url: string, attemptId: number): Promise<string | null> => {
+    const fetchAndPlay = async (url: string, type: 'video' | 'audio', attemptId: number): Promise<string | null> => {
         try {
             // Check cache first
             if (assetsCacheRef.current.has(attemptId)) {
@@ -330,16 +326,16 @@ export default function Scanner() {
 
         // 1. Lock loading state so we don't trigger again
         loadingRef.current = true;
-        // setLoadingNewTarget(true); // Optional: show a small spinner in the corner, not full screen
+        setLoadingNewTarget(true); // Optional: show a small spinner in the corner, not full screen
 
         console.log(`Loading content for ${t.name}... (Background)`);
 
         // 2. Fetch Blob in background (Old content keeps playing!)
-        const blobUrl = await fetchAndPlay(t.contentUrl, t.id);
+        const blobUrl = await fetchAndPlay(t.content_url, t.content_type as any, t.id);
 
         // 3. Unlock loading state
         loadingRef.current = false;
-        // setLoadingNewTarget(false);
+        setLoadingNewTarget(false);
 
         if (!blobUrl) {
             console.error("Failed to load new content");
@@ -356,11 +352,11 @@ export default function Scanner() {
         activeTargetRef.current = t;
 
         // 6. Mount new content instantly (it's already a blob)
-        if (t.contentType === 'video') {
+        if (t.content_type === 'video') {
             videoOverlayRef.current = new VideoOverlay(container);
             videoOverlayRef.current.setSource(blobUrl);
             videoOverlayRef.current.show();
-        } else if (t.contentType === 'audio') {
+        } else if (t.content_type === 'audio') {
             audioOverlayRef.current = new AudioOverlay(blobUrl);
             audioOverlayRef.current.play();
             const div = document.createElement('div');
@@ -370,9 +366,9 @@ export default function Scanner() {
             div.style.pointerEvents = 'auto'; // allow click
             div.innerHTML = `<h3>Playing Audio</h3><p>${t.name}</p>`;
             container.appendChild(div);
-        } else if (t.contentType === '3d') {
+        } else if (t.content_type === '3d') {
             threeOverlayRef.current = new Overlay3D(container);
-            threeOverlayRef.current.loadModel(t.contentUrl).then(() => {
+            threeOverlayRef.current.loadModel(t.content_url).then(() => {
                 threeOverlayRef.current?.show();
             });
         }

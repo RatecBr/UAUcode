@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Upload, Box } from 'lucide-react';
+import { LogOut, Upload, Image as ImageIcon, Box } from 'lucide-react';
+
+import { supabase } from '../supabaseClient';
 
 interface Target {
     id: number;
     name: string;
-    targetUrl: string;
+    target_url: string; // Changed to match snake_case DB or map it
+    content_url: string;
+    content_type: string;
 }
 
 export default function AdminDashboard() {
-    const { token, logout } = useAuth();
+    const { logout } = useAuth();
     const navigate = useNavigate();
     const [targets, setTargets] = useState<Target[]>([]);
     const [uploading, setUploading] = useState(false);
@@ -29,74 +33,82 @@ export default function AdminDashboard() {
     }, []);
 
     const fetchTargets = async () => {
-        try {
-            const res = await fetch('/api/targets', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            if (res.ok) setTargets(await res.json());
-        } catch (e) { console.error(e); }
+        const { data, error } = await supabase.from('targets').select('*').order('id', { ascending: false });
+        if (error) {
+            console.error(error);
+        } else {
+            // Map keys if component expects camelCase but DB is snake_case (optional, keeping types consistent helps)
+            setTargets(data || []);
+        }
+    };
+
+    const uploadFile = async (file: File) => {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random()}.${fileExt}`;
+        const filePath = `${fileName}`;
+
+        const { error: uploadError } = await supabase.storage.from('assets').upload(filePath, file);
+        if (uploadError) throw uploadError;
+
+        const { data } = supabase.storage.from('assets').getPublicUrl(filePath);
+        return data.publicUrl;
     };
 
     const handleUpload = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Validation: New requires files, Edit can be partial
         if (!editId && (!targetFile || !contentFile)) {
             alert("Both files are required for new experience.");
             return;
         }
 
         setUploading(true);
-        const formData = new FormData();
-        formData.append('name', name);
-        if (targetFile) formData.append('target', targetFile);
-        if (contentFile) formData.append('content', contentFile);
-        formData.append('contentType', contentType);
-
         try {
-            const url = editId ? `/api/targets/${editId}` : '/api/upload';
-            const method = editId ? 'PUT' : 'POST';
+            let tUrl = null;
+            let cUrl = null;
 
-            const res = await fetch(url, {
-                method: method,
-                headers: { Authorization: `Bearer ${token}` },
-                body: formData
-            });
+            if (targetFile) tUrl = await uploadFile(targetFile);
+            if (contentFile) cUrl = await uploadFile(contentFile);
 
-            if (res.ok) {
-                alert(editId ? 'Experience Updated!' : 'Experience Created!');
-                resetForm();
-                fetchTargets();
+            if (editId) {
+                // Update
+                const updates: any = { name, content_type: contentType };
+                if (tUrl) updates.target_url = tUrl;
+                if (cUrl) updates.content_url = cUrl;
+
+                const { error } = await supabase.from('targets').update(updates).eq('id', editId);
+                if (error) throw error;
+                alert('Updated!');
             } else {
-                const err = await res.json();
-                console.error("Server Error:", err);
-                alert(`Save Error: ${err.error || res.statusText}`);
+                // Insert
+                const { error } = await supabase.from('targets').insert({
+                    name,
+                    target_url: tUrl,
+                    content_url: cUrl,
+                    content_type: contentType
+                });
+                if (error) throw error;
+                alert('Experience Created!');
             }
-        } catch (error) {
-            console.error("Network Error:", error);
-            alert('Connection/Network Error');
+
+            resetForm();
+            fetchTargets();
+        } catch (error: any) {
+            console.error("Error:", error);
+            alert(`Error: ${error.message}`);
         } finally {
             setUploading(false);
         }
     };
 
     const handleDelete = async (id: number) => {
-        if (!confirm("Are you sure you want to delete this experience?")) return;
+        if (!confirm("Delete this experience?")) return;
         try {
-            const res = await fetch(`/api/targets/${id}`, {
-                method: 'DELETE',
-                headers: { Authorization: `Bearer ${token}` }
-            });
-
-            if (res.ok) {
-                fetchTargets();
-            } else {
-                const err = await res.json();
-                alert(`Delete failed: ${err.error}`);
-            }
-        } catch (e) {
-            console.error(e);
-            alert("Delete connection error");
+            const { error } = await supabase.from('targets').delete().eq('id', id);
+            if (error) throw error;
+            fetchTargets();
+        } catch (e: any) {
+            alert(e.message);
         }
     };
 
@@ -189,7 +201,7 @@ export default function AdminDashboard() {
                                 borderBottom: '1px solid var(--glass-border)'
                             }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                                    <img src={t.targetUrl} style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '8px' }} />
+                                    <img src={t.target_url} style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '8px' }} />
                                     <div>
                                         <div style={{ fontWeight: 600 }}>{t.name}</div>
                                         <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>ID: {t.id}</div>

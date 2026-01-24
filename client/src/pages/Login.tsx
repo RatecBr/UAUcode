@@ -1,21 +1,37 @@
+import React, { useState } from 'react';
 import { useAuth } from '../AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Lock, User } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+import { supabase } from '../supabaseClient';
+
 export default function Login() {
-    // const [username, setUsername] = useState('');
-    // const [password, setPassword] = useState('');
-    // const [error, setError] = useState('');
-    const { login } = useAuth();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
     const navigate = useNavigate();
 
-    const handleMockLogin = (role: 'admin' | 'user') => {
-        // MOCK LOGIN for Serverless/Vercel Demo
-        const mockToken = "mock_token_" + Date.now();
-        const mockUser = { username: role, role: role };
-        login(mockToken, mockUser);
-        navigate(role === 'admin' ? '/admin' : '/scanner');
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError('');
+
+        try {
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email,
+                password
+            });
+
+            if (error) throw error;
+
+            if (data.user) {
+                // Determine redirect based on logic (or just go to Admin for now since roles need DB config)
+                // For now, everyone goes to Scanner, Admin link is there
+                navigate('/admin');
+            }
+        } catch (err: any) {
+            setError(err.message || 'Login failed');
+        }
     };
 
     return (
@@ -32,30 +48,42 @@ export default function Login() {
                 className="glass-card"
                 style={{ padding: '40px', width: '100%', maxWidth: '400px' }}
             >
-                <h1 style={{ textAlign: 'center', marginBottom: '10px', color: 'var(--primary)' }}>IMAGYNE</h1>
-                <p style={{ textAlign: 'center', marginBottom: '30px', color: 'var(--text-muted)' }}>Augmented Reality Platform</p>
+                <h1 style={{ textAlign: 'center', marginBottom: '30px', color: 'var(--primary)' }}>IMAGYNE</h1>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                    <button
-                        onClick={() => handleMockLogin('admin')}
-                        className="btn-primary"
-                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}
-                    >
-                        <Lock size={18} /> ADMIN ACCESS
-                    </button>
-
-                    <button
-                        onClick={() => handleMockLogin('user')}
-                        className="btn-secondary"
-                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}
-                    >
-                        <User size={18} /> OPEN SCANNER
-                    </button>
-
-                    <div style={{ textAlign: 'center', fontSize: '11px', color: '#666', marginTop: '20px' }}>
-                        * Demo Mode: Authentication bypassed for preview
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                    <div style={{ position: 'relative' }}>
+                        <User size={20} style={{ position: 'absolute', top: '14px', left: '12px', color: 'var(--text-muted)' }} />
+                        <input
+                            className="glass-input"
+                            style={{ paddingLeft: '45px' }}
+                            placeholder="Email"
+                            value={email}
+                            onChange={e => setEmail(e.target.value)}
+                        />
                     </div>
-                </div>
+
+                    <div style={{ position: 'relative' }}>
+                        <Lock size={20} style={{ position: 'absolute', top: '14px', left: '12px', color: 'var(--text-muted)' }} />
+                        <input
+                            type="password"
+                            className="glass-input"
+                            style={{ paddingLeft: '45px' }}
+                            placeholder="Password"
+                            value={password}
+                            onChange={e => setPassword(e.target.value)}
+                        />
+                    </div>
+
+                    {error && <div style={{ color: '#ff4444', fontSize: '14px', textAlign: 'center' }}>{error}</div>}
+
+                    <button type="submit" className="btn-primary">
+                        ACCESS SYSTEM
+                    </button>
+
+                    <div style={{ textAlign: 'center', fontSize: '12px', color: 'var(--text-muted)', marginTop: '10px' }}>
+                        Default: admin/admin123 or user/user123
+                    </div>
+                </form>
             </motion.div>
         </div>
     );

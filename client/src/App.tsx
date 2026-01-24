@@ -11,7 +11,7 @@ const PrivateRoute = ({ children, role }: { children: React.ReactNode, role?: 'a
   if (!token) return <Navigate to="/" />;
 
   if (role && user) {
-    if (user.role !== role && (user.role as string) !== 'admin') {
+    if (user.role !== role && user.role !== 'admin') {
       return <Navigate to={user.role === 'admin' ? '/admin' : '/scanner'} />;
     }
   }

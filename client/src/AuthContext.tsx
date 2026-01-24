@@ -1,60 +1,43 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-interface User {
-    username: string;
-    role: 'admin' | 'user';
-}
+
+
+import { supabase } from './supabaseClient';
 
 interface AuthContextType {
-    user: User | null;
-    token: string | null;
-    login: (token: string, user: User) => void;
-    logout: () => void;
+    user: any | null;
+    loading: boolean;
+    logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>(null!);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [user, setUser] = useState<User | null>(null);
-    const [token, setToken] = useState<string | null>(null);
+    const [user, setUser] = useState<any | null>(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Restore session
-        const storedToken = localStorage.getItem('imagyne_token');
-        const storedUser = localStorage.getItem('imagyne_user');
-        if (storedToken && storedUser) {
-            try {
-                const parsedUser = JSON.parse(storedUser);
-                if (parsedUser && parsedUser.username) {
-                    setToken(storedToken);
-                    setUser(parsedUser);
-                } else {
-                    throw new Error("Invalid user data");
-                }
-            } catch (e) {
-                console.error("Auth restore error", e);
-                localStorage.removeItem('imagyne_token');
-                localStorage.removeItem('imagyne_user');
-            }
-        }
+        // Check active session
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setUser(session?.user ?? null);
+            setLoading(false);
+        });
+
+        // Listen for changes
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            setUser(session?.user ?? null);
+            setLoading(false);
+        });
+
+        return () => subscription.unsubscribe();
     }, []);
 
-    const login = (newToken: string, newUser: User) => {
-        setToken(newToken);
-        setUser(newUser);
-        localStorage.setItem('imagyne_token', newToken);
-        localStorage.setItem('imagyne_user', JSON.stringify(newUser));
-    };
-
-    const logout = () => {
-        setToken(null);
-        setUser(null);
-        localStorage.removeItem('imagyne_token');
-        localStorage.removeItem('imagyne_user');
+    const logout = async () => {
+        await supabase.auth.signOut();
     };
 
     return (
-        <AuthContext.Provider value={{ user, token, login, logout }}>
+        <AuthContext.Provider value={{ user, loading, logout }}>
             {children}
         </AuthContext.Provider>
     );
