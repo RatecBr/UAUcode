@@ -1,0 +1,17 @@
+{
+    "version": 2,
+    "rewrites": [
+        {
+            "source": "/api/(.*)",
+            "destination": "https://seu-backend-em-outro-lugar.com/api/$1"
+        },
+        {
+            "source": "/(.*)",
+            "destination": "/client/$1"
+        }
+    ],
+    "framework": "vite",
+    "buildCommand": "cd client && npm run build",
+    "outputDirectory": "client/dist",
+    "installCommand": "cd client && npm install"
+}
