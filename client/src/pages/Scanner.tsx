@@ -22,11 +22,11 @@ export default function Scanner() {
     const navigate = useNavigate();
 
     // State
-    const [targets, setTargets] = useState<Target[]>([]);
+    const [, setTargets] = useState<Target[]>([]);
     const [status, setStatus] = useState<string>('Initializing...');
     const [isDetected, setIsDetected] = useState(false);
     const [activeTarget, setActiveTarget] = useState<Target | null>(null);
-    const [loadingNewTarget, setLoadingNewTarget] = useState(false); // UI indicator logic if needed
+    // const [loadingNewTarget, setLoadingNewTarget] = useState(false); // Removed unused
     const [debugMode, setDebugMode] = useState(false);
     const [debugInfo, setDebugInfo] = useState<string>("");
 
@@ -154,7 +154,7 @@ export default function Scanner() {
     };
 
     // Helper: JIT Fetching
-    const fetchAndPlay = async (url: string, type: 'video' | 'audio', attemptId: number): Promise<string | null> => {
+    const fetchAndPlay = async (url: string, attemptId: number): Promise<string | null> => {
         try {
             // Check cache first
             if (assetsCacheRef.current.has(attemptId)) {
@@ -330,16 +330,16 @@ export default function Scanner() {
 
         // 1. Lock loading state so we don't trigger again
         loadingRef.current = true;
-        setLoadingNewTarget(true); // Optional: show a small spinner in the corner, not full screen
+        // setLoadingNewTarget(true); // Optional: show a small spinner in the corner, not full screen
 
         console.log(`Loading content for ${t.name}... (Background)`);
 
         // 2. Fetch Blob in background (Old content keeps playing!)
-        const blobUrl = await fetchAndPlay(t.contentUrl, t.contentType === 'video' ? 'video' : 'audio', t.id);
+        const blobUrl = await fetchAndPlay(t.contentUrl, t.id);
 
         // 3. Unlock loading state
         loadingRef.current = false;
-        setLoadingNewTarget(false);
+        // setLoadingNewTarget(false);
 
         if (!blobUrl) {
             console.error("Failed to load new content");
