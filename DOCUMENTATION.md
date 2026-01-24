@@ -1,5 +1,7 @@
 # Documentação Técnica - Plataforma UAU
 
+**Versão:** `UAU V.1.10 - DEPLOY`
+
 A **Plataforma UAU** é um ecossistema WebAR de alta performance focado em reconhecimento de imagens (marker-based). Utiliza processamento local no dispositivo do usuário para garantir privacidade e baixa latência.
 
 ## 📖 Visão Geral do Sistema
