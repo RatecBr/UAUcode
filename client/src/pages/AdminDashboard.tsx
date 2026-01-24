@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Upload, Image as ImageIcon, Box } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 
 import { supabase } from '../AuthContext';
 

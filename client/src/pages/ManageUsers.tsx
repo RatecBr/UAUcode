@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../AuthContext';
-import { Trash2, UserPlus, Shield, User } from 'lucide-react';
+import { UserPlus, Shield, User } from 'lucide-react';
 
 interface Profile {
     id: string;
