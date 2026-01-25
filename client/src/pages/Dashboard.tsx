@@ -8,6 +8,7 @@ import {
 import { supabase, useAuth, getPlanLimit, getPlanName } from '../AuthContext';
 import QRCodeGenerator from '../components/QRCodeGenerator';
 import MediaCapture from '../components/MediaCapture';
+import { optimizeImage } from '../utils/fileOptimizer';
 
 interface Target {
     id: number;
@@ -157,15 +158,28 @@ export default function Dashboard() {
         setShowForm(false);
     };
 
-    const handleFileChange = (file: File | null, type: 'target' | 'content') => {
+    const handleFileChange = async (file: File | null, type: 'target' | 'content') => {
         if (!file) return;
 
+        let processedFile = file;
+
+        // Otimiza se for imagem (alvo sempre é imagem, conteúdo pode ser)
+        if (type === 'target' || (type === 'content' && file.type.startsWith('image/'))) {
+            try {
+                // Diminuímos para 800px para o marcador ser leve e rápido de baixar
+                const maxWidth = type === 'target' ? 800 : 1280;
+                processedFile = await optimizeImage(file, maxWidth, 0.6);
+            } catch (e) {
+                console.error('Erro ao otimizar imagem:', e);
+            }
+        }
+
         if (type === 'target') {
-            setTargetFile(file);
-            setTargetPreview(URL.createObjectURL(file));
+            setTargetFile(processedFile);
+            setTargetPreview(URL.createObjectURL(processedFile));
         } else {
-            setContentFile(file);
-            setContentPreview(URL.createObjectURL(file));
+            setContentFile(processedFile);
+            setContentPreview(URL.createObjectURL(processedFile));
         }
     };
 
@@ -231,7 +245,6 @@ export default function Dashboard() {
             fontSize: '11px',
             fontWeight: 700,
             letterSpacing: '0.05em',
-            textTransform: 'uppercase' as const,
             background: profile?.plan === 'enterprise'
                 ? 'linear-gradient(135deg, #ffd700, #ff8c00)'
                 : profile?.plan === 'pro'
@@ -484,10 +497,10 @@ export default function Dashboard() {
             <header style={styles.header}>
                 <div style={styles.topRow}>
                     <div>
-                        <h1 style={styles.logo}>UAU</h1>
+                        <h1 style={styles.logo}>MAIPIX</h1>
                         <div style={{ ...styles.planBadge, marginTop: '8px' }}>
                             <Crown size={12} />
-                            {isAdmin ? 'Administrador' : getPlanName(profile?.plan || 'free')}
+                            {isAdmin ? 'Admin' : getPlanName(profile?.plan || 'free')}
                         </div>
                     </div>
                     <div style={styles.buttons}>
@@ -594,14 +607,21 @@ export default function Dashboard() {
                                 <div style={styles.dropzone}>
                                     {targetPreview ? (
                                         <div style={{ position: 'relative', width: '100%', height: '140px' }}>
-                                            <img src={targetPreview} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '12px' }} />
-                                            <button
-                                                type="button"
-                                                onClick={() => { setTargetFile(null); setTargetPreview(null); }}
-                                                style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(0,0,0,0.6)', border: 'none', borderRadius: '10px', color: '#fff', padding: '8px' }}
-                                            >
-                                                <RefreshCw size={14} />
-                                            </button>
+                                            <img src={targetPreview} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '12px', opacity: 0.6 }} />
+                                            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.3)', borderRadius: '12px' }}>
+                                                <div style={{ textAlign: 'center', width: '100%' }}>
+                                                    <p style={{ margin: '0 0 8px', fontSize: '12px', fontWeight: 700, color: '#fff' }}>
+                                                        {targetFile ? 'NOVA IMAGEM SELECIONADA' : 'IMAGEM ATUAL'}
+                                                    </p>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => { setTargetFile(null); setTargetPreview(null); }}
+                                                        style={{ ...styles.modernUploadBtn, margin: '0 auto', padding: '8px 16px', background: '#ff4757', border: 'none', width: 'auto', flex: 'none' }}
+                                                    >
+                                                        <RefreshCw size={14} /> ALTERAR
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
                                     ) : (
                                         <div style={{ display: 'flex', gap: '12px', width: '100%' }}>
@@ -625,11 +645,14 @@ export default function Dashboard() {
                                 <label style={styles.fieldLabel}>CONTEÚDO AR (ARQUIVO OU GRAVAÇÃO)</label>
                                 <div style={styles.dropzone}>
                                     {contentPreview ? (
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '100%', padding: '12px', backgroundColor: 'rgba(0,255,157,0.05)', borderRadius: '12px', border: '1px solid rgba(0,255,157,0.1)' }}>
-                                            <CheckCircle2 size={24} color="#00ff9d" />
-                                            <span style={{ fontSize: '14px', flex: 1, fontWeight: 600, color: '#00ff9d' }}>Pronto para salvar</span>
-                                            <button type="button" onClick={() => { setContentFile(null); setContentPreview(null); }} style={{ background: 'none', border: 'none', color: '#ff4757', cursor: 'pointer' }}>
-                                                <RefreshCw size={18} />
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '100%', padding: '12px', backgroundColor: contentFile ? 'rgba(0,255,157,0.1)' : 'rgba(255,255,255,0.05)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                            <div style={{ flex: 1 }}>
+                                                <span style={{ fontSize: '12px', fontWeight: 800, color: contentFile ? '#00ff9d' : 'rgba(255,255,255,0.5)', display: 'block' }}>
+                                                    {contentFile ? '✓ NOVO CONTEÚDO PRONTO' : 'CONTEÚDO EXISTENTE'}
+                                                </span>
+                                            </div>
+                                            <button type="button" onClick={() => { setContentFile(null); setContentPreview(null); }} style={{ background: '#ff4757', border: 'none', color: '#fff', cursor: 'pointer', padding: '8px 12px', borderRadius: '8px', fontSize: '11px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                <RefreshCw size={14} /> ALTERAR
                                             </button>
                                         </div>
                                     ) : (
@@ -741,7 +764,7 @@ export default function Dashboard() {
                                 placeholder="seunome"
                             />
                             <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginTop: '8px' }}>
-                                URL: uau.app/s/{newSlug || 'seunome'}
+                                URL: maipix.app/s/{newSlug || 'seunome'}
                             </div>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>

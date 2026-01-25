@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { X, Circle, StopCircle, RefreshCw, Check, Video, Mic } from 'lucide-react';
+import { optimizeImage, getVideoConstraints, getVideoRecorderOptions, getAudioRecorderOptions } from '../utils/fileOptimizer';
 
 interface MediaCaptureProps {
     mode: 'photo' | 'video' | 'audio';
@@ -31,7 +32,10 @@ export default function MediaCapture({ mode, onCapture, onClose }: MediaCaptureP
         try {
             stopStream();
             const constraints: MediaStreamConstraints = {
-                video: mode === 'audio' ? false : { facingMode },
+                video: mode === 'audio' ? false : {
+                    facingMode,
+                    ...getVideoConstraints()
+                },
                 audio: mode !== 'photo'
             };
             const newStream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -61,9 +65,12 @@ export default function MediaCapture({ mode, onCapture, onClose }: MediaCaptureP
         const ctx = canvas.getContext('2d');
         if (ctx) {
             ctx.drawImage(videoRef.current, 0, 0);
-            canvas.toBlob((blob) => {
+            canvas.toBlob(async (blob) => {
                 if (blob) {
-                    setCapturedBlob(blob);
+                    const tempFile = new File([blob], 'temp.jpg', { type: 'image/jpeg' });
+                    // Aplica compressão extrema: 800px é o ideal para o motor OpenCV mobile
+                    const optimized = await optimizeImage(tempFile, 800, 0.6);
+                    setCapturedBlob(optimized);
                     stopStream();
                 }
             }, 'image/jpeg', 0.8);
@@ -73,13 +80,17 @@ export default function MediaCapture({ mode, onCapture, onClose }: MediaCaptureP
     const startRecording = () => {
         if (!stream) return;
         chunksRef.current = [];
-        const recorder = new MediaRecorder(stream);
+
+        // Aplica opções de bitrate e codec
+        const options = mode === 'video' ? getVideoRecorderOptions() : getAudioRecorderOptions();
+        const recorder = new MediaRecorder(stream, options);
+
         recorder.ondataavailable = (e) => {
             if (e.data.size > 0) chunksRef.current.push(e.data);
         };
         recorder.onstop = () => {
             const blob = new Blob(chunksRef.current, {
-                type: mode === 'video' ? 'video/webm' : 'audio/webm'
+                type: mode === 'video' ? ((options as any).mimeType || 'video/webm') : 'audio/webm'
             });
             setCapturedBlob(blob);
         };

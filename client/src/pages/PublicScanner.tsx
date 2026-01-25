@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Loader2, AlertCircle, ArrowLeft, QrCode, Play, Bug } from 'lucide-react';
+import { Loader2, AlertCircle, ArrowLeft, QrCode, Play } from 'lucide-react';
 import { supabase } from '../AuthContext';
 import { initCamera } from '../camera';
 import { ImageRecognizer } from '../recognition';
@@ -37,8 +37,6 @@ export default function PublicScanner() {
     const activeTargetRef = useRef<Target | null>(null);
     const [activeTarget, setActiveTarget] = useState<Target | null>(null);
     const [loadingNewTarget, setLoadingNewTarget] = useState(false);
-    const [debugMode, setDebugMode] = useState(false);
-    const [debugInfo, setDebugInfo] = useState('');
     const [showManualStart, setShowManualStart] = useState(false);
     const loadingRef = useRef(false);
 
@@ -262,9 +260,7 @@ export default function PublicScanner() {
             try {
                 const result: RecognitionResult = recognizerRef.current.processFrame(video);
 
-                if (debugMode) {
-                    setDebugInfo(`Targets: ${targetsRef.current.length} | ID: ${result.targetId} | Conf: ${result.confidence?.toFixed(2)}`);
-                }
+
 
                 if (result.detected && result.targetId !== null) {
                     const currentActiveId = activeTargetRef.current?.id;
@@ -612,23 +608,7 @@ export default function PublicScanner() {
                                     {status}
                                 </div>
                             )}
-                            <button
-                                onClick={() => setDebugMode(!debugMode)}
-                                style={{
-                                    ...styles.statusBadge,
-                                    backgroundColor: debugMode ? 'rgba(255,107,107,0.3)' : 'rgba(0,0,0,0.5)',
-                                    pointerEvents: 'auto',
-                                    border: 'none',
-                                    cursor: 'pointer'
-                                }}
-                            >
-                                <Bug size={14} color="#fff" />
-                            </button>
-                            {debugMode && (
-                                <div style={{ ...styles.statusBadge, fontSize: '10px', color: '#00ff9d' }}>
-                                    {debugInfo}
-                                </div>
-                            )}
+
                             {userProfile && (
                                 <div style={styles.userInfo}>
                                     @{userProfile.slug}

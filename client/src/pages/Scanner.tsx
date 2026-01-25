@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Loader2, Bug } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 import { initCamera, stopCamera } from '../camera';
 import { ImageRecognizer } from '../recognition';
 import type { RecognitionResult } from '../recognition';
@@ -42,18 +42,7 @@ export default function Scanner() {
         if (data) setAllUsers(data);
     };
 
-    // Promote to Admin (TEMPORARY - REMOVE AFTER USE)
-    const promoteToAdmin = async () => {
-        if (!user) return;
-        const { error } = await supabase
-            .from('profiles')
-            .upsert({ id: user.id, email: user.email, role: 'admin' });
-        if (error) {
-            alert("Error promoting: " + error.message);
-        } else {
-            alert("Promoted to Admin! Please logout and login again.");
-        }
-    };
+
 
     // State
     const [_targets, setTargets] = useState<Target[]>([]);
@@ -61,12 +50,9 @@ export default function Scanner() {
     const [isDetected, setIsDetected] = useState(false);
     const [activeTarget, setActiveTarget] = useState<Target | null>(null);
     const [_loadingNewTarget, setLoadingNewTarget] = useState(false); // UI indicator logic if needed
-    const [debugMode, setDebugMode] = useState(false);
-    const [debugInfo, setDebugInfo] = useState<string>("");
 
     // Refs
-    // Fix for closure trap: Ref that tracks debugMode state
-    const debugModeRef = useRef(false);
+
     const targetsRef = useRef<Target[]>([]); // To access targets inside closure
 
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -106,10 +92,7 @@ export default function Scanner() {
         return () => stopScan();
     }, [selectedUserId]);
 
-    // Sync state changes to ref for loop access
-    useEffect(() => {
-        debugModeRef.current = debugMode;
-    }, [debugMode]);
+
 
     const isInitializing = useRef(false);
     const hasInitialized = useRef(false);
@@ -282,16 +265,7 @@ export default function Scanner() {
                 try {
                     const result = recognizerRef.current.processFrame(videoRef.current);
 
-                    // READ FROM REF, NOT STATE
-                    const isDebug = debugModeRef.current;
-
-                    if (isDebug) {
-                        // Use targetsRef.current.length to ensure we see the true count updated after init
-                        setDebugInfo(`Targets: ${targetsRef.current.length} | Detected: ${result.detected} | Conf: ${result.confidence} | ID: ${result.targetId}`);
-                        drawDebug(result, true);
-                    } else {
-                        drawDebug(result, false);
-                    }
+                    drawDebug(result, false);
 
                     if (result.detected && result.targetId !== null) {
                         const currentActiveId = activeTargetRef.current?.id;
@@ -523,7 +497,7 @@ export default function Scanner() {
                                 }}
                             >
                                 <option value="" disabled style={{ color: '#000' }}>Selecionar Usuário...</option>
-                                <option value="none" style={{ color: '#000' }}>Apenas Globais (UAU)</option>
+                                <option value="none" style={{ color: '#000' }}>Apenas Globais (MAIPIX)</option>
                                 {allUsers.map(u => (
                                     <option key={u.id} value={u.id} style={{ color: '#000' }}>
                                         {u.email} {u.id === user?.id ? '(Você)' : ''}
@@ -562,48 +536,7 @@ export default function Scanner() {
                             </div>
                         )}
 
-                        <button
-                            onClick={() => { console.log("Debug Click"); setDebugMode(p => !p); }}
-                            className="glass-card"
-                            style={{
-                                padding: 'var(--space-sm)',
-                                pointerEvents: 'auto',
-                                background: debugMode ? 'rgba(255, 71, 87, 0.5)' : 'var(--glass-bg)'
-                            }}
-                        >
-                            <Bug size={16} color="white" />
-                        </button>
 
-                        {debugMode && (
-                            <div
-                                className="glass-card animate-enter"
-                                style={{
-                                    padding: 'var(--space-xs)',
-                                    fontSize: 'var(--font-size-xs)',
-                                    maxWidth: '180px',
-                                    wordWrap: 'break-word',
-                                    color: 'var(--text)'
-                                }}
-                            >
-                                {debugInfo}
-                            </div>
-                        )}
-
-                        {/* TEMPORARY: Promote to Admin button - REMOVE AFTER USE */}
-                        <button
-                            onClick={promoteToAdmin}
-                            className="glass-card"
-                            style={{
-                                padding: 'var(--space-xs) var(--space-sm)',
-                                pointerEvents: 'auto',
-                                background: 'rgba(0, 255, 157, 0.25)',
-                                color: 'var(--primary)',
-                                fontSize: 'var(--font-size-xs)',
-                                fontWeight: 600
-                            }}
-                        >
-                            Promover Admin
-                        </button>
                     </div>
                 </div>
 

@@ -1,5 +1,5 @@
 -- ==========================================
--- UAU SUPABASE MIGRATION (FULL SETUP)
+-- MAIPIX SUPABASE MIGRATION (FULL SETUP)
 -- ==========================================
 
 -- 1. Create Targets Table (For AR Experiences)

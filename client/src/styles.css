@@ -15,7 +15,7 @@ body {
   background-color: var(--bg-color);
   color: var(--text-color);
   font-family: var(--font-family);
-  overflow: hidden; /* Prevent scroll on camera view */
+  /* overflow: hidden removed to allow landing page to scroll */
   -webkit-font-smoothing: antialiased;
 }
 
@@ -48,7 +48,8 @@ video.camera-feed {
   width: 100%;
   height: 100%;
   z-index: 10;
-  pointer-events: none; /* Let touches pass through to 3D/Video if needed, but buttons need pointer-events: auto */
+  pointer-events: none;
+  /* Let touches pass through to 3D/Video if needed, but buttons need pointer-events: auto */
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -105,7 +106,7 @@ video.camera-feed {
   padding: 20px;
   border-radius: 20px;
   border: 1px solid var(--glass-border);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 .control-group {
@@ -170,14 +171,21 @@ input[type="file"] {
   max-width: 80%;
   max-height: 80%;
   border-radius: 16px;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
   overflow: hidden;
   animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 @keyframes popIn {
-  from { opacity: 0; transform: scale(0.8); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* 3D Container */

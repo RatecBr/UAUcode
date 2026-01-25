@@ -1,5 +1,5 @@
 -- ==========================================
--- UAU SAAS MIGRATION V2.0
+-- MAIPIX SAAS MIGRATION V2.0
 -- Execute no Supabase SQL Editor
 -- ==========================================
 

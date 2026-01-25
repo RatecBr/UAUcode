@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { LogOut, Camera, Plus, X, Edit2, Trash2 } from 'lucide-react';
 import { supabase } from '../AuthContext';
 import ManageUsers from './ManageUsers';
+import { optimizeImage } from '../utils/fileOptimizer';
 
 interface Target {
     id: number;
@@ -81,6 +82,19 @@ export default function AdminDashboard() {
         setTargetFile(null);
         setContentFile(null);
         setShowForm(true);
+    };
+
+    const handleFileChange = async (file: File | null, type: 'target' | 'content') => {
+        if (!file) return;
+        let processedFile = file;
+        if (type === 'target' || (type === 'content' && file.type.startsWith('image/'))) {
+            try {
+                const maxWidth = type === 'target' ? 800 : 1280;
+                processedFile = await optimizeImage(file, maxWidth, 0.6);
+            } catch (e) { console.error('Erro ao otimizar:', e); }
+        }
+        if (type === 'target') setTargetFile(processedFile);
+        else setContentFile(processedFile);
     };
 
     const resetForm = () => {
@@ -376,7 +390,7 @@ export default function AdminDashboard() {
                                     <input
                                         type="file"
                                         accept="image/*"
-                                        onChange={e => setTargetFile(e.target.files?.[0] || null)}
+                                        onChange={e => handleFileChange(e.target.files?.[0] || null, 'target')}
                                         style={{ ...styles.input, marginBottom: 0 }}
                                     />
                                 </div>
@@ -384,7 +398,7 @@ export default function AdminDashboard() {
                                     <label style={styles.label}>Arquivo de Conteúdo</label>
                                     <input
                                         type="file"
-                                        onChange={e => setContentFile(e.target.files?.[0] || null)}
+                                        onChange={e => handleFileChange(e.target.files?.[0] || null, 'content')}
                                         style={{ ...styles.input, marginBottom: 0 }}
                                     />
                                 </div>

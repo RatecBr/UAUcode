@@ -1,5 +1,5 @@
 -- ==========================================
--- UAU - CORREÇÃO COMPLETA DE RLS V3.0
+-- MAIPIX - CORREÇÃO COMPLETA DE RLS V3.0
 -- Execute este script INTEIRO no Supabase SQL Editor
 -- ==========================================
 

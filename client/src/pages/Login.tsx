@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase, useAuth } from '../AuthContext';
-import { Sparkles, Mail, Lock, ArrowRight, UserPlus } from 'lucide-react';
+import { Mail, Lock, ArrowRight, UserPlus } from 'lucide-react';
 
 export default function Login() {
     const [email, setEmail] = useState('');
@@ -293,10 +293,10 @@ export default function Login() {
             {/* Logo */}
             <div style={styles.logoContainer}>
                 <div style={styles.logoIcon}>
-                    <Sparkles size={40} color="#00ff9d" />
+                    <img src="/logo.png" alt="MAIPIX Logo" style={{ width: '120px', height: '120px', objectFit: 'contain' }} />
                 </div>
-                <h1 style={styles.logo}>UAU</h1>
-                <p style={styles.tagline}>Experiências em Realidade Aumentada</p>
+                <h1 style={styles.logo}>MAIPIX</h1>
+                <p style={styles.tagline}>Imagens que falam</p>
             </div>
 
             {/* Login Card */}
@@ -397,7 +397,7 @@ export default function Login() {
 
             {/* Footer */}
             <p style={styles.footer}>
-                © 2024 UAU. Todos os direitos reservados.
+                © 2024 MAIPIX. Todos os direitos reservados.
             </p>
         </div>
     );

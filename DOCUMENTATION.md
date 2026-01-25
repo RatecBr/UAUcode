@@ -1,8 +1,8 @@
-# Documentação Técnica - Plataforma UAU
+# Documentação Técnica - Plataforma MAIPIX
 
-**Versão:** `UAU V.1.10 - DEPLOY`
+**Versão:** `MAIPIX V.1.20 - DEPLOY`
 
-A **Plataforma UAU** é um ecossistema WebAR de alta performance focado em reconhecimento de imagens (marker-based). Utiliza processamento local no dispositivo do usuário para garantir privacidade e baixa latência.
+A **Plataforma MAIPIX** é um ecossistema WebAR de alta performance focado em reconhecimento de imagens (marker-based). Utiliza processamento local no dispositivo do usuário para garantir privacidade e baixa latência.
 
 ## 📖 Visão Geral do Sistema
 
@@ -10,6 +10,7 @@ O sistema é dividido em três camadas principais:
 1.  **Dashboard de Gestão**: Onde usuários e admins gerenciam seus marcadores e conteúdos.
 2.  **Motor de Reconhecimento (Engine)**: Núcleo em WebAssembly (OpenCV.js) que processa os frames da câmera.
 3.  **Camada de Overlay**: Sistema de renderização que projeta Vídeos, Áudios e Modelos 3D sobre o mundo real.
+4.  **Acessibilidade**: Módulo de leitura de etiquetas para áudio, otimizando a experiência para PCD.
 
 ---
 
@@ -27,7 +28,7 @@ O processo de detecção segue o fluxo abaixo por frame (aprox. 150ms de interva
 ### Lógica de Experiências Globais
 As experiências globais são carregadas em todos os contextos de scanner. 
 - **Query**: `supabase.from('targets').select('*').or('user_id.eq.ID_DONO,is_global.eq.true')`.
-- Isso garante que a capacidade de reconhecimento seja somada (Experiências do Cliente + Experiências da UAU).
+- Isso garante que a capacidade de reconhecimento seja somada (Experiências do Cliente + Experiências da MAIPIX).
 
 ---
 
@@ -47,7 +48,7 @@ O Dashboard utiliza uma arquitetura baseada em **MediaStream Recording API**.
 | Coluna | Tipo | Descrição |
 | :--- | :--- | :--- |
 | `id` | uuid | Link com Supabase Auth |
-| `slug` | text | Nome na URL (ex: uau.app/s/**jose**) |
+| `slug` | text | Nome na URL (ex: maipix.app/s/**jose**) |
 | `plan` | text | free, pro, enterprise |
 | `role` | text | admin, user |
 
@@ -67,7 +68,7 @@ O Dashboard utiliza uma arquitetura baseada em **MediaStream Recording API**.
 ## 🚀 Performance e Otimização
 
 Para manter 60 FPS na interface e 10-15 FPS no reconhecimento em dispositivos móveis:
-- **Downsampling**: O reconhecimento processa uma versão reduzida (VGA) do frame original.
+- **Downsampling**: O reconhecimento processa uma version reduzida (VGA) do frame original.
 - **JIT Loading**: Conteúdos pesados (vídeos) são baixados via `fetch` para Blobs no momento da detecção estável, evitando gaps de carregamento do player nativo.
 - **Asset Caching**: O `PublicScanner` mantém um cache em memória dos assets já baixados para evitar re-downloads durante a mesma sessão.
 
@@ -76,8 +77,8 @@ Para manter 60 FPS na interface e 10-15 FPS no reconhecimento em dispositivos m�
 ## 🛡 Segurança
 
 - **RLS (Row Level Security)**: Configurado no Supabase para garantir que usuários comuns só editem seus próprios dados, enquanto Admins têm bypass total.
-- **CORS**: Domínios de Storage configurados para permitir acesso apenas das origens autorizadas (localhost e uau.app).
+- **CORS**: Domínios de Storage configurados para permitir acesso apenas das origens autorizadas (localhost e maipix.app).
 
 ---
 
-*Versão: 1.1.0 - Jan/2026*
+*Versão: 1.2.0 - Jan/2026*

@@ -1,4 +1,4 @@
-# UAU: Image Recognition PWA
+# MAIPIX: Image Recognition PWA
 
 ## Project Overview
 A web-based (PWA) image recognition application using OpenCV.js (WASM) for local device detection of target images to trigger multimedia overlays (Video, Audio, 3D).

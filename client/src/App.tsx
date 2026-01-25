@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './AuthContext';
 import Login from './pages/Login';
+import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
 import AdminPanel from './pages/AdminPanel';
 import Scanner from './pages/Scanner';
@@ -28,7 +29,7 @@ const PrivateRoute = ({ children, adminOnly }: { children: React.ReactNode, admi
     );
   }
 
-  if (!user) return <Navigate to="/" />;
+  if (!user) return <Navigate to="/login" />;
 
   // Se é rota apenas para admin e usuário não é admin
   if (adminOnly && profile?.role !== 'admin') {
@@ -44,7 +45,8 @@ export default function App() {
       <AuthProvider>
         <Routes>
           {/* Rotas públicas */}
-          <Route path="/" element={<Login />} />
+          <Route path="/" element={<Landing />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/s/:userSlug" element={<PublicScanner />} />
           <Route path="/s/:userSlug/:targetId" element={<PublicScanner />} />
 
