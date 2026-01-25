@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
     LogOut, Camera, Plus, X, Edit2, Trash2,
     QrCode, Share2, BarChart3, Crown, Settings,
-    Video, Mic, Image as ImageIcon, CheckCircle2, Loader2, RefreshCw
+    Video, Mic, Image as ImageIcon, Loader2, RefreshCw
 } from 'lucide-react';
 import { supabase, useAuth, getPlanLimit, getPlanName } from '../AuthContext';
 import QRCodeGenerator from '../components/QRCodeGenerator';
