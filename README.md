@@ -144,6 +144,16 @@ O deploy é configurado via CI/CD (GitHub → Vercel):
 
 ---
 
+## 🛠️ Boas Práticas e Build
+
+Para garantir que o deploy na Vercel não falhe, siga estas regras:
+
+1. **Imports Limpos**: Nunca deixe ícones (lucide-react) ou bibliotecas importadas que não estão sendo usadas. O `tsc` (TypeScript Compiler) na Vercel está configurado para falhar o build em caso de variáveis não utilizadas.
+2. **Teste de Build Local**: Sempre rode `npm run build` na pasta `client` antes de fazer o push para o GitHub. Se der erro aqui, a Vercel também vai falhar.
+3. **OpenCV.js**: O arquivo `opencv.js` deve permanecer na pasta `public`. Ele é carregado via script tag no `index.html`.
+
+---
+
 ### v1.2.0 (2026-01-25)
 -   **New Landing Page**: Desenvolvida página inicial poderosa com foco em "Imagens que falam".
 -   **Accessibility Focus**: Novas funcionalidades para leitura de rótulos e etiquetas.

@@ -81,4 +81,13 @@ Para manter 60 FPS na interface e 10-15 FPS no reconhecimento em dispositivos m�
 
 ---
 
+## 💡 Troubleshooting (Resolução de Problemas)
+
+### Erro: "Build Failed" no Vercel (Exit code 2/1)
+- **Causa**: O TypeScript detectou "Unused Imports" ou ícones declarados mas não utilizados em páginas como `Dashboard.tsx`.
+- **Solução**: Remova qualquer importação que não esteja sendo estritamente utilizada no código.
+- **Prevenção**: Rodar `cd client && npm run build` localmente antes de cada Push. Este comando valida se o código está pronto para produção.
+
+---
+
 *Versão: 1.2.0 - Jan/2026*
