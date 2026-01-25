@@ -74,6 +74,7 @@ export default function Scanner() {
     // Stability/Debounce Refs
     const stabilityCounterRef = useRef(0);
     const potentialTargetIdRef = useRef<number | null>(null);
+    const currentLoadingIdRef = useRef<number | null>(null);
 
     // Asset Cache for Instant Playback
     const assetsCacheRef = useRef<Map<number, HTMLVideoElement | HTMLAudioElement>>(new Map());
@@ -246,6 +247,11 @@ export default function Scanner() {
         threeOverlayRef.current?.dispose();
         if (overlayContainerRef.current) overlayContainerRef.current.innerHTML = '';
 
+        // Cancela qualquer carga em andamento
+        currentLoadingIdRef.current = null;
+        loadingRef.current = false;
+        setLoadingNewTarget(false);
+
         // Reset State AND Refs
         setIsDetected(false);
         setActiveTarget(null);
@@ -364,15 +370,23 @@ export default function Scanner() {
         // 1. Lock loading state so we don't trigger again
         loadingRef.current = true;
         setLoadingNewTarget(true); // Optional: show a small spinner in the corner, not full screen
+        currentLoadingIdRef.current = t.id;
 
         console.log(`Loading content for ${t.name}... (Background)`);
 
         // 2. Fetch Blob in background (Old content keeps playing!)
         const blobUrl = await fetchAndPlay(t.content_url, t.content_type as any, t.id);
 
-        // 3. Unlock loading state
+        // 3. Verificação de Integridade
+        if (currentLoadingIdRef.current !== t.id) {
+            console.log(`[Scanner] Download concluído para ${t.name}, mas ignorado (cancelado ou trocado).`);
+            return;
+        }
+
+        // 4. Unlock loading state
         loadingRef.current = false;
         setLoadingNewTarget(false);
+        currentLoadingIdRef.current = null;
 
         if (!blobUrl) {
             console.error("Failed to load new content");

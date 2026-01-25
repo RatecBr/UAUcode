@@ -1,6 +1,6 @@
 ---
 name: project-protocols
-description: Mandatory project standards for UAU (WebAR, Versioning, Supabase, GitHub Deploy) and Context Memory guidelines.
+description: Mandatory project standards for MAIPIX (WebAR, Versioning, Supabase, GitHub Deploy) and Context Memory guidelines.
 ---
 
 # Project Protocols & Standards
@@ -13,9 +13,10 @@ description: Mandatory project standards for UAU (WebAR, Versioning, Supabase, G
 - **Reading:** Upon activation, ALWAYS check the last entries of `SESSION_LOG.md`.
 
 ## 2. Versioning Standard
-- **Format:** `UAU V.1.XX - "KEYWORD"`
-- **Example:** `UAU V.1.05 - SUPABASE`
-- **Rule:** Every significant deployment or architecture change must increment the version and update `DOCUMENTATION.md`.
+- **Format:** `MAIPIX V.1.X (Keyword)`
+- **Example:** `MAIPIX V.1.2 (DESIGN)`
+- **Rule:** Every significant deployment or architecture change must increment the version (X) and update `DOCUMENTATION.md`.
+- **Note:** Version increments are managed manually by the agent when a deployment is requested.
 
 ## 3. WebAR Architecture (Immutable)
 - **Engine:** OpenCV.js (WASM) + ORB (800 Features) + VGA Processing.
@@ -26,6 +27,8 @@ description: Mandatory project standards for UAU (WebAR, Versioning, Supabase, G
   - **JIT Loading:** Background fetch (Blob) while current media plays.
 
 ## 4. Deploy Protocol (GitHub → Vercel)
+
+> **IMPORTANT:** ONLY perform deployment actions (Push to GitHub) when the USER explicitly requests it.
 
 ### Prerequisites
 - GitHub repository with Vercel integration configured
@@ -56,11 +59,11 @@ description: Mandatory project standards for UAU (WebAR, Versioning, Supabase, G
 ### GitHub Commit Convention
 
 ```
-Format: "UAU vX.XX - KEYWORD: description"
+Format: "MAIPIX V.1.X (KEYWORD): description"
 
 Examples:
-- "UAU v1.06 - AUTH: Fixed login flow with single Supabase client"
-- "UAU v1.07 - SCANNER: Added debug mode for AR tracking"
+- "MAIPIX V.1.3 (AUTH): Fixed login flow with single Supabase client"
+- "MAIPIX V.1.4 (SCANNER): Added debug mode for AR tracking"
 ```
 
 ### Environment Variables (Vercel Dashboard)

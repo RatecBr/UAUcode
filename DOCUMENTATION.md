@@ -1,6 +1,6 @@
 # Documentação Técnica - Plataforma MAIPIX
 
-**Versão:** `MAIPIX V.1.20 - DEPLOY`
+**Versão:** `MAIPIX V.1.2 (REBRAND)`
 
 A **Plataforma MAIPIX** é um ecossistema WebAR de alta performance focado em reconhecimento de imagens (marker-based). Utiliza processamento local no dispositivo do usuário para garantir privacidade e baixa latência.
 

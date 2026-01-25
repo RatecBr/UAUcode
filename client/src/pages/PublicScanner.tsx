@@ -39,6 +39,7 @@ export default function PublicScanner() {
     const [loadingNewTarget, setLoadingNewTarget] = useState(false);
     const [showManualStart, setShowManualStart] = useState(false);
     const loadingRef = useRef(false);
+    const currentLoadingIdRef = useRef<number | null>(null);
 
     // Cache de assets para evitar re-downloads
     const assetsCacheRef = useRef<Map<number, Blob | string>>(new Map());
@@ -316,13 +317,21 @@ export default function PublicScanner() {
         // 1. Bloqueia disparo concorrente
         loadingRef.current = true;
         setLoadingNewTarget(true);
+        currentLoadingIdRef.current = target.id;
 
         // 2. Carrega asset em background (Blob ou Cache)
         const assetUrl = await fetchAsset(target.content_url, target.id);
 
-        // 3. Desbloqueia
+        // 3. Verificação de Integridade: Se durante o download o usuário cancelou ou o target mudou, abortamos.
+        if (currentLoadingIdRef.current !== target.id) {
+            console.log(`[PublicScanner] Download concluído para ${target.name}, mas a carga foi cancelada/trocada.`);
+            return;
+        }
+
+        // 4. Desbloqueia e limpa ID de carga
         loadingRef.current = false;
         setLoadingNewTarget(false);
+        currentLoadingIdRef.current = null;
 
         if (!assetUrl) {
             console.error('[PublicScanner] Falha ao carregar asset.');
@@ -367,6 +376,11 @@ export default function PublicScanner() {
         if (overlayContainerRef.current) {
             overlayContainerRef.current.innerHTML = '';
         }
+
+        // Cancela qualquer carga em andamento
+        currentLoadingIdRef.current = null;
+        loadingRef.current = false;
+        setLoadingNewTarget(false);
 
         activeTargetRef.current = null;
         setIsDetected(false);

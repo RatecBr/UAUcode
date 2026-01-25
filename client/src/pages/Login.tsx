@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase, useAuth } from '../AuthContext';
-import { Mail, Lock, ArrowRight, UserPlus } from 'lucide-react';
+import { Mail, Lock, ArrowRight, UserPlus, ArrowLeft } from 'lucide-react';
 
 export default function Login() {
     const [email, setEmail] = useState('');
@@ -143,6 +143,25 @@ export default function Login() {
             background: 'radial-gradient(circle, rgba(0,255,157,0.08) 0%, transparent 70%)',
             borderRadius: '50%',
             pointerEvents: 'none' as const
+        },
+        backHome: {
+            position: 'absolute' as const,
+            top: '24px',
+            left: '24px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '10px 16px',
+            borderRadius: '50px',
+            backgroundColor: 'rgba(255,255,255,0.05)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            color: '#00ff9d',
+            fontSize: '14px',
+            fontWeight: 700,
+            transition: 'all 0.3s ease',
+            cursor: 'pointer',
+            zIndex: 10,
+            textDecoration: 'none'
         },
         logoContainer: {
             marginBottom: '32px',
@@ -289,6 +308,17 @@ export default function Login() {
         <div style={styles.container}>
             {/* Background glow effect */}
             <div style={styles.bgGlow} />
+
+            {/* Back Home Button */}
+            <button
+                onClick={() => navigate('/')}
+                style={styles.backHome}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(0,255,157,0.1)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'}
+            >
+                <ArrowLeft size={18} />
+                Início
+            </button>
 
             {/* Logo */}
             <div style={styles.logoContainer}>

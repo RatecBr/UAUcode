@@ -21,7 +21,20 @@
     *   Updated `Scanner`, `Admin`, and `Login` to use `supabase-js`.
     *   Verified `UAU V.1.05 - Supabase Migration` complete.
 
+## [2026-01-25] Session 2: Rebranding & Protocol Update
+**Goal:** Rebrand to MAIPIX and established strict deployment/versioning protocols.
+
+1.  **Rebranding complete:**
+    *   Moved from "UAU" to "MAIPIX" (Slogan: "Imagens que falam").
+    *   Updated Landing page, SEO metadata, PWA manifest, and documentation.
+    *   Unified UI style with `#00ff9d` primary color and glassmorphism.
+
+2.  **Protocol Update (SKILL: project-protocols):**
+    *   **Deployment Rule:** NEVER deploy automatically. Only push/deploy when explicitly requested by user.
+    *   **Versioning Standard:** `MAIPIX V.1.X (Keyword)`.
+    *   **Current Version:** 1.1.0/1.2.0 (To be finalized on next deploy).
+
 **Next Steps / Context for Next Session:**
-- Monitor Vercel deploy.
-- Maintain Sticky Playback logic (Do not revert to "stop on lost").
-- Ensure all new features follow Serverless pattern.
+- Wait for user's signal to deploy.
+- Next deploy should be named `MAIPIX V.1.2 (REBRAND)`.
+- Continue monitoring scanner performance and "Sticky Playback" stability.
