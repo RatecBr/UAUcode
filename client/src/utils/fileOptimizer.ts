@@ -68,10 +68,10 @@ export const getVideoRecorderOptions = () => {
     const bitsPerSecond = 700000;
 
     const types = [
+        'video/mp4', // Prioridade no iOS/Safari
         'video/webm;codecs=vp9,opus',
         'video/webm;codecs=vp8,opus',
-        'video/webm',
-        'video/mp4'
+        'video/webm'
     ];
 
     for (const type of types) {
@@ -84,8 +84,19 @@ export const getVideoRecorderOptions = () => {
 };
 
 export const getAudioRecorderOptions = () => {
-    // 64kbps é mais que suficiente para efeitos e voz em AR
+    // iOS Safari suporta audio/mp4. WebM é limitado.
+    const audioTypes = ['audio/mp4', 'audio/webm;codecs=opus', 'audio/webm'];
+    let mimeType = 'audio/webm'; // fallback
+
+    for (const type of audioTypes) {
+        if (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported(type)) {
+            mimeType = type;
+            break;
+        }
+    }
+
     return {
-        audioBitsPerSecond: 64000
+        audioBitsPerSecond: 64000,
+        mimeType
     };
 };

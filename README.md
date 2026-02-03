@@ -156,26 +156,12 @@ Para garantir que o deploy na Vercel não falhe, siga estas regras:
 
 ---
 
-### v1.2.1 (2026-01-27)
+### v1.2.2 (2026-02-03)
 
-- **Favicon Update**: Substituição do ícone padrão pela logo oficial MAIPIX.
-- **Version Bump**: Atualização para v1.2.1.
-
-### v1.2.0 (2026-01-25)
-
-- **New Landing Page**: Desenvolvida página inicial poderosa com foco em "Imagens que falam".
-- **Accessibility Focus**: Novas funcionalidades para leitura de rótulos e etiquetas.
-- **Branding v2**: Novo logotipo minimalista oficial aplicado em todo o sistema.
-- **Video Optimization**: Lógica de compressão "Economy" para carregamento instantâneo.
-- **Clean UI**: Remoção de ferramentas de debug e simplificação do scanner público.
-
-### v1.1.0 (2026-01-24)
-
-- **Rebranding**: Transição completa da marca para **MAIPIX**.
-- **Media Capture**: Implementação de gravação direta de vídeo e áudio no navegador.
-- **Global Targets**: Lógica de reconhecimento de alvos mestres em todos os slugs.
-- **Admin Optimization**: Dashboard com visão macro e seletor de usuário no scanner para performance.
-- **UI/UX**: Redesign completo estilo Glassmorphism com novos feedbacks de carregamento.
+- **Otimização iOS (iPhone)**: Implementação de Meta Tags PWA, suporte a safe-areas (notch) e prevenção de auto-zoom em inputs.
+- **Resiliência de Upload**: Mecanismo de retry para erros de "signal aborted" em conexões móveis e tratamento explícito de MIME types para 3D e Áudio (WEBW/GLB).
+- **Mídia iOS**: Suporte a gravação em containers nativos (MP4/M4A) para garantir compatibilidade com Safari Mobile.
+- **Correções de Código**: Resolução de conflitos de hoisting no MediaCapture e otimização de cache (Blob) para modelos 3D no scanner.
 
 ---
 

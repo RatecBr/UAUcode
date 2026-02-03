@@ -19,14 +19,12 @@ export default function MediaCapture({ mode, onCapture, onClose }: MediaCaptureP
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const chunksRef = useRef<Blob[]>([]);
     const timerRef = useRef<number | null>(null);
-
-    useEffect(() => {
-        startStream();
-        return () => {
-            stopStream();
-            if (timerRef.current) clearInterval(timerRef.current);
-        };
-    }, [facingMode]);
+    const stopStream = () => {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+        }
+        setStream(null);
+    };
 
     const startStream = async () => {
         try {
@@ -50,12 +48,14 @@ export default function MediaCapture({ mode, onCapture, onClose }: MediaCaptureP
         }
     };
 
-    const stopStream = () => {
-        if (stream) {
-            stream.getTracks().forEach(track => track.stop());
-        }
-        setStream(null);
-    };
+    useEffect(() => {
+        startStream();
+        return () => {
+            stopStream();
+            if (timerRef.current) clearInterval(timerRef.current);
+        };
+    }, [facingMode]);
+
 
     const takePhoto = () => {
         if (!videoRef.current) return;
@@ -89,9 +89,8 @@ export default function MediaCapture({ mode, onCapture, onClose }: MediaCaptureP
             if (e.data.size > 0) chunksRef.current.push(e.data);
         };
         recorder.onstop = () => {
-            const blob = new Blob(chunksRef.current, {
-                type: mode === 'video' ? ((options as any).mimeType || 'video/webm') : 'audio/webm'
-            });
+            const mimeType = (options as any).mimeType || (mode === 'video' ? 'video/webm' : 'audio/webm');
+            const blob = new Blob(chunksRef.current, { type: mimeType });
             setCapturedBlob(blob);
         };
         recorder.start();
@@ -117,7 +116,10 @@ export default function MediaCapture({ mode, onCapture, onClose }: MediaCaptureP
 
     const handleConfirm = () => {
         if (capturedBlob) {
-            const ext = mode === 'photo' ? 'jpg' : 'webm';
+            let ext = mode === 'photo' ? 'jpg' : 'webm';
+            if (capturedBlob.type.includes('mp4')) ext = 'mp4';
+            if (capturedBlob.type.includes('mpeg') || capturedBlob.type.includes('m4a')) ext = 'm4a';
+            
             const file = new File([capturedBlob], `capture-${Date.now()}.${ext}`, { type: capturedBlob.type });
             onCapture(file);
         }

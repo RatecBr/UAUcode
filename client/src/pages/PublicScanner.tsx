@@ -360,7 +360,8 @@ export default function PublicScanner() {
             audioOverlayRef.current.play();
         } else if (target.content_type === '3d') {
             overlay3DRef.current = new Overlay3D(container);
-            overlay3DRef.current.loadModel(target.content_url).then(() => {
+            // IMPORTANTE: Usar assetUrl (blob) para garantir performance e evitar erro de CORS duplicado
+            overlay3DRef.current.loadModel(assetUrl).then(() => {
                 if (activeTargetRef.current?.id === target.id) {
                     overlay3DRef.current?.show();
                 }
@@ -449,8 +450,6 @@ export default function PublicScanner() {
             flexDirection: 'column' as const,
             justifyContent: 'space-between',
             padding: '16px',
-            paddingTop: 'max(16px, env(safe-area-inset-top))',
-            paddingBottom: 'max(16px, env(safe-area-inset-bottom))'
         },
         header: {
             display: 'flex',

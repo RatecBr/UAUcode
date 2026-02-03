@@ -197,7 +197,7 @@ export default function Scanner() {
     };
 
     // Helper: JIT Fetching
-    const fetchAndPlay = async (url: string, _type: 'video' | 'audio', attemptId: number): Promise<string | null> => {
+    const fetchAndPlay = async (url: string, _type: 'video' | 'audio' | '3d', attemptId: number): Promise<string | null> => {
         try {
             // Check cache first
             if (assetsCacheRef.current.has(attemptId)) {
@@ -209,6 +209,10 @@ export default function Scanner() {
             const response = await fetch(url);
             const blob = await response.blob();
             const blobUrl = URL.createObjectURL(blob);
+            
+            // Armazena no cache (podemos armazenar como um objeto temporário com 'src')
+            assetsCacheRef.current.set(attemptId, { src: blobUrl } as any);
+            
             return blobUrl;
         } catch (e) {
             console.error("Asset fetch error:", e);
@@ -419,7 +423,8 @@ export default function Scanner() {
             container.appendChild(div);
         } else if (t.content_type === '3d') {
             threeOverlayRef.current = new Overlay3D(container);
-            threeOverlayRef.current.loadModel(t.content_url).then(() => {
+            // IMPORTANTE: Usar blobUrl para consistência e performance
+            threeOverlayRef.current.loadModel(blobUrl).then(() => {
                 threeOverlayRef.current?.show();
             });
         }
