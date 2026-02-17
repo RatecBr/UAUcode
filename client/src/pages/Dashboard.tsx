@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   LogOut,
@@ -58,14 +58,9 @@ export default function Dashboard() {
   const canCreate = targets.length < planLimit;
   const scannerUrl = `${window.location.origin}/s/${profile?.slug || "carregando"}`;
 
-  useEffect(() => {
-    if (profile?.id) {
-      fetchTargets();
-      setNewSlug(profile.slug || "");
-    }
-  }, [profile]);
+  console.log("Dashboard State:", { profile, targets: targets.length, planLimit, canCreate, showForm });
 
-  const fetchTargets = async () => {
+  const fetchTargets = useCallback(async () => {
     if (!profile?.id) return;
 
     let query = supabase.from("targets").select("*");
@@ -78,7 +73,14 @@ export default function Dashboard() {
     const { data, error } = await query.order("id", { ascending: false });
 
     if (!error) setTargets(data || []);
-  };
+  }, [profile, isAdmin]);
+
+  useEffect(() => {
+    if (profile?.id) {
+      fetchTargets();
+      setNewSlug(profile.slug || "");
+    }
+  }, [profile, fetchTargets]);
 
   const uploadFile = async (file: File, predefinedType?: string) => {
     const fileExt = file.name.split(".").pop()?.toLowerCase();
@@ -298,9 +300,10 @@ export default function Dashboard() {
     logo: {
       fontSize: "24px",
       fontWeight: 800,
-      color: "#fff",
-      margin: 0,
       letterSpacing: "-0.02em",
+      background: 'linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-purple) 50%, var(--neon-red) 100%)',
+      WebkitBackgroundClip: 'text',
+      WebkitTextFillColor: 'transparent',
     },
     planBadge: {
       display: "inline-flex",
@@ -315,9 +318,11 @@ export default function Dashboard() {
         profile?.plan === "enterprise"
           ? "linear-gradient(135deg, #ffd700, #ff8c00)"
           : profile?.plan === "pro"
-            ? "linear-gradient(135deg, #00d4ff, #00ff9d)"
+            ? "linear-gradient(135deg, var(--neon-blue), var(--neon-purple))"
             : "rgba(255,255,255,0.05)",
-      color: profile?.plan === "free" ? "rgba(255,255,255,0.5)" : "#000",
+      color: "#fff",
+      boxShadow: profile?.plan !== "free" ? 'var(--neon-purple-glow)' : 'none',
+      border: '1px solid rgba(255,255,255,0.1)'
     },
     buttons: {
       display: "flex",
@@ -352,7 +357,8 @@ export default function Dashboard() {
     statValue: {
       fontSize: "28px",
       fontWeight: 800,
-      color: "#00ff9d",
+      color: "var(--neon-purple)",
+      textShadow: 'var(--neon-purple-glow)',
     },
     statLabel: {
       fontSize: "12px",
@@ -363,8 +369,8 @@ export default function Dashboard() {
       letterSpacing: "0.05em",
     },
     scannerLink: {
-      backgroundColor: "rgba(0,255,157,0.05)",
-      border: "1px solid rgba(0,255,157,0.1)",
+      backgroundColor: "rgba(188, 54, 194, 0.05)",
+      border: "1px solid rgba(188, 54, 194, 0.1)",
       borderRadius: "16px",
       padding: "20px",
       marginBottom: "32px",
@@ -378,7 +384,7 @@ export default function Dashboard() {
       flex: 1,
       fontSize: "14px",
       fontWeight: 500,
-      color: "#00ff9d",
+      color: "var(--neon-purple)",
       wordBreak: "break-all" as const,
     },
     card: {
@@ -454,17 +460,19 @@ export default function Dashboard() {
       position: "fixed" as const,
       bottom: "32px",
       right: "32px",
-      width: "64px",
-      height: "64px",
-      borderRadius: "22px",
-      backgroundColor: "#00ff9d",
-      border: "none",
+      width: "72px",
+      height: "72px",
+      borderRadius: "24px",
+      background: "linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-purple) 50%, var(--neon-red) 100%)",
+      border: "2px solid rgba(255, 255, 255, 0.3)",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
       cursor: "pointer",
-      boxShadow: "0 12px 24px rgba(0,255,157,0.4)",
+      boxShadow: "0 0 30px rgba(188, 54, 194, 0.8), 0 0 60px rgba(49, 86, 243, 0.5), 0 0 90px rgba(245, 70, 74, 0.3)",
       transition: "all 0.3s ease",
+      animation: "pulse-glow 2s ease-in-out infinite",
+      zIndex: 1000,
     },
     modal: {
       position: "fixed" as const,
@@ -540,8 +548,8 @@ export default function Dashboard() {
     primaryBtn: {
       width: "100%",
       padding: "18px",
-      backgroundColor: "#00ff9d",
-      color: "#000",
+      background: "linear-gradient(135deg, var(--blue), var(--purple), var(--red))",
+      color: "#fff",
       border: "none",
       borderRadius: "18px",
       fontSize: "15px",
@@ -552,7 +560,7 @@ export default function Dashboard() {
       justifyContent: "center",
       gap: "10px",
       marginTop: "12px",
-      boxShadow: "0 12px 24px rgba(0,255,157,0.3)",
+      boxShadow: "0 0 20px rgba(188, 54, 194, 0.5)",
       transition: "all 0.2s",
     },
   };
@@ -563,9 +571,9 @@ export default function Dashboard() {
     <div style={styles.container}>
       <header style={styles.header}>
         <div style={styles.topRow}>
-          <div>
-            <h1 style={styles.logo}>MAIPIX</h1>
-            <div style={{ ...styles.planBadge, marginTop: "8px" }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <img src="/logo.png" alt="UAU Code Logo" style={{ height: '75px', objectFit: 'contain' }} />
+            <div style={{ ...styles.planBadge }}>
               <Crown size={12} />
               {isAdmin ? "Admin" : getPlanName(profile?.plan || "free")}
             </div>
@@ -634,7 +642,7 @@ export default function Dashboard() {
         <div style={styles.linkRow}>
           <div style={styles.linkText}>{scannerUrl}</div>
           <button style={styles.iconButton} onClick={copyLink}>
-            <Share2 size={18} color="#00ff9d" />
+            <Share2 size={18} color="var(--neon-purple)" />
           </button>
         </div>
       </div>
@@ -698,15 +706,15 @@ export default function Dashboard() {
                         border: "2px solid",
                         borderColor:
                           contentType === type
-                            ? "#00ff9d"
+                            ? "#BC36C2"
                             : "rgba(255,255,255,0.05)",
                         backgroundColor:
                           contentType === type
-                            ? "rgba(0,255,157,0.1)"
+                            ? "rgba(188, 54, 194, 0.1)"
                             : "rgba(255,255,255,0.02)",
                         color:
                           contentType === type
-                            ? "#00ff9d"
+                            ? "#BC36C2"
                             : "rgba(255,255,255,0.3)",
                         fontSize: "12px",
                         fontWeight: 700,
@@ -1039,10 +1047,17 @@ export default function Dashboard() {
       {!showForm && (
         <button
           style={styles.fab}
-          onClick={() => canCreate && setShowForm(true)}
-          disabled={!canCreate}
+          onClick={() => setShowForm(true)}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = "scale(1.1) rotate(90deg)";
+            e.currentTarget.style.boxShadow = "0 0 50px rgba(188, 54, 194, 1), 0 0 100px rgba(49, 86, 243, 0.8), 0 0 150px rgba(245, 70, 74, 0.6)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = "scale(1) rotate(0deg)";
+            e.currentTarget.style.boxShadow = "0 0 30px rgba(188, 54, 194, 0.8), 0 0 60px rgba(49, 86, 243, 0.5), 0 0 90px rgba(245, 70, 74, 0.3)";
+          }}
         >
-          <Plus size={32} color="#000" />
+          <Plus size={36} color="#fff" />
         </button>
       )}
 
@@ -1052,7 +1067,7 @@ export default function Dashboard() {
             <h3
               style={{ margin: "0 0 24px", fontSize: "20px", fontWeight: 800 }}
             >
-              QR Code da Experiência
+              UAU Code
             </h3>
             <div
               style={{

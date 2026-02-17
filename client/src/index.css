@@ -5,25 +5,46 @@
 
 /* --- Design Tokens --- */
 :root {
-  /* Colors */
-  --primary: #00ff9d;
-  --primary-dark: #00cc7a;
-  --secondary: #1a1a2e;
-  --background: #0a0a0f;
-  --surface: #16161a;
+  /* Colors - Based on UAU Code Logo */
+  --neon-blue: #3156f3;
+  --neon-purple: #bc36c2;
+  --neon-red: #f5464a;
+
+  --primary: var(--neon-purple);
+  --primary-glow: rgba(188, 54, 194, 0.5);
+  --blue: var(--neon-blue);
+  --purple: var(--neon-purple);
+  --red: var(--neon-red);
+
+  --primary-dark: #a12da7;
+  --secondary: #0a0a0f;
+  --background: #050508;
+  --surface: #0a0a0f;
   --text: rgba(255, 255, 255, 0.95);
   --text-muted: rgba(255, 255, 255, 0.6);
-  --error: #ff4757;
-  --success: #00ff9d;
+  --error: var(--neon-red);
+  --success: var(--neon-blue);
   --warning: #ffa502;
 
+  /* Neon Glow Effects */
+  --neon-blue-glow:
+    0 0 10px rgba(49, 86, 243, 0.5), 0 0 20px rgba(49, 86, 243, 0.3);
+  --neon-purple-glow:
+    0 0 10px rgba(188, 54, 194, 0.5), 0 0 20px rgba(188, 54, 194, 0.3);
+  --neon-red-glow:
+    0 0 10px rgba(245, 70, 74, 0.5), 0 0 20px rgba(245, 70, 74, 0.3);
+  --neon-multi-glow:
+    0 0 15px rgba(188, 54, 194, 0.4), 0 0 30px rgba(49, 86, 243, 0.2);
+
   /* Glass Effect */
-  --glass-bg: rgba(255, 255, 255, 0.05);
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 
   /* Typography */
-  --font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family:
+    "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    sans-serif;
   --font-size-xs: clamp(0.625rem, 2vw, 0.75rem);
   --font-size-sm: clamp(0.75rem, 2.5vw, 0.875rem);
   --font-size-base: clamp(0.875rem, 3vw, 1rem);
@@ -42,20 +63,15 @@
 
   /* Border Radius */
   --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 32px;
   --radius-full: 9999px;
 
   /* Transitions */
   --transition-fast: 150ms ease;
-  --transition-base: 250ms ease;
+  --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 400ms ease;
-
-  /* Z-Index */
-  --z-overlay: 100;
-  --z-modal: 200;
-  --z-toast: 300;
 
   font-family: var(--font-family);
   line-height: 1.6;
@@ -67,6 +83,75 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.neon-gradient-text {
+  background: linear-gradient(
+    135deg,
+    var(--neon-blue),
+    var(--neon-purple),
+    var(--neon-red)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 15px rgba(188, 54, 194, 0.4));
+}
+
+.neon-border {
+  border: 1px solid var(--neon-purple);
+  box-shadow: var(--neon-purple-glow);
+}
+
+.neon-border-blue {
+  border: 1px solid var(--neon-blue);
+  box-shadow: var(--neon-blue-glow);
+}
+
+.neon-border-red {
+  border: 1px solid var(--neon-red);
+  box-shadow: var(--neon-red-glow);
+}
+
+.glass-morphism {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+}
+
+@keyframes neon-flicker {
+  0%,
+  19%,
+  21%,
+  23%,
+  25%,
+  54%,
+  56%,
+  100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 10px var(--neon-purple));
+  }
+  20%,
+  22%,
+  24%,
+  55% {
+    opacity: 0.7;
+    filter: drop-shadow(0 0 2px var(--neon-purple));
+  }
+}
+
+.neon-flicker {
+  animation: neon-flicker 3s infinite;
+}
+
+.logo-glow {
+  filter: drop-shadow(0 0 15px rgba(188, 54, 194, 0.4));
+  transition: filter var(--transition-base);
+}
+
+.logo-glow:hover {
+  filter: drop-shadow(0 0 25px rgba(188, 54, 194, 0.6));
 }
 
 /* --- Reset & Base --- */
@@ -138,22 +223,27 @@ a {
 }
 
 a:hover {
-  color: var(--primary-dark);
+  color: var(--blue);
+  text-shadow: 0 0 8px var(--blue);
 }
 
 /* --- Glass Card --- */
 .glass-card {
-  background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--glass-shadow);
-  transition: transform var(--transition-base), box-shadow var(--transition-base);
+  background: rgba(188, 54, 194, 0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  transition:
+    transform var(--transition-base),
+    box-shadow var(--transition-base);
 }
 
 .glass-card:hover {
-  box-shadow: 0 12px 40px rgba(0, 255, 157, 0.1);
+  box-shadow: 0 0 30px rgba(188, 54, 194, 0.15);
+  border-color: rgba(188, 54, 194, 0.3);
+  transform: translateY(-2px);
 }
 
 /* --- Buttons --- */
@@ -181,15 +271,23 @@ button:disabled {
 }
 
 .btn-primary {
-  background: var(--primary);
-  color: var(--background);
-  font-weight: 600;
+  background: linear-gradient(
+    135deg,
+    var(--blue) 0%,
+    var(--purple) 50%,
+    var(--red) 100%
+  );
+  color: #fff;
+  font-weight: 700;
   padding: var(--space-sm) var(--space-lg);
+  box-shadow: 0 4px 15px rgba(188, 54, 194, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: var(--primary-dark);
-  transform: translateY(-1px);
+  box-shadow: 0 0 25px rgba(188, 54, 194, 0.6);
+  transform: translateY(-2px) scale(1.02);
 }
 
 .btn-primary:active:not(:disabled) {
@@ -198,12 +296,16 @@ button:disabled {
 
 .btn-secondary {
   background: transparent;
-  color: var(--primary);
-  border: 1px solid var(--primary);
+  color: #fff;
+  border: 1px solid var(--purple);
+  box-shadow:
+    inset 0 0 10px rgba(188, 54, 194, 0.2),
+    0 0 10px rgba(188, 54, 194, 0.2);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: rgba(0, 255, 157, 0.1);
+  background: rgba(188, 54, 194, 0.1);
+  box-shadow: 0 0 20px rgba(188, 54, 194, 0.4);
 }
 
 .btn-ghost {
@@ -225,7 +327,9 @@ button:disabled {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
   -webkit-appearance: none;
   appearance: none;
 }
@@ -236,8 +340,8 @@ button:disabled {
 
 .glass-input:focus {
   outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(0, 255, 157, 0.15);
+  border-color: var(--purple);
+  box-shadow: 0 0 15px rgba(188, 54, 194, 0.3);
 }
 
 select.glass-input {
@@ -272,7 +376,6 @@ select.glass-input {
 }
 
 @keyframes pulse {
-
   0%,
   100% {
     opacity: 1;
@@ -292,6 +395,22 @@ select.glass-input {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 30px rgba(188, 54, 194, 0.8), 
+                0 0 60px rgba(49, 86, 243, 0.5), 
+                0 0 90px rgba(245, 70, 74, 0.3);
+    transform: scale(1);
+  }
+  
+  50% {
+    box-shadow: 0 0 40px rgba(188, 54, 194, 1), 
+                0 0 80px rgba(49, 86, 243, 0.7), 
+                0 0 120px rgba(245, 70, 74, 0.5);
+    transform: scale(1.05);
   }
 }
 
@@ -452,6 +571,6 @@ select.glass-input {
 
 /* --- Selection --- */
 ::selection {
-  background: rgba(0, 255, 157, 0.3);
+  background: rgba(188, 54, 194, 0.4);
   color: var(--text);
 }

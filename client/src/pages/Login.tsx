@@ -140,7 +140,7 @@ export default function Login() {
             transform: 'translateX(-50%)',
             width: '400px',
             height: '400px',
-            background: 'radial-gradient(circle, rgba(0,255,157,0.08) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(188, 54, 194, 0.2) 0%, transparent 70%)',
             borderRadius: '50%',
             pointerEvents: 'none' as const
         },
@@ -155,7 +155,7 @@ export default function Login() {
             borderRadius: '50px',
             backgroundColor: 'rgba(255,255,255,0.05)',
             border: '1px solid rgba(255,255,255,0.1)',
-            color: '#00ff9d',
+            color: 'var(--neon-purple)',
             fontSize: '14px',
             fontWeight: 700,
             transition: 'all 0.3s ease',
@@ -175,9 +175,10 @@ export default function Login() {
         logo: {
             fontSize: '32px',
             fontWeight: 800,
-            background: 'linear-gradient(135deg, #00ff9d 0%, #00d4ff 100%)',
+            background: 'linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-purple) 50%, var(--neon-red) 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
+            filter: 'drop-shadow(0 0 10px rgba(188, 54, 194, 0.5))',
             backgroundClip: 'text',
             letterSpacing: '0.15em',
             margin: 0
@@ -196,6 +197,7 @@ export default function Login() {
             borderRadius: '20px',
             border: '1px solid rgba(255,255,255,0.08)',
             padding: '32px 24px',
+            boxShadow: '0 0 40px rgba(0,0,0,0.5), 0 0 20px rgba(188, 54, 194, 0.1)',
             position: 'relative' as const,
             zIndex: 1
         },
@@ -216,8 +218,9 @@ export default function Login() {
             borderRadius: '10px',
             cursor: 'pointer',
             transition: 'all 0.2s ease',
-            backgroundColor: isActive ? '#00ff9d' : 'transparent',
-            color: isActive ? '#000' : 'rgba(255,255,255,0.6)'
+            backgroundColor: isActive ? 'var(--neon-purple)' : 'transparent',
+            color: isActive ? '#fff' : 'rgba(255,255,255,0.6)',
+            boxShadow: isActive ? 'var(--neon-purple-glow)' : 'none'
         }),
         inputGroup: {
             marginBottom: '16px',
@@ -248,9 +251,6 @@ export default function Login() {
             padding: '16px',
             fontSize: '15px',
             fontWeight: 700,
-            backgroundColor: '#00ff9d',
-            color: '#000',
-            border: 'none',
             borderRadius: '12px',
             cursor: 'pointer',
             display: 'flex',
@@ -278,12 +278,12 @@ export default function Login() {
             color: type === 'error'
                 ? '#ff6b7a'
                 : type === 'success'
-                    ? '#00ff9d'
+                    ? '#BC36C2'
                     : 'rgba(255,255,255,0.7)',
             border: `1px solid ${type === 'error'
                 ? 'rgba(255, 71, 87, 0.2)'
                 : type === 'success'
-                    ? 'rgba(0, 255, 157, 0.2)'
+                    ? 'rgba(188, 54, 194, 0.2)'
                     : 'rgba(255,255,255,0.1)'}`
         }),
         footer: {
@@ -313,7 +313,7 @@ export default function Login() {
             <button
                 onClick={() => navigate('/')}
                 style={styles.backHome}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(0,255,157,0.1)'}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(188, 54, 194, 0.1)'}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'}
             >
                 <ArrowLeft size={18} />
@@ -322,11 +322,8 @@ export default function Login() {
 
             {/* Logo */}
             <div style={styles.logoContainer}>
-                <div style={styles.logoIcon}>
-                    <img src="/logo.png" alt="MAIPIX Logo" style={{ width: '120px', height: '120px', objectFit: 'contain' }} />
-                </div>
-                <h1 style={styles.logo}>MAIPIX</h1>
-                <p style={styles.tagline}>Imagens que falam</p>
+                <img src="/logo.png" alt="UAU Code Logo" style={{ width: '280px', height: 'auto', objectFit: 'contain' }} />
+                <p style={styles.tagline}>O sucessor do QR Code</p>
             </div>
 
             {/* Login Card */}
@@ -388,8 +385,11 @@ export default function Login() {
                     {/* Submit Button */}
                     <button
                         type="submit"
+                        className="btn-primary"
                         style={{
                             ...styles.submitButton,
+                            backgroundColor: 'unset',
+                            boxShadow: 'unset',
                             ...((!isFormValid || isLoading) ? styles.submitButtonDisabled : {})
                         }}
                         disabled={!isFormValid || isLoading}
@@ -427,7 +427,7 @@ export default function Login() {
 
             {/* Footer */}
             <p style={styles.footer}>
-                © 2024 MAIPIX. Todos os direitos reservados.
+                © 2026 UAU Code. Todos os direitos reservados.
             </p>
         </div>
     );

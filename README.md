@@ -1,4 +1,6 @@
-MAIPIX é uma plataforma WebAR (Realidade Aumentada Web) de alta performance. Sob o slogan **"Imagens que falam"**, transformamos marcadores físicos em experiências imersivas (Vídeo, Áudio, 3D) com processamento local via OpenCV.js e React.
+# UAU Code - O Sucessor do QR Code
+
+**UAU Code** é uma plataforma WebAR (Realidade Aumentada Web) de alta performance. Sob o slogan **"Imagens que falam"**, transformamos marcadores físicos em experiências imersivas (Vídeo, Áudio, 3D) com uma estética Neon moderna e vibrante.
 
 ## 🏗️ Arquitetura
 
@@ -26,8 +28,8 @@ MAIPIX é uma plataforma WebAR (Realidade Aumentada Web) de alta performance. So
 │  │  (GoTrue)   │  │   (S3)      │  │  (Postgres) │         │
 │  └─────────────┘  └─────────────┘  └─────────────┘         │
 │                                                             │
-│  Tables: profiles, targets                                  │
-│  Buckets: target-images, content-files                      │
+│  Tables: profiles, targets, scan_logs                       │
+│  Buckets: assets, target-images, content-files              │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -37,132 +39,71 @@ MAIPIX é uma plataforma WebAR (Realidade Aumentada Web) de alta performance. So
 
 - Node.js (v18+)
 - Navegador com suporte a WebAssembly e Câmera (Chrome/Safari Mobile)
-- Conta Supabase com projeto configurado
+- Conta Supabase (Projeto: UAU-CODE)
 
 ### Instalação
 
 ```bash
 # Clone o repositório
 git clone <repo-url>
-cd MAIPIX
+cd UAU-CODE
 
-# Instalar dependências do cliente
+# Instalar dependências
 cd client
 npm install
 ```
 
-### Configuração
-
-1.  **Supabase**: Configure as credenciais em `client/src/AuthContext.tsx`
-2.  **Tabelas necessárias**:
-    - `profiles`: Gerencia usuários, planos (free, pro, enterprise), roles (admin, user) e slugs personalizados.
-    - `targets`: Armazena os marcadores, URLs de conteúdo, contagem de scans e flag `is_global`.
-
 ### Executar Localmente
 
 ```bash
-cd client
 npm run dev
 ```
 
-Acesse `http://localhost:8080`
+Acesse `https://localhost:8080` (Atenção: Necessário HTTPS para acesso à câmera).
 
 ---
 
 ## 🛠 Funcionalidades Principais
 
-### MAIPIX - WebAR Image Recognition Platform
-
-MAIPIX é uma plataforma WebAR (Realidade Aumentada Web) de alta performance para reconhecimento de imagens utilizando OpenCV.js e React. O sistema permite criar experiências imersivas associando conteúdos multimídia (Vídeo, Áudio, 3D) a marcadores físicos (imagens-alvo), com suporte a captura direta de mídia e gerenciamento global de alvos.
-
----
-
-## 🚀 Funcionalidades Principais
-
-- **Reconhecimento de Imagem Local**: Processamento via OpenCV.js diretamente no navegador (WASM).
-- **Landing Page de Alta Conversão**: Nova interface pública focada em marketing e conversão.
-- **Acessibilidade**: Suporte para "leitura" de rótulos e etiquetas para pessoas com deficiência visual.
-- **Suporte Multimídia**: Reproduza Vídeos, Áudio ou Modelos 3D (GLB) ao detectar um alvo.
-- **Modo Offline (PWA)**: Aplicativo instalável com suporte a cache de assets críticos.
-- **Capacidade de Compressão Inteligente**: Opção de economia de dados para vídeos (ideal para WebAR).
-- **Captura Direta de Mídia**: Faça upload ou tire fotos/grave vídeos diretamente do Dashboard.
-- **Gerenciamento de Alvos**: Dashboard administrativo para criar e gerenciar experiências.
-- **Reconhecimento Híbrido**: O scanner reconhece tanto Marcadores do Usuário quanto Marcadores Globais da plataforma.
-- **Feedback Visual Premium**: Interface moderna com animações via Framer Motion.
+- **Visual Neon Premium**: Interface totalmente remodelada com gradientes vibrantes e efeitos de brilho neon.
+- **Reconhecimento Local**: Processamento via OpenCV.js (WASM) diretamente no navegador.
+- **Acessibilidade**: Transforme rótulos físicos em áudio para acessibilidade universal.
+- **Suporte Multimídia**: Vídeos Transparentes, Áudio Imersivo e Objetos 3D (GLB).
+- **Dashboard Admin**: Gestão completa de usuários e marcadores globais.
 
 ---
 
-## 🛠️ Stack Tecnológica
+## 🎨 Design System
 
-- **Frontend**: Vite, React 19, TypeScript, Tailwind CSS.
-- **Backend/DB**: Supabase (Auth, PostgreSQL, Storage).
-- **Processamento**: OpenCV.js (WebAssembly).
-- **AR/3D**: Three.js / Google Model Viewer.
-- **Hospedagem**: Vercel.
+- **Paleta**: Electric Blue, Royal Purple e Coral Red.
+- **Efeitos**: Glow Neon, Glassmorphism Profundo, Micro-animações.
 
 ---
 
-## 📋 Arquitetura do Sistema
-
-- **Slugs Personalizados**: Cada usuário tem sua própria URL de scanner (ex: `maipix.app/s/seu-nome`).
-- **Detecção Multialvo**: O sistema carrega os descritores de imagem (ORB/AKAZE) e compara com o stream da câmera.
-- **Persistência de Detecção**: Algoritmo que mantém o conteúdo visível por 2s após a perda do alvo para evitar flickering.
-
----
-
-## 📂 Estrutura de Pastas
+## 📁 Estrutura de Pastas
 
 ```text
-MAIPIX/
+UAU-CODE/
 ├── client/              # Frontend React + PWA
 │   ├── src/
 │   │   ├── components/  # Componentes reutilizáveis
-│   │   ├── pages/       # Login, Dashboard, Scanner
-│   │   ├── hooks/       # Lógica Customizada
+│   │   ├── pages/       # Landing, Login, Dashboard, Scanner
+│   │   ├── styles/      # Temas e CSS Global
 │   │   └── utils/       # OpenCV e Helpers
-│   └── public/          # Manifest, Service Worker, OpenCV.js
+│   └── public/          # Assets estáticos e OpenCV.js
 ├── migrations/          # Scripts SQL do Supabase
-└── server/              # Referência (Lógica centralizada no Supabase)
+└── DOCUMENTATION.md      # Detalhes técnicos profundos
 ```
 
 ---
 
-## 🔐 Segurança & RLS
+### v1.3.0 (2026-02-17) - "Neon Revolution"
 
-O sistema utiliza **Row Level Security (RLS)** no Supabase:
-
-- Usuários só podem ver e editar seus próprios alvos.
-- Usuários anônimos podem ler alvos globais através do scanner.
-
----
-
-## 🚀 Deploy Automatizado
-
-O deploy é configurado via CI/CD (GitHub → Vercel):
-
-1.  Faça o push para a branch `main`.
-2.  O Vercel detecta a alteração na pasta `client` e executa o build.
-3.  Certifique-se de configurar as Secret Env Vars (`VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY`) no painel da Vercel.
+- **Nova Marca**: Transição completa de MAIPIX para **UAU Code**.
+- **Tema Neon**: Estilo visual futurista com glow e gradientes Blue-Purple-Red.
+- **Migração Supabase**: Banco de dados migrado para novo projeto dedicado.
+- **UI Refresh**: Landing Page, Dashboard e Login totalmente redesenhados.
 
 ---
 
-## 🛠️ Boas Práticas e Build
-
-Para garantir que o deploy na Vercel não falhe, siga estas regras:
-
-1. **Imports Limpos**: Nunca deixe ícones (lucide-react) ou bibliotecas importadas que não estão sendo usadas. O `tsc` (TypeScript Compiler) na Vercel está configurado para falhar o build em caso de variáveis não utilizadas.
-2. **Teste de Build Local**: Sempre rode `npm run build` na pasta `client` antes de fazer o push para o GitHub. Se der erro aqui, a Vercel também vai falhar.
-3. **OpenCV.js**: O arquivo `opencv.js` deve permanecer na pasta `public`. Ele é carregado via script tag no `index.html`.
-
----
-
-### v1.2.2 (2026-02-03)
-
-- **Otimização iOS (iPhone)**: Implementação de Meta Tags PWA, suporte a safe-areas (notch) e prevenção de auto-zoom em inputs.
-- **Resiliência de Upload**: Mecanismo de retry para erros de "signal aborted" em conexões móveis e tratamento explícito de MIME types para 3D e Áudio (WEBW/GLB).
-- **Mídia iOS**: Suporte a gravação em containers nativos (MP4/M4A) para garantir compatibilidade com Safari Mobile.
-- **Correções de Código**: Resolução de conflitos de hoisting no MediaCapture e otimização de cache (Blob) para modelos 3D no scanner.
-
----
-
-_Desenvolvido pela equipe MAIPIX & Antigravity_
+_Desenvolvido por Antigravity AI_

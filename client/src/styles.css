@@ -1,12 +1,15 @@
 :root {
-  --bg-color: #0d0d0d;
-  --surface-color: #1a1a1a;
-  --primary-color: #00ff88;
-  --secondary-color: #00ccff;
+  --bg-color: #050508;
+  --surface-color: #0d0d12;
+  --primary-color: #BC36C2;
+  --blue: #3156F3;
+  --purple: #BC36C2;
+  --red: #F5464A;
+  --secondary-color: #3156F3;
   --text-color: #ffffff;
-  --text-secondary: #a0a0a0;
-  --glass-bg: rgba(255, 255, 255, 0.1);
-  --glass-border: rgba(255, 255, 255, 0.2);
+  --text-secondary: #888888;
+  --glass-bg: rgba(188, 54, 194, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
   --font-family: 'Inter', system-ui, sans-serif;
 }
 
@@ -82,8 +85,8 @@ video.camera-feed {
 }
 
 .status-dot.active {
-  background-color: var(--primary-color);
-  box-shadow: 0 0 15px var(--primary-color);
+  background-color: var(--purple);
+  box-shadow: 0 0 15px var(--purple), 0 0 30px var(--purple);
 }
 
 .status-text {
@@ -131,16 +134,23 @@ input[type="file"] {
 }
 
 .primary-btn {
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  background: linear-gradient(135deg, var(--blue), var(--purple), var(--red));
   border: none;
   padding: 14px;
   border-radius: 12px;
-  color: #000;
+  color: #fff;
   font-weight: 800;
   font-size: 16px;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: all 0.3s ease;
   text-transform: uppercase;
+  letter-spacing: 0.1em;
+  box-shadow: 0 0 20px rgba(188, 54, 194, 0.4);
+}
+
+.primary-btn:hover {
+  box-shadow: 0 0 30px rgba(188, 54, 194, 0.6);
+  transform: translateY(-2px);
 }
 
 .primary-btn:active {

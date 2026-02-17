@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     ArrowLeft, Users, Layers, BarChart3, Edit2, Trash2,
@@ -39,11 +39,7 @@ export default function AdminPanel() {
     const [editingUser, setEditingUser] = useState<User | null>(null);
     const [stats, setStats] = useState({ users: 0, targets: 0, scans: 0 });
 
-    useEffect(() => {
-        fetchData();
-    }, [tab]);
-
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         setLoading(true);
 
         if (tab === 'users') {
@@ -102,7 +98,11 @@ export default function AdminPanel() {
 
         setStats({ users: usersCount || 0, targets: targetsCount || 0, scans: totalScans });
         setLoading(false);
-    };
+    }, [tab]);
+
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
 
     const updateUser = async (userId: string, updates: Partial<User>) => {
         await supabase.from('profiles').update(updates).eq('id', userId);
@@ -151,8 +151,10 @@ export default function AdminPanel() {
         },
         title: {
             fontSize: '20px',
-            fontWeight: 700,
-            color: '#ffd700',
+            fontWeight: 800,
+            background: 'linear-gradient(135deg, var(--neon-blue), var(--neon-purple))',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
             margin: 0
         },
         statsGrid: {
@@ -170,7 +172,8 @@ export default function AdminPanel() {
         statValue: {
             fontSize: '24px',
             fontWeight: 700,
-            color: '#00ff9d'
+            color: 'var(--neon-purple)',
+            textShadow: 'var(--neon-purple-glow)'
         },
         statLabel: {
             fontSize: '11px',
@@ -189,12 +192,14 @@ export default function AdminPanel() {
             flex: 1,
             padding: '10px',
             fontSize: '13px',
-            fontWeight: 600,
+            fontWeight: 700,
             border: 'none',
             borderRadius: '8px',
             cursor: 'pointer',
-            backgroundColor: active ? '#ffd700' : 'transparent',
-            color: active ? '#000' : 'rgba(255,255,255,0.6)'
+            background: active ? 'linear-gradient(135deg, var(--neon-blue), var(--neon-purple))' : 'transparent',
+            color: active ? '#fff' : 'rgba(255,255,255,0.6)',
+            boxShadow: active ? 'var(--neon-purple-glow)' : 'none',
+            transition: 'all 0.3s ease'
         }),
         card: {
             backgroundColor: 'rgba(255,255,255,0.03)',
@@ -304,15 +309,16 @@ export default function AdminPanel() {
         },
         btn: {
             width: '100%',
-            padding: '12px',
+            padding: '14px',
             fontSize: '14px',
-            fontWeight: 600,
-            backgroundColor: '#ffd700',
-            color: '#000',
+            fontWeight: 800,
+            background: 'linear-gradient(135deg, var(--neon-blue), var(--neon-purple))',
+            color: '#fff',
             border: 'none',
-            borderRadius: '8px',
+            borderRadius: '12px',
             cursor: 'pointer',
-            marginTop: '8px'
+            marginTop: '8px',
+            boxShadow: 'var(--neon-purple-glow)'
         }
     };
 
@@ -388,7 +394,7 @@ export default function AdminPanel() {
                                     <Edit2 size={16} />
                                 </button>
                                 <button
-                                    style={{ ...styles.actionBtn, color: user.is_active ? '#ff4757' : '#00ff9d' }}
+                                    style={{ ...styles.actionBtn, color: user.is_active ? '#ff4757' : 'var(--neon-blue)' }}
                                     onClick={() => toggleUserActive(user)}
                                     title={user.is_active ? 'Desativar' : 'Ativar'}
                                 >

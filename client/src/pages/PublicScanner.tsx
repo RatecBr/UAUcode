@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Loader2, AlertCircle, ArrowLeft, QrCode, Play } from 'lucide-react';
+import { Loader2, AlertCircle, ArrowLeft, Play } from 'lucide-react';
 import { supabase } from '../AuthContext';
 import { initCamera } from '../camera';
 import { ImageRecognizer } from '../recognition';
@@ -482,29 +482,33 @@ export default function PublicScanner() {
         },
         userInfo: {
             padding: '8px 12px',
-            backgroundColor: 'rgba(0,255,157,0.1)',
+            backgroundColor: 'rgba(188, 54, 194, 0.1)',
             backdropFilter: 'blur(10px)',
             borderRadius: '12px',
             fontSize: '12px',
-            color: '#00ff9d'
+            color: 'var(--neon-purple)',
+            border: '1px solid rgba(188, 54, 194, 0.2)'
         },
         detectedCard: {
             alignSelf: 'center',
-            backgroundColor: 'rgba(0,0,0,0.7)',
-            backdropFilter: 'blur(20px)',
-            borderRadius: '16px',
-            padding: '20px',
+            backgroundColor: 'rgba(0,0,0,0.8)',
+            backdropFilter: 'blur(30px)',
+            borderRadius: '24px',
+            padding: '24px',
             textAlign: 'center' as const,
-            maxWidth: '280px',
+            maxWidth: '300px',
             width: '100%',
-            pointerEvents: 'auto' as const
+            pointerEvents: 'auto' as const,
+            border: '1px solid var(--neon-purple)',
+            boxShadow: '0 0 30px rgba(188, 54, 194, 0.3)'
         },
         detectedLabel: {
-            fontSize: '12px',
-            color: '#00ff9d',
-            fontWeight: 600,
-            letterSpacing: '0.1em',
-            marginBottom: '8px'
+            fontSize: '11px',
+            color: 'var(--neon-purple)',
+            fontWeight: 800,
+            letterSpacing: '0.2em',
+            marginBottom: '8px',
+            textTransform: 'uppercase' as const
         },
         detectedName: {
             fontSize: '18px',
@@ -583,8 +587,8 @@ export default function PublicScanner() {
 
             {loading && (
                 <div style={styles.loadingContainer}>
-                    <QrCode size={48} color="#00ff9d" />
-                    <Loader2 size={24} color="#00ff9d" className="spin" />
+                    <img src="/logo.png" style={{ width: '120px', height: 'auto', marginBottom: '24px', filter: 'drop-shadow(0 0 10px var(--neon-purple))' }} />
+                    <Loader2 size={32} color="var(--neon-purple)" className="spin" />
                     <div style={styles.loadingText}>{status}</div>
                 </div>
             )}
@@ -634,9 +638,9 @@ export default function PublicScanner() {
                         {loadingNewTarget && (
                             <div style={{
                                 ...styles.statusBadge,
-                                backgroundColor: 'rgba(0, 255, 157, 0.2)',
-                                border: '1px solid rgba(0, 255, 157, 0.3)',
-                                color: '#00ff9d',
+                                backgroundColor: 'rgba(188, 54, 194, 0.2)',
+                                border: '1px solid rgba(188, 54, 194, 0.3)',
+                                color: 'var(--neon-purple)',
                                 animation: 'pulse 2s infinite'
                             }}>
                                 <Loader2 size={16} className="spin" />
@@ -658,14 +662,15 @@ export default function PublicScanner() {
                                 }}
                                 style={{
                                     ...styles.closeBtn,
-                                    backgroundColor: '#00ff9d',
-                                    color: '#000',
+                                    background: 'linear-gradient(135deg, var(--neon-blue), var(--neon-purple))',
+                                    color: '#fff',
                                     fontWeight: 'bold',
                                     fontSize: '16px',
                                     padding: '16px 32px',
                                     width: 'auto',
                                     pointerEvents: 'auto',
-                                    boxShadow: '0 0 20px rgba(0, 255, 157, 0.4)'
+                                    boxShadow: 'var(--neon-purple-glow)',
+                                    border: 'none'
                                 }}
                             >
                                 <Play size={20} fill="#000" />

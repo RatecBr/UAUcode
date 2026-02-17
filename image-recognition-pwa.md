@@ -1,41 +1,43 @@
-# MAIPIX: Image Recognition PWA
+# UAU Code: Image Recognition PWA
 
 ## Project Overview
-A web-based (PWA) image recognition application using OpenCV.js (WASM) for local device detection of target images to trigger multimedia overlays (Video, Audio, 3D).
+
+A web-based (PWA) image recognition application using OpenCV.js (WASM) for local device detection of target images to trigger multimedia overlays (Video, Audio, 3D). Now with a premium "Neon Revolution" aesthetic.
 
 ## Tech Stack
+
 - **Frontend**: React (Vite), TypeScript, OpenCV.js (WASM), Three.js
-- **Backend**: Node.js + Express (File Storage)
-- **Architecture**: Local recognition loop (2-5 FPS), minimal server dependence.
+- **Backend/DB**: Supabase (Auth, Storage, Postgres)
+- **Architecture**: Local recognition loop (marker-based), Supabase RLS policies.
 
 ## Implementation Phases
 
-### Phase 1: Project Scaffolding
-- [ ] Create directory structure (`client`, `server`)
-- [ ] Initialize `server/package.json` with dependencies (`express`, `multer`, `cors`, `typescript`)
-- [ ] Initialize `client` with Vite (React + TS)
-- [ ] Configure `client/vite.config.ts` for PWA and Proxy
+### Phase 1: Branding & Migration (New)
 
-### Phase 2: Backend Implementation
-- [ ] Implement `server/index.ts` (API Endpoints: /upload/target, /upload/content)
-- [ ] Configure `multer` for file storage
-- [ ] Serve static files from `storage`
+- [x] Migrate from MAIPIX to UAU Code.
+- [x] Implement the "Neon Revolution" design system.
+- [x] Migrate Supabase project to dedicated `UAU-CODE` environment.
 
-### Phase 3: Frontend Core - Infrastructure
-- [ ] Setup `public/opencv.js` and load mechanism
-- [ ] Create `src/camera.ts` (Camera stream handling)
-- [ ] Create `src/recognition.ts` (OpenCV logic: ORB, Matcher, Homography)
+### Phase 2: Core Engine
 
-### Phase 4: Frontend Core - Overlays
-- [ ] Implement `src/overlayVideo.ts`
-- [ ] Implement `src/overlayAudio.ts`
-- [ ] Implement `src/overlay3D.ts` (Three.js Scene)
+- [x] Configure OpenCV.js WASM bridge.
+- [x] Implement ORB Keypoint extraction and KNN matching.
+- [x] Add Homography-based validation for detection stable.
 
-### Phase 5: UI & Integration
-- [ ] Build `src/App.tsx` (Upload UI, Start/Stop Logic, Detection State)
-- [ ] Style application (`src/styles.css`) - Premium Mobile-First aesthetics
-- [ ] PWA Configuration (Manifest, Service Worker)
+### Phase 3: Content Overlays
 
-### Phase 6: Final Polish
-- [ ] Testing (Camera permissions, Detection tuning)
-- [ ] README.md generation
+- [x] Video Overlay (support for transparent/standard videos).
+- [x] Audio Overlay (Accessibility mode).
+- [x] 3D Model Overlay (Google Model Viewer / Three.js).
+
+### Phase 4: UI/UX Neon
+
+- [x] Landing Page with marketing hooks.
+- [x] Modern Dashboard for managing AR experiences.
+- [x] Secure Login/Auth via Supabase.
+
+### Phase 5: Final Polish
+
+- [x] PWA support (Manifest, Icons).
+- [x] Systematic Testing on Mobile (iOS/Android).
+- [x] Comprehensive technical documentation.
