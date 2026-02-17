@@ -323,7 +323,7 @@ export default function Login() {
             {/* Logo */}
             <div style={styles.logoContainer}>
                 <img src="/logo.png" alt="UAU Code Logo" style={{ width: '280px', height: 'auto', objectFit: 'contain' }} />
-                <p style={styles.tagline}>O sucessor do QR Code</p>
+                <p style={styles.tagline}>A evolução do QR Code</p>
             </div>
 
             {/* Login Card */}
