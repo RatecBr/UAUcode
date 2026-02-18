@@ -8,20 +8,23 @@ description: Mandatory project standards for MAIPIX (WebAR, Versioning, Supabase
 > **CRITICAL:** Start every session by reading `.agent/memory/SESSION_LOG.md` to restore context.
 
 ## 1. Context Retention Protocol (Memory)
+
 - **Objective:** Maintain continuity across sessions (Application Restarts).
 - **Action:** Before ending a turn or closing a major task, ALWAYS update the `.agent/memory/SESSION_LOG.md` file with a summary of the last 2 major interactions.
 - **Reading:** Upon activation, ALWAYS check the last entries of `SESSION_LOG.md`.
 
 ## 2. Versioning Standard
-- **Format:** `MAIPIX V.1.X (Keyword)`
-- **Example:** `MAIPIX V.1.2 (DESIGN)`
+
+- **Format:** `UAUCode V.X.X.X - Description`
+- **Example:** `UAUCode V.1.3.2 - Complete Documentation Overhaul`
 - **Rule:** Every significant deployment or architecture change must increment the version (X) and update `DOCUMENTATION.md`.
 - **Note:** Version increments are managed manually by the agent when a deployment is requested.
 
 ## 3. WebAR Architecture (Immutable)
+
 - **Engine:** OpenCV.js (WASM) + ORB (800 Features) + VGA Processing.
 - **Backend:** Serverless (Supabase Only). NO Node.js custom servers.
-- **UX Pattern:** 
+- **UX Pattern:**
   - **Sticky Playback:** Media plays until explicit close or NEW target confirmed.
   - **Debounce:** 3-frame stability check for new targets.
   - **JIT Loading:** Background fetch (Blob) while current media plays.
@@ -31,6 +34,7 @@ description: Mandatory project standards for MAIPIX (WebAR, Versioning, Supabase
 > **IMPORTANT:** ONLY perform deployment actions (Push to GitHub) when the USER explicitly requests it.
 
 ### Prerequisites
+
 - GitHub repository with Vercel integration configured
 - Supabase project with all tables/buckets created
 
@@ -45,7 +49,7 @@ description: Mandatory project standards for MAIPIX (WebAR, Versioning, Supabase
 
 3. COMMIT & PUSH
    └── git add .
-   └── git commit -m "v1.XX - DESCRIPTION"
+   └── git commit -m "UAUCode V.1.X.X - Description"
    └── git push origin main
 
 4. AUTOMATIC DEPLOY
@@ -59,19 +63,19 @@ description: Mandatory project standards for MAIPIX (WebAR, Versioning, Supabase
 ### GitHub Commit Convention
 
 ```
-Format: "MAIPIX V.1.X (KEYWORD): description"
+Format: "UAUCode V.X.X.X - Description"
 
 Examples:
-- "MAIPIX V.1.3 (AUTH): Fixed login flow with single Supabase client"
-- "MAIPIX V.1.4 (SCANNER): Added debug mode for AR tracking"
+- "UAUCode V.1.3.0 - Database Migration, Neon FAB Button"
+- "UAUCode V.1.3.1 - Brand Consistency Update"
 ```
 
 ### Environment Variables (Vercel Dashboard)
 
-| Variable | Value |
-|----------|-------|
-| `VITE_SUPABASE_URL` | `https://anzxgurkbpyegcibebfu.supabase.co` |
-| `VITE_SUPABASE_ANON_KEY` | `eyJhbGci...` (anon key) |
+| Variable                 | Value                                      |
+| ------------------------ | ------------------------------------------ |
+| `VITE_SUPABASE_URL`      | `https://anzxgurkbpyegcibebfu.supabase.co` |
+| `VITE_SUPABASE_ANON_KEY` | `eyJhbGci...` (anon key)                   |
 
 ### Rollback Procedure
 
@@ -90,25 +94,27 @@ git push origin main
 
 ### Required Tables
 
-| Table | Columns | Purpose |
-|-------|---------|---------|
-| `profiles` | id (uuid), email, role | User roles (admin/user) |
-| `targets` | id, name, target_url, content_url, content_type | AR experiences |
+| Table      | Columns                                         | Purpose                 |
+| ---------- | ----------------------------------------------- | ----------------------- |
+| `profiles` | id (uuid), email, role                          | User roles (admin/user) |
+| `targets`  | id, name, target_url, content_url, content_type | AR experiences          |
 
 ### Required Storage Buckets
 
-| Bucket | Purpose |
-|--------|---------|
+| Bucket          | Purpose                          |
+| --------------- | -------------------------------- |
 | `target-images` | Reference images for recognition |
-| `content-files` | Video, audio, 3D files |
+| `content-files` | Video, audio, 3D files           |
 
 ### RLS Policies
+
 - `profiles`: Users can read/update own profile (role changes require admin)
 - `targets`: Public read, admin insert/update/delete
 
 ## 6. Authentication Architecture
 
 ### Single Client Pattern (CRITICAL)
+
 - **ONE** Supabase client instance in `AuthContext.tsx`
 - All components import `supabase` from `AuthContext`
 - **NEVER** create `createClient()` in individual components

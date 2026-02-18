@@ -216,7 +216,7 @@ export default function Landing() {
                         onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
                         onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                     >
-                        Criar minha conta grátis
+                        CRIAR MINHA CONTA GRÁTIS
                         <ArrowRight size={20} />
                     </button>
                 </section>
@@ -395,7 +395,7 @@ export default function Landing() {
                                     className="btn-primary"
                                     style={{ width: '100%', borderRadius: '12px' }}
                                 >
-                                    Começar Grátis
+                                    CRIAR MINHA CONTA GRÁTIS
                                 </button>
                             </div>
                         </div>

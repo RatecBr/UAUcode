@@ -116,7 +116,7 @@ const { user, profile } = useAuth();
 ```env
 # .env
 VITE_SUPABASE_URL=https://nqpkttlgdjpduytebndy.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+VITE_SUPABASE_ANON_KEY=your-anon-key-here
 ```
 
 ---
@@ -319,7 +319,7 @@ const detectTarget = (
 ### Fluxo de Login
 
 ```
-1. Usuário → email + senha
+1. Usuário → email + senha (ou Google OAuth - *configuração pendente*)
 2. Supabase Auth → JWT token
 3. AuthContext → atualiza estado
 4. Fetch profile → Supabase DB
@@ -482,7 +482,7 @@ vercel --prod
 
 ```
 VITE_SUPABASE_URL=https://nqpkttlgdjpduytebndy.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+VITE_SUPABASE_ANON_KEY=your-anon-key-here
 ```
 
 ### Netlify (Alternativa)
