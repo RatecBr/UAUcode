@@ -78,6 +78,8 @@ App.tsx
 │   └── Overlays (Video, Audio, 3D)
 └── PublicScanner.tsx (/s/:slug)
     └── Overlays (Video, Audio, 3D)
+├── Terms.tsx (/terms)
+└── Privacy.tsx (/privacy)
 ```
 
 ### Roteamento
@@ -90,6 +92,8 @@ App.tsx
   <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
   <Route path="/scanner" element={<ProtectedRoute><Scanner /></ProtectedRoute>} />
   <Route path="/s/:slug" element={<PublicScanner />} />
+  <Route path="/terms" element={<Terms />} />
+  <Route path="/privacy" element={<Privacy />} />
   <Route path="/admin" element={<AdminRoute><AdminPanel /></AdminRoute>} />
 </Routes>
 ```
@@ -457,26 +461,16 @@ self.addEventListener("fetch", (event) => {
 
 ## 8. Deploy
 
-### Vercel (Produção)
+### GitHub Flow (Produção)
 
-```bash
-# 1. Install CLI
-npm i -g vercel
+1.  **Commit**: Realize os commits das suas alterações localmente.
+2.  **Push**: Envie as alterações para a branch `main` do repositório remoto.
+    ```bash
+    git push origin main
+    ```
+3.  **Automatic Deploy**: O Vercel detectará automaticamente o push e iniciará o build e deploy.
 
-# 2. Login
-vercel login
-
-# 3. Deploy
-cd client
-vercel --prod
-```
-
-**Configurações**:
-
-- Build Command: `npm run build`
-- Output Directory: `dist`
-- Install Command: `npm install`
-- Framework: Vite
+> **Nota Crítica**: Nunca utilize o comando `vercel --prod` diretamente. O deploy deve ser sempre rastreável via histórico do Git.
 
 **Environment Variables**:
 
@@ -588,4 +582,4 @@ await waitForOpenCV();
 
 ---
 
-_Última atualização: 2026-02-17_
+_Última atualização: 18 de fevereiro de 2026_
