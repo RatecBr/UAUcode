@@ -323,11 +323,13 @@ const detectTarget = (
 ### Fluxo de Login
 
 ```
-1. Usuário → email + senha (ou Google OAuth - *configuração pendente*)
+1. Usuário → email + senha (ou Google OAuth)
 2. Supabase Auth → JWT token
 3. AuthContext → atualiza estado
 4. Fetch profile → Supabase DB
 5. Redirect → /dashboard
+
+> **Nota de Produção (Google OAuth)**: Para o login com Google funcionar sem avisos de segurança em produção, o aplicativo deve estar com status "Publicado" na tela de permissão OAuth do Google Cloud Console e o domínio verificado.
 ```
 
 ### Proteção de Rotas
