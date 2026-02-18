@@ -14,6 +14,7 @@ export { supabase };
 export interface UserProfile {
   id: string;
   email: string;
+  full_name?: string;
   role: "admin" | "user";
   plan: "free" | "pro" | "enterprise";
   slug: string;
@@ -56,7 +57,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
       const fetchPromise = supabase
         .from("profiles")
-        .select("*")
+        .select("*, full_name")
         .eq("id", userId)
         .single();
 

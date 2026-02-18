@@ -8,13 +8,14 @@ import type { RecognitionResult } from '../recognition';
 import { VideoOverlay } from '../overlayVideo';
 import { AudioOverlay } from '../overlayAudio';
 import { Overlay3D } from '../overlay3D';
+import { LinkOverlay } from '../overlayLink';
 
 interface Target {
     id: number;
     name: string;
     target_url: string;
     content_url: string;
-    content_type: 'video' | 'audio' | '3d';
+    content_type: 'video' | 'audio' | '3d' | 'link';
 }
 
 interface UserProfile {
@@ -57,6 +58,7 @@ export default function PublicScanner() {
     const videoOverlayRef = useRef<VideoOverlay | null>(null);
     const audioOverlayRef = useRef<AudioOverlay | null>(null);
     const overlay3DRef = useRef<Overlay3D | null>(null);
+    const linkOverlayRef = useRef<LinkOverlay | null>(null);
 
     // Sistema de Estabilidade e Detecção
     const stabilityCounterRef = useRef(0);
@@ -314,6 +316,20 @@ export default function PublicScanner() {
 
         console.log(`[PublicScanner] Preparando conteúdo para ${target.name}...`);
 
+        // Tipo LINK: exibe a página dentro de um iframe overlay
+        if (target.content_type === 'link') {
+            resetOverlays();
+            activeTargetRef.current = target;
+            setActiveTarget(target);
+            setIsDetected(true);
+            try { supabase.from('scan_logs').insert({ target_id: target.id }).then(); } catch (_) { }
+            const lo = new LinkOverlay(() => resetOverlays());
+            lo.setSource(target.content_url);
+            lo.show();
+            linkOverlayRef.current = lo;
+            return;
+        }
+
         // 1. Bloqueia disparo concorrente
         loadingRef.current = true;
         setLoadingNewTarget(true);
@@ -338,10 +354,8 @@ export default function PublicScanner() {
             return;
         }
 
-        // 4. AGORA sim fazemos o swap. Para o antigo.
+        // Para o overlay anterior e atualiza estado
         resetOverlays();
-
-        // 5. Atualiza status síncrono e estado
         activeTargetRef.current = target;
         setActiveTarget(target);
         setIsDetected(true);
@@ -350,7 +364,7 @@ export default function PublicScanner() {
             supabase.from('scan_logs').insert({ target_id: target.id }).then();
         } catch (e) { }
 
-        // 6. Monta o novo conteúdo instantaneamente
+        // Monta o novo conteúdo
         if (target.content_type === 'video') {
             videoOverlayRef.current = new VideoOverlay(container);
             videoOverlayRef.current.setSource(assetUrl);
@@ -360,7 +374,6 @@ export default function PublicScanner() {
             audioOverlayRef.current.play();
         } else if (target.content_type === '3d') {
             overlay3DRef.current = new Overlay3D(container);
-            // IMPORTANTE: Usar assetUrl (blob) para garantir performance e evitar erro de CORS duplicado
             overlay3DRef.current.loadModel(assetUrl).then(() => {
                 if (activeTargetRef.current?.id === target.id) {
                     overlay3DRef.current?.show();
@@ -373,12 +386,15 @@ export default function PublicScanner() {
         videoOverlayRef.current?.dispose();
         audioOverlayRef.current?.dispose();
         overlay3DRef.current?.dispose();
+        // Nula ANTES do dispose para evitar loop recursivo via onClose
+        const link = linkOverlayRef.current;
+        linkOverlayRef.current = null;
+        link?.dispose();
 
         if (overlayContainerRef.current) {
             overlayContainerRef.current.innerHTML = '';
         }
 
-        // Cancela qualquer carga em andamento
         currentLoadingIdRef.current = null;
         loadingRef.current = false;
         setLoadingNewTarget(false);
@@ -678,7 +694,7 @@ export default function PublicScanner() {
                             </button>
                         )}
 
-                        {isDetected && activeTarget && (
+                        {isDetected && activeTarget && activeTarget.content_type !== 'link' && (
                             <div style={styles.detectedCard}>
                                 <div style={styles.detectedLabel}>DETECTADO</div>
                                 <div style={styles.detectedName}>{activeTarget.name}</div>

@@ -29,19 +29,21 @@ export default function QRCodeGenerator({ url, name, size = 256 }: QRCodeGenerat
                 errorCorrectionLevel: 'H'  // High error correction for logo overlay
             });
 
-            // Add logo overlay in center
+            {/* Add logo overlay in center */}
             if (logoRef.current && logoRef.current.complete) {
-                const logoSize = size * 0.2;  // 20% of QR size
+                const logoSize = size * 0.24;  // 24% of QR size (Increased from 20%)
                 const logoX = (size - logoSize) / 2;
                 const logoY = (size - logoSize) / 2;
 
                 // White circle background for logo
                 ctx.fillStyle = '#ffffff';
                 ctx.beginPath();
-                ctx.arc(size / 2, size / 2, logoSize / 2 + 6, 0, Math.PI * 2);
+                ctx.arc(size / 2, size / 2, logoSize / 2 + 5, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Draw logo
+                // Draw logo with high quality smoothing
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
                 ctx.drawImage(logoRef.current, logoX, logoY, logoSize, logoSize);
             }
         } catch (e) {
@@ -92,12 +94,11 @@ export default function QRCodeGenerator({ url, name, size = 256 }: QRCodeGenerat
             />
             
             <h3 style={{
-                fontSize: '18px',
-                fontWeight: 700,
-                marginBottom: '16px',
-                background: 'linear-gradient(135deg, var(--neon-blue), var(--neon-purple), var(--neon-red))',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent'
+                fontSize: '22px',
+                fontWeight: 800,
+                marginBottom: '20px',
+                color: '#fff',
+                textShadow: '0 0 20px rgba(188, 54, 194, 0.5)'
             }}>
                 UAU Code
             </h3>
@@ -105,89 +106,74 @@ export default function QRCodeGenerator({ url, name, size = 256 }: QRCodeGenerat
             <div style={{
                 display: 'inline-block',
                 padding: '20px',
-                background: 'rgba(255, 255, 255, 0.05)',
-                borderRadius: '20px',
-                border: '2px solid rgba(255, 255, 255, 0.1)',
-                boxShadow: '0 0 30px rgba(188, 54, 194, 0.3), 0 0 60px rgba(49, 86, 243, 0.2)'
+                background: '#fff',
+                borderRadius: '24px',
+                boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
             }}>
                 <canvas
                     ref={canvasRef}
                     width={size}
                     height={size}
                     style={{
-                        borderRadius: '12px',
+                        borderRadius: '8px',
                         display: 'block',
-                        backgroundColor: '#fff'
                     }}
                 />
             </div>
 
             <div style={{
-                marginTop: '16px',
-                fontSize: '11px',
-                color: 'rgba(255,255,255,0.5)',
+                marginTop: '20px',
+                fontSize: '13px',
+                color: '#fff',
+                fontWeight: 500,
                 wordBreak: 'break-all',
                 maxWidth: size + 'px',
-                margin: '16px auto 0'
+                margin: '20px auto 0',
+                padding: '10px',
+                background: 'rgba(255,255,255,0.1)',
+                borderRadius: '12px'
             }}>
                 {url}
             </div>
 
             <div style={{ 
                 display: 'flex', 
-                gap: '8px', 
-                marginTop: '16px',
+                gap: '10px', 
+                marginTop: '20px',
                 maxWidth: size + 'px',
-                margin: '16px auto 0'
+                margin: '20px auto 0'
             }}>
                 <button
                     onClick={copyLink}
+                    title="Copiar Link"
                     style={{
-                        flex: 1,
                         padding: '12px',
-                        fontSize: '13px',
-                        fontWeight: 600,
-                        backgroundColor: 'rgba(255,255,255,0.1)',
+                        borderRadius: '12px',
+                        backgroundColor: 'rgba(255,255,255,0.15)',
                         border: '1px solid rgba(255,255,255,0.2)',
-                        borderRadius: '10px',
                         color: '#fff',
                         cursor: 'pointer',
-                        transition: 'all 0.2s'
-                    }}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.15)';
-                        e.currentTarget.style.transform = 'translateY(-2px)';
-                    }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)';
-                        e.currentTarget.style.transform = 'translateY(0)';
+                        transition: 'all 0.2s',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center'
                     }}
                 >
-                    📋 Copiar Link
+                    📋
                 </button>
 
                 <button
                     onClick={shareWhatsApp}
                     style={{
-                        flex: 1,
+                        flex: 2,
                         padding: '12px',
-                        fontSize: '13px',
-                        fontWeight: 600,
-                        background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
+                        fontSize: '14px',
+                        fontWeight: 700,
+                        background: '#25D366',
                         border: 'none',
-                        borderRadius: '10px',
+                        borderRadius: '12px',
                         color: '#fff',
                         cursor: 'pointer',
-                        boxShadow: '0 4px 12px rgba(37, 211, 102, 0.3)',
-                        transition: 'all 0.2s'
-                    }}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = 'translateY(-2px)';
-                        e.currentTarget.style.boxShadow = '0 6px 16px rgba(37, 211, 102, 0.4)';
-                    }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = 'translateY(0)';
-                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(37, 211, 102, 0.3)';
+                        boxShadow: '0 4px 15px rgba(37, 211, 102, 0.4)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
                     }}
                 >
                     💬 WhatsApp
@@ -195,29 +181,19 @@ export default function QRCodeGenerator({ url, name, size = 256 }: QRCodeGenerat
 
                 <button
                     onClick={downloadQR}
+                    title="Baixar QR Code"
                     style={{
-                        flex: 1,
                         padding: '12px',
-                        fontSize: '13px',
-                        fontWeight: 600,
+                        borderRadius: '12px',
                         background: 'linear-gradient(135deg, var(--neon-blue), var(--neon-purple))',
                         border: 'none',
-                        borderRadius: '10px',
                         color: '#fff',
                         cursor: 'pointer',
-                        boxShadow: '0 4px 12px rgba(188, 54, 194, 0.3)',
-                        transition: 'all 0.2s'
-                    }}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = 'translateY(-2px)';
-                        e.currentTarget.style.boxShadow = '0 6px 16px rgba(188, 54, 194, 0.4)';
-                    }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = 'translateY(0)';
-                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(188, 54, 194, 0.3)';
+                        boxShadow: '0 4px 15px rgba(188, 54, 194, 0.4)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center'
                     }}
                 >
-                    ⬇️ Baixar
+                    ⬇️
                 </button>
             </div>
         </div>

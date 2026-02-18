@@ -8,26 +8,26 @@ import type { RecognitionResult } from '../recognition';
 import { VideoOverlay } from '../overlayVideo';
 import { AudioOverlay } from '../overlayAudio';
 import { Overlay3D } from '../overlay3D';
+import { LinkOverlay } from '../overlayLink';
 
 interface Target {
     id: number;
     name: string;
     target_url: string;
     content_url: string;
-    content_type: 'video' | 'audio' | '3d';
+    content_type: 'video' | 'audio' | '3d' | 'link';
 }
 
 export default function Scanner() {
     const { user, isAdmin } = useAuth();
     const navigate = useNavigate();
 
-    const [allUsers, setAllUsers] = useState<{ id: string; email: string }[]>([]);
+    const [allUsers, setAllUsers] = useState<{ id: string; email: string; full_name?: string }[]>([]);
     const [selectedUserId, setSelectedUserId] = useState<string>('');
     const [status, setStatus] = useState<string>('Initializing...');
     const [isDetected, setIsDetected] = useState(false);
     const [activeTarget, setActiveTarget] = useState<Target | null>(null);
     const [loadingNewTarget, setLoadingNewTarget] = useState(false);
-
     // Refs
     const targetsRef = useRef<Target[]>([]);
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -39,6 +39,7 @@ export default function Scanner() {
     const videoOverlayRef = useRef<VideoOverlay | null>(null);
     const audioOverlayRef = useRef<AudioOverlay | null>(null);
     const threeOverlayRef = useRef<Overlay3D | null>(null);
+    const linkOverlayRef = useRef<LinkOverlay | null>(null);
     const isDetectedRef = useRef(false);
     const activeTargetRef = useRef<Target | null>(null);
     const stabilityCounterRef = useRef(0);
@@ -50,7 +51,7 @@ export default function Scanner() {
     const assetsCacheRef = useRef<Map<number, HTMLVideoElement | HTMLAudioElement>>(new Map());
 
     const fetchUsers = useCallback(async () => {
-        const { data } = await supabase.from('profiles').select('id, email');
+        const { data } = await supabase.from('profiles').select('id, email, full_name');
         if (data) setAllUsers(data);
     }, []);
 
@@ -58,6 +59,10 @@ export default function Scanner() {
         videoOverlayRef.current?.dispose();
         audioOverlayRef.current?.dispose();
         threeOverlayRef.current?.dispose();
+        // Nula ANTES do dispose para evitar loop recursivo via onClose
+        const link = linkOverlayRef.current;
+        linkOverlayRef.current = null;
+        link?.dispose();
         if (overlayContainerRef.current) overlayContainerRef.current.innerHTML = '';
         currentLoadingIdRef.current = null;
         loadingRef.current = false;
@@ -89,6 +94,21 @@ export default function Scanner() {
         const container = overlayContainerRef.current;
         if (!container) return;
         if (loadingRef.current || (activeTargetRef.current?.id === t.id && isDetectedRef.current)) return;
+
+        // Tipo LINK: exibe a página dentro de um iframe overlay
+        if (t.content_type === 'link') {
+            resetOverlays();
+            setIsDetected(true);
+            setActiveTarget(t);
+            isDetectedRef.current = true;
+            activeTargetRef.current = t;
+            try { supabase.from('scan_logs').insert({ target_id: t.id }).then(); } catch (_) { }
+            const lo = new LinkOverlay(() => resetOverlays());
+            lo.setSource(t.content_url);
+            lo.show();
+            linkOverlayRef.current = lo;
+            return;
+        }
 
         loadingRef.current = true;
         setLoadingNewTarget(true);
@@ -307,31 +327,93 @@ export default function Scanner() {
             <video ref={videoRef} className="camera-feed" playsInline muted autoPlay style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             <canvas ref={canvasRef} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', display: 'block' }} />
             <div ref={overlayContainerRef} className="overlay-container" style={{ zIndex: 10 }}></div>
-            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 20, pointerEvents: 'none', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: 'var(--space-md)', paddingTop: 'max(var(--space-md), env(safe-area-inset-top))', paddingBottom: 'max(var(--space-md), env(safe-area-inset-bottom))' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <button onClick={() => { stopScan(); navigate('/dashboard'); }} className="glass-card" style={{ padding: 'var(--space-sm) var(--space-md)', pointerEvents: 'auto', display: 'flex', alignItems: 'center', gap: 'var(--space-xs)', color: 'var(--text)' }}>
-                        <ArrowLeft size={18} /><span>Dashboard</span>
+            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 20, pointerEvents: 'none', padding: 'var(--space-md)', paddingTop: 'max(var(--space-md), env(safe-area-inset-top))' }}>
+                
+                {/* Header Container Check */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr auto', alignItems: 'start', gap: '12px' }}>
+                    
+                    {/* Botão Voltar (Circular Glass) */}
+                    <button 
+                        onClick={() => { stopScan(); navigate('/dashboard'); }} 
+                        style={{ 
+                            pointerEvents: 'auto', 
+                            width: '44px', height: '44px', 
+                            borderRadius: '50%', 
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            background: 'rgba(0,0,0,0.4)', 
+                            backdropFilter: 'blur(10px)', 
+                            border: '1px solid rgba(255,255,255,0.1)',
+                            color: '#fff',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
+                        }}
+                    >
+                        <ArrowLeft size={22} />
                     </button>
-                    {isAdmin && allUsers.length > 0 && (
-                        <div style={{ pointerEvents: 'auto', flex: 1, margin: '0 12px' }}>
-                            <select value={selectedUserId} onChange={(e) => setSelectedUserId(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '12px', background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)', color: 'white', border: '1px solid var(--neon-purple)', fontSize: '12px', outline: 'none', boxShadow: 'var(--neon-purple-glow)' }}>
+
+                    {/* Seletor de Usuário (Centralizado) */}
+                    {isAdmin && allUsers.length > 0 ? (
+                        <div style={{ pointerEvents: 'auto', display: 'flex', justifyContent: 'center' }}>
+                            <select 
+                                value={selectedUserId} 
+                                onChange={(e) => setSelectedUserId(e.target.value)} 
+                                style={{ 
+                                    appearance: 'none',
+                                    maxWidth: '220px', 
+                                    width: '100%',
+                                    padding: '10px 16px', 
+                                    borderRadius: '24px', 
+                                    background: 'rgba(0,0,0,0.4)', 
+                                    backdropFilter: 'blur(10px)', 
+                                    color: 'white', 
+                                    border: '1px solid rgba(255,255,255,0.15)', 
+                                    fontSize: '13px', 
+                                    fontWeight: 500,
+                                    outline: 'none', 
+                                    textAlign: 'center',
+                                    cursor: 'pointer',
+                                    boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
+                                }}
+                            >
                                 <option value="" disabled style={{ color: '#000' }}>Selecionar Usuário...</option>
-                                <option value="none" style={{ color: '#000' }}>Apenas Globais (UAU Code)</option>
-                                {allUsers.map(u => (<option key={u.id} value={u.id} style={{ color: '#000' }}>{u.email} {u.id === user?.id ? '(Você)' : ''}</option>))}
+                                <option value="none" style={{ color: '#000' }}>🌍 Apenas Globais (UAU Code)</option>
+                                {allUsers.map(u => (
+                                    <option key={u.id} value={u.id} style={{ color: '#000' }}>
+                                        👤 {u.full_name || u.email} {u.id === user?.id ? '(Você)' : ''}
+                                    </option>
+                                ))}
                             </select>
                         </div>
-                    )}
-                    <div style={{ display: 'flex', gap: 'var(--space-sm)', flexDirection: 'column', alignItems: 'flex-end' }}>
-                        {status && (<div className="glass-card" style={{ padding: 'var(--space-xs) var(--space-sm)', display: 'flex', gap: 'var(--space-sm)', alignItems: 'center', fontSize: 'var(--font-size-sm)', maxWidth: '200px', borderColor: 'var(--neon-blue)', boxShadow: 'var(--neon-blue-glow)' }}><Loader2 className="spin" size={14} /><span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{status}</span></div>)}
+                    ) : <div />}
+
+                    {/* Status Loader (Canto Direito) */}
+                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        {status && (
+                            <div style={{ 
+                                padding: '8px 12px', 
+                                borderRadius: '20px', 
+                                background: 'rgba(0,0,0,0.6)', 
+                                backdropFilter: 'blur(4px)', 
+                                display: 'flex', gap: '8px', alignItems: 'center', 
+                                fontSize: '12px', color: '#ccc',
+                                border: '1px solid rgba(255,255,255,0.05)'
+                            }}>
+                                <Loader2 className="spin" size={14} />
+                                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '80px' }}>{status}</span>
+                            </div>
+                        )}
                     </div>
                 </div>
-                {isDetected && activeTarget && (
-                    <div className="glass-card animate-enter" style={{ alignSelf: 'center', marginBottom: 'var(--space-md)', padding: 'var(--space-md)', pointerEvents: 'auto', textAlign: 'center', maxWidth: '300px', width: '100%', border: '1px solid var(--neon-purple)', boxShadow: 'var(--neon-purple-glow)' }}>
-                        <div className="neon-flicker" style={{ fontSize: 'var(--font-size-xs)', color: 'var(--neon-purple)', marginBottom: 'var(--space-xs)', fontWeight: 800, letterSpacing: '0.2em', textShadow: 'var(--neon-purple-glow)' }}>DETECTADO</div>
-                        <div style={{ fontWeight: 700, fontSize: 'var(--font-size-lg)' }}>{activeTarget.name}</div>
-                        <button onClick={() => { resetOverlays(); }} className="btn-secondary" style={{ marginTop: 'var(--space-sm)', width: '100%', fontSize: 'var(--font-size-sm)' }}>Fechar Experiência</button>
-                    </div>
-                )}
+
+                {/* Área Flexível para empurrar o card para baixo */}
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', height: '100%', paddingBottom: '80px', pointerEvents: 'none' }}>
+                    {isDetected && activeTarget && activeTarget.content_type !== 'link' && (
+                        <div className="glass-card animate-enter" style={{ pointerEvents: 'auto', alignSelf: 'center', padding: '20px', textAlign: 'center', maxWidth: '300px', width: '100%', border: '1px solid var(--neon-purple)', boxShadow: '0 8px 32px rgba(0,0,0,0.5)', background: 'rgba(10,10,14,0.85)' }}>
+                            <div className="neon-flicker" style={{ fontSize: '10px', color: 'var(--neon-purple)', marginBottom: '8px', fontWeight: 800, letterSpacing: '0.2em', textTransform: 'uppercase' }}>DETECTADO</div>
+                            <div style={{ fontWeight: 700, fontSize: '18px', color: '#fff', marginBottom: '12px' }}>{activeTarget.name}</div>
+                            <button onClick={() => { resetOverlays(); }} className="btn-secondary" style={{ width: '100%', fontSize: '13px', padding: '10px' }}>Fechar Experiência</button>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );

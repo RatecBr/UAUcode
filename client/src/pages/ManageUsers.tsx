@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../AuthContext';
-import { UserPlus, Shield, User } from 'lucide-react';
+import { Edit2, Check, X, UserPlus, Shield, User } from 'lucide-react';
 
 interface Profile {
     id: string;
     email: string;
+    full_name?: string;
     role: 'admin' | 'user';
 }
 
@@ -14,15 +15,40 @@ export default function ManageUsers() {
     const [newUserEmail, setNewUserEmail] = useState('');
     const [newUserPass, setNewUserPass] = useState('');
     const [showCreateForm, setShowCreateForm] = useState(false);
+    
+    // Editing state
+    const [editingId, setEditingId] = useState<string | null>(null);
+    const [editName, setEditName] = useState('');
 
     useEffect(() => {
         fetchUsers();
     }, []);
 
     const fetchUsers = async () => {
-        const { data, error } = await supabase.from('profiles').select('*');
+        const { data, error } = await supabase.from('profiles').select('*, full_name').order('created_at', { ascending: false });
         if (error) console.error("Error fetching profiles:", error);
         else setUsers(data as any[] || []);
+    };
+
+    const startEditing = (user: Profile) => {
+        setEditingId(user.id);
+        setEditName(user.full_name || user.email.split('@')[0]);
+    };
+
+    const saveName = async () => {
+        if (!editingId) return;
+        
+        const { error } = await supabase
+            .from('profiles')
+            .update({ full_name: editName })
+            .eq('id', editingId);
+
+        if (error) {
+            alert('Erro ao atualizar nome');
+        } else {
+            setUsers(users.map(u => u.id === editingId ? { ...u, full_name: editName } : u));
+            setEditingId(null);
+        }
     };
 
     const handleCreateUser = async (e: React.FormEvent) => {
@@ -186,24 +212,67 @@ export default function ManageUsers() {
                                 display: 'flex',
                                 flexDirection: 'column',
                                 minWidth: 0,
-                                flex: 1
+                                flex: 1,
+                                marginRight: '16px'
                             }}>
-                                <span style={{
-                                    fontWeight: 600,
-                                    fontSize: 'var(--font-size-base)',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap'
-                                }}>
-                                    {u.email}
-                                </span>
+                                {editingId === u.id ? (
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <input 
+                                            value={editName}
+                                            onChange={e => setEditName(e.target.value)}
+                                            style={{
+                                                background: 'rgba(255,255,255,0.1)',
+                                                border: '1px solid rgba(255,255,255,0.2)',
+                                                borderRadius: '4px',
+                                                padding: '4px 8px',
+                                                color: '#fff',
+                                                fontSize: 'var(--font-size-base)',
+                                                width: '100%',
+                                                maxWidth: '200px'
+                                            }}
+                                            autoFocus
+                                        />
+                                        <button onClick={saveName} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#4ade80' }}>
+                                            <Check size={18} />
+                                        </button>
+                                        <button onClick={() => setEditingId(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#f87171' }}>
+                                            <X size={18} />
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <span style={{
+                                            fontWeight: 700,
+                                            fontSize: 'var(--font-size-base)',
+                                            color: '#fff'
+                                        }}>
+                                            {u.full_name || 'Sem nome'}
+                                        </span>
+                                        <button 
+                                            onClick={() => startEditing(u)}
+                                            style={{ 
+                                                background: 'none', 
+                                                border: 'none', 
+                                                cursor: 'pointer', 
+                                                color: 'var(--text-muted)', 
+                                                opacity: 0.5,
+                                                padding: 0,
+                                                display: 'flex',
+                                                alignItems: 'center'
+                                            }}
+                                            title="Editar nome"
+                                        >
+                                            <Edit2 size={14} />
+                                        </button>
+                                    </div>
+                                )}
+                                
                                 <span style={{
                                     fontSize: 'var(--font-size-xs)',
                                     color: 'var(--text-muted)',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis'
+                                    marginTop: '2px'
                                 }}>
-                                    {u.id}
+                                    {u.email}
                                 </span>
                             </div>
 

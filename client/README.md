@@ -1,73 +1,78 @@
-# React + TypeScript + Vite
+# UAU Code (Maipix Client)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## 🚀 Sobre o Projeto
 
-Currently, two official plugins are available:
+UAU Code (anteriormente Maipix) é uma aplicação web progressiva (PWA) de Realidade Aumentada (AR) que permite aos usuários criar, gerenciar e escanear experiências interativas. Através de "Imagens Inteligentes", o sistema reconhece alvos impressos e sobrepõe conteúdo digital (vídeo, áudio, modelos 3D ou links).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🛠️ Tech Stack
 
-## React Compiler
+- **Frontend**: React 19, Vite, TypeScript
+- **Estilização**: CSS Modules (Glassmorphism, Neon Theme), Lucide React
+- **Backend**: Supabase (Auth, Postgres, Storage, Edge Functions)
+- **AR Engine**: OpenCV.js / MindAR (custom implementation)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## ✨ Funcionalidades Principais
 
-## Expanding the ESLint configuration
+### 👤 Usuário
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **Cadastro/Login**: Autenticação segura via Supabase Auth.
+- **Dashboard**: Gerenciamento de experiências (criação, edição, exclusão).
+- **QR Code Generator**: Geração de QR Codes estilizados com logo e cores da marca.
+- **Scanner**: Leitor de AR integrado via câmera do dispositivo.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### 🛡️ Admin
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- **Painel Administrativo**: Visão geral de usuários e estatísticas.
+- **Gerenciamento de Usuários**:
+  - Listagem com nomes completos.
+  - Edição de perfil (Nome, Plano, Função).
+  - Ativação/Desativação de contas.
+- **Controle de Planos**: Gratuito, Profissional (Limites de 1 vs 20 experiências).
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## 📦 Instalação e Execução
+
+### Pré-requisitos
+
+- Node.js 18+
+- NPM ou Yarn
+
+### Instalação
+
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Desenvolvimento
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run dev
+# Acesse em https://localhost:8080 (HTTPS necessário para câmera)
 ```
+
+### Build (Produção)
+
+```bash
+npm run build
+# Os arquivos gerados estarão na pasta /dist
+```
+
+### Preview
+
+```bash
+npm run preview
+```
+
+## 🔒 Variáveis de Ambiente
+
+Crie um arquivo `.env` na raiz com:
+
+```env
+VITE_SUPABASE_URL=sua_url_supabase
+VITE_SUPABASE_ANON_KEY=sua_chave_anonima
+```
+
+## 🚀 Deploy
+
+Este projeto é otimizado para deploy em Vercel ou Netlify.
+Basta conectar o repositório git e configurar as variáveis de ambiente.
+O comando de build é `npm run build` e a pasta de saída é `dist`.

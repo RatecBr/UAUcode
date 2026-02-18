@@ -6,6 +6,7 @@ import { Mail, Lock, ArrowRight, UserPlus, ArrowLeft } from 'lucide-react';
 export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [fullName, setFullName] = useState('');
     const [status, setStatus] = useState('');
     const [statusType, setStatusType] = useState<'info' | 'success' | 'error'>('info');
     const [isLoading, setIsLoading] = useState(false);
@@ -60,7 +61,10 @@ export default function Login() {
                 email,
                 password,
                 options: {
-                    emailRedirectTo: window.location.origin
+                    emailRedirectTo: window.location.origin,
+                    data: {
+                        full_name: fullName
+                    }
                 }
             });
 
@@ -302,7 +306,8 @@ export default function Login() {
         }
     };
 
-    const isFormValid = email.length > 0 && password.length > 0;
+    // Validação: email + senha. Se cadastro, exige nome também.
+    const isFormValid = email.length > 0 && password.length > 0 && (mode === 'login' || fullName.length > 0);
 
     return (
         <div style={styles.container}>
@@ -347,6 +352,25 @@ export default function Login() {
                 </div>
 
                 <form onSubmit={handleSubmit}>
+                    {/* Full Name Input (Signup Only) */}
+                    {mode === 'signup' && (
+                        <div style={styles.inputGroup}>
+                            <div style={styles.inputIcon}>
+                                <UserPlus size={18} />
+                            </div>
+                            <input
+                                type="text"
+                                placeholder="Seu nome completo"
+                                value={fullName}
+                                onChange={e => setFullName(e.target.value)}
+                                style={styles.input}
+                                autoComplete="name"
+                                disabled={isLoading}
+                                required={mode === 'signup'}
+                            />
+                        </div>
+                    )}
+
                     {/* Email Input */}
                     <div style={styles.inputGroup}>
                         <div style={styles.inputIcon}>

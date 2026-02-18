@@ -9,6 +9,7 @@ import { supabase, useAuth, getPlanName } from '../AuthContext';
 interface User {
     id: string;
     email: string;
+    full_name?: string;
     role: string;
     plan: string;
     slug: string;
@@ -377,7 +378,10 @@ export default function AdminPanel() {
                                 {user.role === 'admin' ? <Crown size={18} color="#ffd700" /> : user.email[0].toUpperCase()}
                             </div>
                             <div style={styles.itemInfo}>
-                                <div style={styles.itemTitle}>{user.email}</div>
+                                <div style={{ fontWeight: 700, fontSize: '15px', color: '#fff' }}>
+                                    {user.full_name || 'Sem nome'}
+                                </div>
+                                <div style={styles.itemTitle} title={user.email}>{user.email}</div>
                                 <div style={styles.itemMeta}>
                                     <span style={styles.badge(user.plan)}>{getPlanName(user.plan)}</span>
                                     {user.role === 'admin' && <span style={styles.badge('admin')}>Admin</span>}
@@ -457,30 +461,46 @@ export default function AdminPanel() {
                             {editingUser.email}
                         </div>
 
-                        <label style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)' }}>Plano</label>
+                        <label style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', display: 'block', marginBottom: '4px' }}>Nome</label>
+                        <input
+                            type="text"
+                            value={editingUser.full_name || ''}
+                            onChange={e => setEditingUser({ ...editingUser, full_name: e.target.value })}
+                            style={{
+                                ...styles.select,
+                                marginBottom: '16px'
+                            }}
+                            placeholder="Nome do usuário"
+                        />
+
+                        <label style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', display: 'block', marginBottom: '4px' }}>Plano</label>
                         <select
                             style={styles.select}
                             value={editingUser.plan}
                             onChange={e => setEditingUser({ ...editingUser, plan: e.target.value })}
                         >
-                            <option value="free">Gratuito (1 exp.)</option>
-                            <option value="pro">Profissional (20 exp.)</option>
-                            <option value="enterprise">Empresarial (ilimitado)</option>
+                            <option value="free" style={{ backgroundColor: '#1a1a24' }}>Gratuito (1 exp.)</option>
+                            <option value="pro" style={{ backgroundColor: '#1a1a24' }}>Profissional (20 exp.)</option>
+                            <option value="enterprise" style={{ backgroundColor: '#1a1a24' }}>Empresarial (ilimitado)</option>
                         </select>
 
-                        <label style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)' }}>Função</label>
+                        <label style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', display: 'block', marginBottom: '4px' }}>Função</label>
                         <select
                             style={styles.select}
                             value={editingUser.role}
                             onChange={e => setEditingUser({ ...editingUser, role: e.target.value })}
                         >
-                            <option value="user">Usuário</option>
-                            <option value="admin">Administrador</option>
+                            <option value="user" style={{ backgroundColor: '#1a1a24' }}>Usuário</option>
+                            <option value="admin" style={{ backgroundColor: '#1a1a24' }}>Administrador</option>
                         </select>
 
                         <button
                             style={styles.btn}
-                            onClick={() => updateUser(editingUser.id, { plan: editingUser.plan, role: editingUser.role })}
+                            onClick={() => updateUser(editingUser.id, { 
+                                plan: editingUser.plan, 
+                                role: editingUser.role,
+                                full_name: editingUser.full_name
+                            })}
                         >
                             Salvar Alterações
                         </button>

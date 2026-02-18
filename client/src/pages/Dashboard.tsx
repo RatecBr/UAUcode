@@ -17,6 +17,7 @@ import {
   Image as ImageIcon,
   Loader2,
   RefreshCw,
+  Link,
 } from "lucide-react";
 import { supabase, useAuth, getPlanLimit, getPlanName } from "../AuthContext";
 import QRCodeGenerator from "../components/QRCodeGenerator";
@@ -42,6 +43,7 @@ export default function Dashboard() {
   const [targetFile, setTargetFile] = useState<File | null>(null);
   const [contentFile, setContentFile] = useState<File | null>(null);
   const [contentType, setContentType] = useState("video");
+  const [contentLink, setContentLink] = useState("");
   const [editId, setEditId] = useState<number | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [showQR, setShowQR] = useState<number | null>(null);
@@ -132,8 +134,16 @@ export default function Dashboard() {
       return;
     }
 
-    if (!editId && (!targetFile || !contentFile)) {
-      alert("Arquivos obrigatórios");
+    if (!editId && !targetFile) {
+      alert("Imagem alvo obrigatória");
+      return;
+    }
+    if (!editId && contentType === "link" && !contentLink.trim()) {
+      alert("Informe o link de destino");
+      return;
+    }
+    if (!editId && contentType !== "link" && !contentFile) {
+      alert("Arquivo de conteúdo obrigatório");
       return;
     }
 
@@ -161,7 +171,7 @@ export default function Dashboard() {
                 : "model/gltf+json"
               : undefined;
 
-      if (contentFile) cUrl = await uploadFile(contentFile, expectedMime);
+      if (contentType !== "link" && contentFile) cUrl = await uploadFile(contentFile, expectedMime);
 
       const payload: any = {
         name,
@@ -169,7 +179,11 @@ export default function Dashboard() {
         user_id: profile.id,
       };
       if (tUrl) payload.target_url = tUrl;
-      if (cUrl) payload.content_url = cUrl;
+      if (contentType === "link") {
+        payload.content_url = contentLink.trim();
+      } else if (cUrl) {
+        payload.content_url = cUrl;
+      }
 
       if (editId) {
         const { error } = await supabase
@@ -204,8 +218,9 @@ export default function Dashboard() {
     setName(t.name);
     setTargetFile(null);
     setContentFile(null);
+    setContentLink(t.content_type === "link" ? t.content_url : "");
     setTargetPreview(t.target_url);
-    setContentPreview(t.content_url);
+    setContentPreview(t.content_type !== "link" ? t.content_url : null);
     setContentType(t.content_type);
     setShowForm(true);
   };
@@ -215,6 +230,7 @@ export default function Dashboard() {
     setEditId(null);
     setTargetFile(null);
     setContentFile(null);
+    setContentLink("");
     setTargetPreview(null);
     setContentPreview(null);
     setShowForm(false);
@@ -613,6 +629,11 @@ export default function Dashboard() {
         </div>
       </header>
 
+      {/* Saudação */}
+      <h2 style={{ fontSize: '20px', fontWeight: 600, marginBottom: '24px', color: '#fff', paddingLeft: '4px' }}>
+        Olá, <span style={{ color: 'var(--neon-purple)' }}>{profile?.full_name?.split(' ')[0] || "Usuário"}</span>!
+      </h2>
+
       <div style={styles.statsCard}>
         <div style={styles.statItem}>
           <div style={styles.statValue}>
@@ -641,8 +662,19 @@ export default function Dashboard() {
         </div>
         <div style={styles.linkRow}>
           <div style={styles.linkText}>{scannerUrl}</div>
-          <button style={styles.iconButton} onClick={copyLink}>
-            <Share2 size={18} color="var(--neon-purple)" />
+          <button 
+            style={{ 
+              ...styles.iconButton, 
+              width: 'auto', 
+              padding: '0 16px', 
+              gap: '8px', 
+              fontSize: '13px', 
+              fontWeight: 600
+            }} 
+            onClick={copyLink}
+          >
+            <Share2 size={16} color="var(--neon-purple)" />
+            <span>Copiar Link</span>
           </button>
         </div>
       </div>
@@ -689,43 +721,6 @@ export default function Dashboard() {
                   style={styles.formInput}
                   required
                 />
-              </div>
-
-              <div>
-                <label style={styles.fieldLabel}>TIPO DE CONTEÚDO</label>
-                <div style={{ display: "flex", gap: "10px" }}>
-                  {["video", "audio", "3d"].map((type) => (
-                    <button
-                      key={type}
-                      type="button"
-                      onClick={() => setContentType(type)}
-                      style={{
-                        flex: 1,
-                        padding: "12px",
-                        borderRadius: "14px",
-                        border: "2px solid",
-                        borderColor:
-                          contentType === type
-                            ? "#BC36C2"
-                            : "rgba(255,255,255,0.05)",
-                        backgroundColor:
-                          contentType === type
-                            ? "rgba(188, 54, 194, 0.1)"
-                            : "rgba(255,255,255,0.02)",
-                        color:
-                          contentType === type
-                            ? "#BC36C2"
-                            : "rgba(255,255,255,0.3)",
-                        fontSize: "12px",
-                        fontWeight: 700,
-                        cursor: "pointer",
-                        transition: "all 0.2s",
-                      }}
-                    >
-                      {type.toUpperCase()}
-                    </button>
-                  ))}
-                </div>
               </div>
 
               <div>
@@ -832,110 +827,183 @@ export default function Dashboard() {
                 </div>
               </div>
 
+              {/* TIPO DE CONTEÚDO — após escolha do alvo */}
               <div>
-                <label style={styles.fieldLabel}>
-                  CONTEÚDO AR (ARQUIVO OU GRAVAÇÃO)
-                </label>
-                <div style={styles.dropzone}>
-                  {contentPreview ? (
-                    <div
+                <label style={styles.fieldLabel}>TIPO DE CONTEÚDO</label>
+                <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                  {[
+                    { id: "video", label: "VIDEO" },
+                    { id: "audio", label: "AUDIO" },
+                    { id: "3d", label: "3D" },
+                    { id: "link", label: "LINK" },
+                  ].map(({ id, label }) => (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => {
+                        setContentType(id);
+                        setContentFile(null);
+                        setContentPreview(null);
+                        setContentLink("");
+                      }}
                       style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "12px",
-                        width: "100%",
-                        padding: "12px",
-                        backgroundColor: contentFile
-                          ? "rgba(0,255,157,0.1)"
-                          : "rgba(255,255,255,0.05)",
-                        borderRadius: "12px",
-                        border: "1px solid rgba(255,255,255,0.1)",
+                        flex: 1,
+                        minWidth: "60px",
+                        padding: "12px 8px",
+                        borderRadius: "14px",
+                        border: "2px solid",
+                        borderColor:
+                          contentType === id
+                            ? "#BC36C2"
+                            : "rgba(255,255,255,0.05)",
+                        backgroundColor:
+                          contentType === id
+                            ? "rgba(188, 54, 194, 0.1)"
+                            : "rgba(255,255,255,0.02)",
+                        color:
+                          contentType === id
+                            ? "#BC36C2"
+                            : "rgba(255,255,255,0.3)",
+                        fontSize: "12px",
+                        fontWeight: 700,
+                        cursor: "pointer",
+                        transition: "all 0.2s",
                       }}
                     >
-                      <div style={{ flex: 1 }}>
-                        <span
-                          style={{
-                            fontSize: "12px",
-                            fontWeight: 800,
-                            color: contentFile
-                              ? "#00ff9d"
-                              : "rgba(255,255,255,0.5)",
-                            display: "block",
-                          }}
-                        >
-                          {contentFile
-                            ? "✓ NOVO CONTEÚDO PRONTO"
-                            : "CONTEÚDO EXISTENTE"}
-                        </span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setContentFile(null);
-                          setContentPreview(null);
-                        }}
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* CONTEÚDO: link ou arquivo/gravação */}
+              {contentType === "link" ? (
+                <div>
+                  <label style={styles.fieldLabel}>URL DE DESTINO</label>
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px", padding: "14px 16px", backgroundColor: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "16px" }}>
+                    <Link size={18} color="#BC36C2" style={{ flexShrink: 0 }} />
+                    <input
+                      type="url"
+                      placeholder="https://exemplo.com"
+                      value={contentLink}
+                      onChange={(e) => setContentLink(e.target.value)}
+                      style={{
+                        flex: 1,
+                        background: "transparent",
+                        border: "none",
+                        outline: "none",
+                        color: "#fff",
+                        fontSize: "14px",
+                      }}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <label style={styles.fieldLabel}>
+                    CONTEÚDO AR (ARQUIVO OU GRAVAÇÃO)
+                  </label>
+                  <div style={styles.dropzone}>
+                    {contentPreview ? (
+                      <div
                         style={{
-                          background: "#ff4757",
-                          border: "none",
-                          color: "#fff",
-                          cursor: "pointer",
-                          padding: "8px 12px",
-                          borderRadius: "8px",
-                          fontSize: "11px",
-                          fontWeight: 700,
                           display: "flex",
                           alignItems: "center",
-                          gap: "4px",
+                          gap: "12px",
+                          width: "100%",
+                          padding: "12px",
+                          backgroundColor: contentFile
+                            ? "rgba(0,255,157,0.1)"
+                            : "rgba(255,255,255,0.05)",
+                          borderRadius: "12px",
+                          border: "1px solid rgba(255,255,255,0.1)",
                         }}
                       >
-                        <RefreshCw size={14} /> ALTERAR
-                      </button>
-                    </div>
-                  ) : (
-                    <div
-                      style={{ display: "flex", gap: "12px", width: "100%" }}
-                    >
-                      {contentType !== "3d" && (
+                        <div style={{ flex: 1 }}>
+                          <span
+                            style={{
+                              fontSize: "12px",
+                              fontWeight: 800,
+                              color: contentFile
+                                ? "#00ff9d"
+                                : "rgba(255,255,255,0.5)",
+                              display: "block",
+                            }}
+                          >
+                            {contentFile
+                              ? "✓ NOVO CONTEÚDO PRONTO"
+                              : "CONTEÚDO EXISTENTE"}
+                          </span>
+                        </div>
                         <button
                           type="button"
                           onClick={() => {
-                            setCaptureMode(contentType as "video" | "audio");
-                            setShowCapture(true);
+                            setContentFile(null);
+                            setContentPreview(null);
                           }}
-                          style={styles.modernUploadBtn}
+                          style={{
+                            background: "#ff4757",
+                            border: "none",
+                            color: "#fff",
+                            cursor: "pointer",
+                            padding: "8px 12px",
+                            borderRadius: "8px",
+                            fontSize: "11px",
+                            fontWeight: 700,
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "4px",
+                          }}
                         >
-                          {contentType === "video" ? (
-                            <Video size={20} color="#00ff9d" />
-                          ) : (
-                            <Mic size={20} color="#00ff9d" />
-                          )}{" "}
-                          GRAVAR
+                          <RefreshCw size={14} /> ALTERAR
                         </button>
-                      )}
-                      <label style={styles.modernUploadBtn}>
-                        <ImageIcon size={20} color="#00ff9d" /> ARQUIVO
-                        <input
-                          type="file"
-                          accept={
-                            contentType === "video"
-                              ? "video/*"
-                              : contentType === "audio"
-                                ? "audio/*"
-                                : ".glb,.gltf,model/gltf-binary,model/gltf+json"
-                          }
-                          onChange={(e) =>
-                            handleFileChange(
-                              e.target.files?.[0] || null,
-                              "content",
-                            )
-                          }
-                          style={{ display: "none" }}
-                        />
-                      </label>
-                    </div>
-                  )}
+                      </div>
+                    ) : (
+                      <div
+                        style={{ display: "flex", gap: "12px", width: "100%" }}
+                      >
+                        {contentType !== "3d" && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setCaptureMode(contentType as "video" | "audio");
+                              setShowCapture(true);
+                            }}
+                            style={styles.modernUploadBtn}
+                          >
+                            {contentType === "video" ? (
+                              <Video size={20} color="#00ff9d" />
+                            ) : (
+                              <Mic size={20} color="#00ff9d" />
+                            )}{" "}
+                            GRAVAR
+                          </button>
+                        )}
+                        <label style={styles.modernUploadBtn}>
+                          <ImageIcon size={20} color="#00ff9d" /> ARQUIVO
+                          <input
+                            type="file"
+                            accept={
+                              contentType === "video"
+                                ? "video/*"
+                                : contentType === "audio"
+                                  ? "audio/*"
+                                  : ".glb,.gltf,model/gltf-binary,model/gltf+json"
+                            }
+                            onChange={(e) =>
+                              handleFileChange(
+                                e.target.files?.[0] || null,
+                                "content",
+                              )
+                            }
+                            style={{ display: "none" }}
+                          />
+                        </label>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
+              )}
 
               <button
                 type="submit"
@@ -1064,11 +1132,6 @@ export default function Dashboard() {
       {showQR && (
         <div style={styles.modal} onClick={() => setShowQR(null)}>
           <div style={{ ...styles.modalContent, textAlign: "center" }}>
-            <h3
-              style={{ margin: "0 0 24px", fontSize: "20px", fontWeight: 800 }}
-            >
-              UAU Code
-            </h3>
             <div
               style={{
                 backgroundColor: "#fff",
