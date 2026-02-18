@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import { Smartphone, Layers, ArrowRight, Play, Mic, Box, Eye, MessageCircle, Upload, Wand2, Share2 } from 'lucide-react';
+import { Smartphone, Layers, ArrowRight, Play, Mic, Box, Eye, Upload, Wand2, Share2 } from 'lucide-react';
+import Footer from '../components/Footer';
 
 export default function Landing() {
     const navigate = useNavigate();
@@ -403,36 +404,7 @@ export default function Landing() {
                 </section>
             </main>
 
-            <footer style={styles.footer}>
-                <p style={{ marginBottom: '24px' }}>UAU Code © 2026. A evolução do QR Code.</p>
-                <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', marginBottom: '32px' }}>
-                    <span onClick={() => navigate('/login')} style={{ cursor: 'pointer' }}>Login</span>
-                    <span onClick={() => navigate('/login')} style={{ cursor: 'pointer' }}>Privacidade</span>
-                    <span onClick={() => navigate('/login')} style={{ cursor: 'pointer' }}>Termos</span>
-                </div>
-                <button
-                    onClick={() => window.open('https://api.whatsapp.com/send?phone=5561981005548', '_blank')}
-                    style={{
-                        margin: '0 auto',
-                        background: 'transparent',
-                        border: '1px solid rgba(37, 211, 102, 0.3)',
-                        color: '#25D366',
-                        padding: '12px 24px',
-                        borderRadius: '12px',
-                        fontSize: '14px',
-                        fontWeight: 600,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '10px',
-                        cursor: 'pointer',
-                        transition: 'all 0.3s ease'
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(37, 211, 102, 0.05)'}
-                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                >
-                    <MessageCircle size={20} /> Falar com um consultor
-                </button>
-            </footer>
+            <Footer />
             <style>{`
                 @keyframes pulse {
                     0% { opacity: 1; transform: scale(1); }

@@ -6,6 +6,8 @@ import Dashboard from './pages/Dashboard';
 import AdminPanel from './pages/AdminPanel';
 import Scanner from './pages/Scanner';
 import PublicScanner from './pages/PublicScanner';
+import Terms from './pages/Terms';
+import Privacy from './pages/Privacy';
 
 // Rota privada (requer login)
 const PrivateRoute = ({ children, adminOnly }: { children: React.ReactNode, adminOnly?: boolean }) => {
@@ -49,6 +51,8 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/s/:userSlug" element={<PublicScanner />} />
           <Route path="/s/:userSlug/:targetId" element={<PublicScanner />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
 
           {/* Dashboard do usuário (qualquer logado) */}
           <Route path="/dashboard" element={

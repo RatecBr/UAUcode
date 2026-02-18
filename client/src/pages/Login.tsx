@@ -578,6 +578,20 @@ export default function Login() {
       {/* Footer */}
       <p style={styles.footer}>
         © 2026 UAU Code. Todos os direitos reservados.
+        <br />
+        <span 
+          onClick={() => navigate('/terms')} 
+          style={{ cursor: 'pointer', textDecoration: 'underline', margin: '0 8px' }}
+        >
+          Termos de Uso
+        </span>
+        |
+        <span 
+          onClick={() => navigate('/privacy')} 
+          style={{ cursor: 'pointer', textDecoration: 'underline', margin: '0 8px' }}
+        >
+          Política de Privacidade
+        </span>
       </p>
     </div>
   );
