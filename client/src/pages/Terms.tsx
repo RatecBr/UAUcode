@@ -53,6 +53,13 @@ export default function Terms() {
             marginBottom: '16px',
             color: '#fff'
         },
+        h3: {
+            fontSize: '18px',
+            fontWeight: 600,
+            marginTop: '24px',
+            marginBottom: '12px',
+            color: 'rgba(255, 255, 255, 0.9)'
+        },
         p: {
             marginBottom: '16px',
             fontSize: '16px'
@@ -75,57 +82,47 @@ export default function Terms() {
             </header>
 
             <main style={styles.content}>
-                <h1 style={styles.h1}>Termos de Serviço</h1>
-                <p style={styles.p}>Última atualização: 18/02/2026</p>
+                <h1 style={styles.h1}>Termos de Uso</h1>
+                <p style={styles.p}>Última atualização: 18 de fevereiro de 2026</p>
 
-                <h2 style={styles.h2}>1. Aceitação dos Termos</h2>
-                <p style={styles.p}>Ao acessar e usar o UAU Code, você concorda em cumprir e estar vinculado a estes Termos de Serviço. Se você não concorda com qualquer parte destes termos, não deve usar nosso serviço.</p>
+                <h2 style={styles.h2}>1. Introdução</h2>
+                <p style={styles.p}>Bem-vindo ao UAU Code. Ao acessar ou utilizar nossa plataforma de Rrealidade Aumentada (AR), você concorda com estes Termos de Uso. A plataforma permite associar conteúdos digitais (vídeos, áudios e modelos 3D) a imagens físicas ("tags") através da câmera de dispositivos móveis.</p>
 
-                <h2 style={styles.h2}>2. Descrição do Serviço</h2>
-                <p style={styles.p}>O UAU Code é uma plataforma de realidade aumentada que permite:</p>
+                <h2 style={styles.h2}>2. Definições de Serviço</h2>
+                <p style={styles.p}>O serviço UAU Code oferece:</p>
                 <ul style={styles.ul}>
-                    <li style={styles.li}>Dar vida a imagens estáticas através de reconhecimento de imagem e inteligência artificial</li>
-                    <li style={styles.li}>Associar vídeos, áudios e modelos 3D a imagens físicas</li>
-                    <li style={styles.li}>Acessar ferramentas de acessibilidade digital e interação</li>
+                    <li style={styles.li}>Hospedagem de conteúdo multimídia associado a imagens.</li>
+                    <li style={styles.li}>Ferramenta de escaneamento via navegador (WebAR).</li>
+                    <li style={styles.li}>Painel de gerenciamento para criação e edição de experiências.</li>
                 </ul>
 
-                <h2 style={styles.h2}>3. Conta de Usuário</h2>
-                <p style={styles.p}>Para usar nossos serviços, você deve:</p>
+                <h2 style={styles.h2}>3. Responsabilidades do Usuário</h2>
+                <p style={styles.p}>Você declara e garante que:</p>
                 <ul style={styles.ul}>
-                    <li style={styles.li}>Fornecer informações precisas e completas durante o registro</li>
-                    <li style={styles.li}>Manter a segurança de sua conta e senha</li>
-                    <li style={styles.li}>Notificar-nos imediatamente sobre qualquer uso não autorizado</li>
-                    <li style={styles.li}>Ser responsável por todas as atividades em sua conta</li>
+                    <li style={styles.li}>É proprietário ou possui os direitos necessários sobre todo o conteúdo (imagens, vídeos, áudios) que enviar para a plataforma.</li>
+                    <li style={styles.li}>Não utilizará o serviço para disseminar conteúdo ilegal, ofensivo, pornográfico, difamatório ou que viole direitos de terceiros.</li>
+                    <li style={styles.li}>Não tentará violar a segurança, realizar engenharia reversa ou sobrecarregar a infraestrutura do serviço.</li>
                 </ul>
 
-                <h2 style={styles.h2}>4. Uso Aceitável</h2>
-                <p style={styles.p}>Você concorda em não usar o serviço para:</p>
-                <ul style={styles.ul}>
-                    <li style={styles.li}>Atividades ilegais ou não autorizadas</li>
-                    <li style={styles.li}>Violar direitos de propriedade intelectual</li>
-                    <li style={styles.li}>Transmitir conteúdo ofensivo, difamatório ou prejudicial</li>
-                    <li style={styles.li}>Interferir com a segurança ou funcionalidade do serviço</li>
-                </ul>
+                <h2 style={styles.h2}>4. Conteúdo Gerado pelo Usuário</h2>
+                <p style={styles.p}>O UAU Code não reivindica propriedade sobre o conteúdo enviado por você. No entanto, ao usar o serviço, você concede ao UAU Code uma licença mundial, não exclusiva e livre de royalties para hospedar, armazenar, modificar (para fins de otimização técnica) e exibir tal conteúdo exclusivamente para a prestação do serviço.</p>
+                <p style={styles.p}>Reservamo-nos o direito de remover qualquer conteúdo que viole estes termos ou a legislação aplicável, sem aviso prévio.</p>
 
                 <h2 style={styles.h2}>5. Planos e Pagamentos</h2>
-                <p style={styles.p}>Nossos serviços incluem:</p>
+                <p style={styles.p}>O uso do serviço pode estar sujeito a taxas de assinatura ou planos pré-pagos, detalhados na página de preços.</p>
                 <ul style={styles.ul}>
-                    <li style={styles.li}>Plano Gratuito: Acesso básico para novos usuários</li>
-                    <li style={styles.li}>Planos Pagos: Acesso a recursos premium e maior volume de escaneamentos</li>
-                    <li style={styles.li}>Política de Reembolso: Conforme nossa política de cancelamento</li>
+                    <li style={styles.li}>O atraso no pagamento pode resultar na suspensão temporária das experiências AR criadas.</li>
+                    <li style={styles.li}>Cancelamentos devem ser solicitados antes da renovação automática do período contratado.</li>
                 </ul>
 
-                <h2 style={styles.h2}>6. Propriedade Intelectual</h2>
-                <p style={styles.p}>O UAU Code e todo seu conteúdo, recursos e funcionalidades são propriedade exclusiva nossa e de nossos licenciadores, protegidos por leis de direitos autorais, marcas registradas e outras leis de propriedade intelectual.</p>
+                <h2 style={styles.h2}>6. Limitação de Responsabilidade</h2>
+                <p style={styles.p}>O serviço é fornecido "no estado em que se encontra". O UAU Code não garante que o reconhecimento de imagem funcionará em todas as condições de iluminação, qualidade de câmera ou estado físico do material impresso. Em nenhum caso seremos responsáveis por danos indiretos, incidentais ou perda de dados.</p>
 
-                <h2 style={styles.h2}>7. Limitação de Responsabilidade</h2>
-                <p style={styles.p}>O serviço é fornecido "como está" e "conforme disponível". Não garantimos que o serviço será ininterrupto, livre de erros ou completamente seguro. Nossa responsabilidade é limitada ao máximo permitido por lei.</p>
+                <h2 style={styles.h2}>7. Alterações</h2>
+                <p style={styles.p}>O UAU Code pode revisar estes termos a qualquer momento. Ao continuar a usar o serviço após as alterações, você concorda com os novos termos.</p>
 
-                <h2 style={styles.h2}>8. Modificações dos Termos</h2>
-                <p style={styles.p}>Reservamos o direito de modificar estes termos a qualquer momento. As alterações serão efetivas imediatamente após a publicação. O uso continuado do serviço constitui aceitação dos termos modificados.</p>
-
-                <h2 style={styles.h2}>9. Contato</h2>
-                <p style={styles.p}>Para questões sobre estes Termos de Serviço, entre em contato conosco através da nossa página de contato ou pelo email <a href="mailto:ra.tec.brasil@gmail.com" style={{color: '#BC36C2'}}>ra.tec.brasil@gmail.com</a>.</p>
+                <h2 style={styles.h2}>8. Contato</h2>
+                <p style={styles.p}>Dúvidas sobre os termos podem ser enviadas para <a href="mailto:ra.tec.brasil@gmail.com" style={{color: '#BC36C2'}}>ra.tec.brasil@gmail.com</a>.</p>
             </main>
 
             <Footer />

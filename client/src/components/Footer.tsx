@@ -25,13 +25,10 @@ export default function Footer() {
             gap: '16px'
         },
         logo: {
-            fontSize: '24px',
-            fontWeight: 800,
-            background: 'linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-purple) 50%, var(--neon-red) 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
+            height: '40px',
+            width: 'auto',
             marginBottom: '16px',
-            display: 'inline-block'
+            objectFit: 'contain' as const
         },
         description: {
             color: 'rgba(255, 255, 255, 0.6)',
@@ -86,9 +83,9 @@ export default function Footer() {
             <div style={styles.container}>
                 {/* Brand Column */}
                 <div style={styles.column}>
-                    <h2 style={styles.logo}>UAU Code</h2>
+                    <img src="/logo.png" alt="UAU Code" style={styles.logo} />
                     <p style={styles.description}>
-                        Ferramenta de inteligência artificial para reconhecer imagens e dar vida a objetos estáticos. Timeline interativa, IA fluida e sistema revolucionário.
+                        Ferramenta de inteligência artificial para reconhecer imagens e dar vida a objetos estáticos.
                     </p>
                     <div style={styles.social}>
                         <a href="https://www.instagram.com/ra.tec.br/" target="_blank" rel="noopener noreferrer" style={styles.socialIcon}>
@@ -108,15 +105,11 @@ export default function Footer() {
                     <h3 style={styles.title}>Recursos</h3>
                     <span onClick={() => navigate('/')} style={styles.link}>Como Funciona</span>
                     <span onClick={() => navigate('/')} style={styles.link}>Sobre</span>
-                    <span onClick={() => navigate('/')} style={styles.link}>Preços</span>
-                    <span onClick={() => navigate('/')} style={styles.link}>Acessibilidade</span>
                 </div>
 
                 {/* Support Column */}
                 <div style={styles.column}>
                     <h3 style={styles.title}>Suporte</h3>
-                    <span onClick={() => navigate('/')} style={styles.link}>FAQ</span>
-                    <a href="mailto:ra.tec.brasil@gmail.com" style={styles.link}>Contato</a>
                     <span onClick={() => navigate('/privacy')} style={styles.link}>Privacidade</span>
                     <span onClick={() => navigate('/terms')} style={styles.link}>Termos</span>
                 </div>
