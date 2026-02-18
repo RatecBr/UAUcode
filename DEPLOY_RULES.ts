@@ -13,9 +13,9 @@ export {};
 
 // 1. AUTORIZAÇÃO DE DEPLOY
 // -----------------------------------------------------------------------------
-// - NENHUM deploy para produção (Vercel --prod ou push para main) deve ser feito
-//   sem o CONSENTIMENTO EXPLÍCITO e PRÉVIO do usuário.
-// - Em caso de dúvida, pergunte. Melhor esperar do que quebrar a produção.
+// - NENHUM deploy para produção deve ser feito diretamente para o Vercel CLI.
+// - O Deploy é feito AUTOMATICAMENTE via GitHub ao realizar push na branch main.
+// - Certifique-se de que tudo está testado localmente antes do push.
 
 // 2. NOMENCLATURA E VERSIONAMENTO
 // -----------------------------------------------------------------------------

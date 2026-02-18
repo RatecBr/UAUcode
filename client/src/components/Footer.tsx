@@ -25,10 +25,12 @@ export default function Footer() {
             gap: '16px'
         },
         logo: {
-            height: '60px',
+            height: '80px',
             width: 'auto',
-            marginBottom: '16px',
-            objectFit: 'contain' as const
+            marginBottom: '0px',
+            objectFit: 'contain' as const,
+            display: 'block',
+            maxWidth: '200px'
         },
         description: {
             color: 'rgba(255, 255, 255, 0.6)',
@@ -98,6 +100,25 @@ export default function Footer() {
                             <Mail size={20} />
                         </a>
                     </div>
+                </div>
+
+                {/* Resources Column */}
+                <div style={styles.column}>
+                    <h3 style={styles.title}>Recursos</h3>
+                    <span onClick={() => {
+                        navigate('/');
+                        setTimeout(() => {
+                           const el = document.getElementById('how-it-works');
+                           if(el) el.scrollIntoView({ behavior: 'smooth' });
+                        }, 100);
+                    }} style={styles.link}>Como Funciona</span>
+                    <span onClick={() => {
+                        navigate('/');
+                        setTimeout(() => {
+                           const el = document.getElementById('about');
+                           if(el) el.scrollIntoView({ behavior: 'smooth' });
+                        }, 100);
+                    }} style={styles.link}>Sobre</span>
                 </div>
 
 
