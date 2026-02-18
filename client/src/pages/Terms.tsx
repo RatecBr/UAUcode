@@ -86,14 +86,14 @@ export default function Terms() {
                 <p style={styles.p}>Última atualização: 18 de fevereiro de 2026</p>
 
                 <h2 style={styles.h2}>1. Introdução</h2>
-                <p style={styles.p}>Bem-vindo ao UAU Code. Ao acessar ou utilizar nossa plataforma de Rrealidade Aumentada (AR), você concorda com estes Termos de Uso. A plataforma permite associar conteúdos digitais (vídeos, áudios e modelos 3D) a imagens físicas ("tags") através da câmera de dispositivos móveis.</p>
+                <p style={styles.p}>Bem-vindo ao UAU Code. Ao acessar ou utilizar nossa plataforma de Experiências Imersivas, você concorda com estes Termos de Uso. A plataforma utiliza tecnologia de reconhecimento de imagem para associar conteúdos digitais (vídeos, áudios e modelos 3D) a imagens físicas ("tags") através da câmera de dispositivos móveis, criando uma camada de interação digital sobre o mundo físico.</p>
 
                 <h2 style={styles.h2}>2. Definições de Serviço</h2>
                 <p style={styles.p}>O serviço UAU Code oferece:</p>
                 <ul style={styles.ul}>
-                    <li style={styles.li}>Hospedagem de conteúdo multimídia associado a imagens.</li>
-                    <li style={styles.li}>Ferramenta de escaneamento via navegador (WebAR).</li>
-                    <li style={styles.li}>Painel de gerenciamento para criação e edição de experiências.</li>
+                    <li style={styles.li}><strong>Reconhecimento de Imagem:</strong> Tecnologia que identifica padrões visuais em imagens pré-cadastradas para acionar conteúdos digitais.</li>
+                    <li style={styles.li}><strong>Hospedagem de Conteúdo:</strong> Armazenamento de vídeos, áudios e modelos 3D associados às imagens.</li>
+                    <li style={styles.li}><strong>Experiência Web:</strong> Visualização acessível diretamente via navegador, sem necessidade de instalação de aplicativos dedicados.</li>
                 </ul>
 
                 <h2 style={styles.h2}>3. Responsabilidades do Usuário</h2>
@@ -111,12 +111,13 @@ export default function Terms() {
                 <h2 style={styles.h2}>5. Planos e Pagamentos</h2>
                 <p style={styles.p}>O uso do serviço pode estar sujeito a taxas de assinatura ou planos pré-pagos, detalhados na página de preços.</p>
                 <ul style={styles.ul}>
-                    <li style={styles.li}>O atraso no pagamento pode resultar na suspensão temporária das experiências AR criadas.</li>
+                    <li style={styles.li}>O atraso no pagamento pode resultar na suspensão temporária das experiências criadas.</li>
                     <li style={styles.li}>Cancelamentos devem ser solicitados antes da renovação automática do período contratado.</li>
                 </ul>
 
-                <h2 style={styles.h2}>6. Limitação de Responsabilidade</h2>
-                <p style={styles.p}>O serviço é fornecido "no estado em que se encontra". O UAU Code não garante que o reconhecimento de imagem funcionará em todas as condições de iluminação, qualidade de câmera ou estado físico do material impresso. Em nenhum caso seremos responsáveis por danos indiretos, incidentais ou perda de dados.</p>
+                <h2 style={styles.h2}>6. Limitações Técnicas e Isenção de Garantia</h2>
+                <p style={styles.p}>O serviço é fornecido "no estado em que se encontra". O UAU Code utiliza tecnologia de reconhecimento de imagem baseada em padrões visuais. Não garantimos que o reconhecimento funcionará em todas as condições de iluminação, qualidade de câmera, ângulo ou estado físico do material impresso. Pequenas variações no ambiente podem afetar a detecção.</p>
+                <p style={styles.p}>Embora proporcionemos uma experiência visual que se assemelha e compartilha princípios da Realidade Aumentada, nosso foco é no reconhecimento de imagem para acionamento de mídia sobreposta (Image Tracking), podendo não incluir todas as características técnicas de sistemas de AR baseados em SLAM ou detecção de planos.</p>
 
                 <h2 style={styles.h2}>7. Alterações</h2>
                 <p style={styles.p}>O UAU Code pode revisar estes termos a qualquer momento. Ao continuar a usar o serviço após as alterações, você concorda com os novos termos.</p>
