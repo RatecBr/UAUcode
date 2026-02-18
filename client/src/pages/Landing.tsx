@@ -4,6 +4,13 @@ import Footer from '../components/Footer';
 
 export default function Landing() {
     const navigate = useNavigate();
+    
+    const scrollToSection = (id: string) => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
 
     const styles = {
         container: {
@@ -172,6 +179,20 @@ export default function Landing() {
                     <img src="/logo.png" alt="UAU Code Logo" className="logo-glow" style={{ height: '100px', objectFit: 'contain' }} />
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                    <button 
+                        onClick={() => scrollToSection('how-it-works')}
+                        className="hide-mobile"
+                        style={{ background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer', fontWeight: 500, fontSize: '14px' }}
+                    >
+                        Como Funciona
+                    </button>
+                    <button 
+                        onClick={() => scrollToSection('about')}
+                        className="hide-mobile"
+                        style={{ background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer', fontWeight: 500, fontSize: '14px', marginRight: '8px' }}
+                    >
+                        Sobre
+                    </button>
                     <button
                         onClick={() => navigate('/login')}
                         style={{
@@ -222,7 +243,7 @@ export default function Landing() {
                     </button>
                 </section>
 
-                <section style={{ ...styles.section, paddingTop: '0' }}>
+                <section id="how-it-works" style={{ ...styles.section, paddingTop: '0' }}>
                     <div style={{ textAlign: 'center', marginBottom: '40px' }}>
                         <h2 style={{ fontSize: '28px', fontWeight: 800, color: '#BC36C2', marginBottom: '8px' }}>É simples como 1, 2, 3</h2>
                     </div>
@@ -310,7 +331,7 @@ export default function Landing() {
                     </div>
                 </section>
 
-                <section style={styles.section}>
+                <section id="about" style={styles.section}>
                     <h2 style={{ fontSize: '32px', textAlign: 'center', marginBottom: '16px' }}>
                         Por que usar o UAU Code?
                     </h2>

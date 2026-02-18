@@ -25,7 +25,7 @@ export default function Footer() {
             gap: '16px'
         },
         logo: {
-            height: '40px',
+            height: '60px',
             width: 'auto',
             marginBottom: '16px',
             objectFit: 'contain' as const
@@ -100,12 +100,6 @@ export default function Footer() {
                     </div>
                 </div>
 
-                {/* Resources Column */}
-                <div style={styles.column}>
-                    <h3 style={styles.title}>Recursos</h3>
-                    <span onClick={() => navigate('/')} style={styles.link}>Como Funciona</span>
-                    <span onClick={() => navigate('/')} style={styles.link}>Sobre</span>
-                </div>
 
                 {/* Support Column */}
                 <div style={styles.column}>
