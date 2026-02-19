@@ -1188,7 +1188,7 @@ export default function Dashboard() {
                   marginTop: "8px",
                 }}
               >
-                URL: maipix.app/s/{newSlug || "seunome"}
+                URL: uaucode.app/s/{newSlug || "seunome"}
               </div>
             </div>
             <div

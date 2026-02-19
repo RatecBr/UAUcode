@@ -1,4 +1,4 @@
-const CACHE_NAME = 'maipix-cache-v1';
+const CACHE_NAME = 'uaucode-cache-v1';
 const urlsToCache = [
     '/',
     '/index.html',

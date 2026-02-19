@@ -14,7 +14,7 @@ A web-based (PWA) image recognition application using OpenCV.js (WASM) for local
 
 ### Phase 1: Branding & Migration (New)
 
-- [x] Migrate from MAIPIX to UAU Code.
+- [x] Migrated from MAIPIX to UAU Code.
 - [x] Implement the "Neon Revolution" design system.
 - [x] Migrate Supabase project to dedicated `UAU-CODE` environment.
 

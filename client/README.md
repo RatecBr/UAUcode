@@ -1,8 +1,8 @@
-# UAU Code (Maipix Client)
+# UAU Code Client
 
 ## 🚀 Sobre o Projeto
 
-UAU Code (anteriormente Maipix) é uma aplicação web progressiva (PWA) de Realidade Aumentada (AR) que permite aos usuários criar, gerenciar e escanear experiências interativas. Através de "Imagens Inteligentes", o sistema reconhece alvos impressos e sobrepõe conteúdo digital (vídeo, áudio, modelos 3D ou links).
+UAU Code é uma aplicação web progressiva (PWA) de Realidade Aumentada (AR) que permite aos usuários criar, gerenciar e escanear experiências interativas. Através de "Imagens Inteligentes", o sistema reconhece alvos impressos e sobrepõe conteúdo digital (vídeo, áudio, modelos 3D ou links).
 
 ## 🛠️ Tech Stack
 
