@@ -7,7 +7,7 @@ import MainLayout from './components/Layout/MainLayout';
 import Login from './pages/Login';
 import Home from './pages/Home';
 import MyLibrary from './pages/MyLibrary';
-import AdminPanel from './pages/AdminPanel';
+import AdminDashboard from './pages/AdminDashboard';
 import Scanner from './pages/Scanner';
 import PublicScanner from './pages/PublicScanner';
 import Terms from './pages/Terms';
@@ -99,7 +99,7 @@ export default function App() {
               <Route path="/admin" element={
                 <PrivateRoute adminOnly>
                   <MainLayout>
-                    <AdminPanel />
+                    <AdminDashboard />
                   </MainLayout>
                 </PrivateRoute>
               } />

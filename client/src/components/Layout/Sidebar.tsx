@@ -8,17 +8,23 @@ import LoginModal from '../Auth/LoginModal';
 export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { logout, user } = useAuth();
+  const { logout, user, profile } = useAuth();
   const { theme, toggleTheme } = useTheme(); // Theme Hook
   const [showLoginModal, setShowLoginModal] = useState(false);
   
   const isActive = (path: string) => location.pathname === path;
 
-  const navItems = [
+  const baseNavItems = [
     { icon: Home, label: 'Início', path: '/' },
     { icon: Layers, label: 'Biblioteca', path: '/library' },
     { icon: Camera, label: 'Scanner', path: '/scanner' },
   ];
+
+  const adminItems = [
+    { icon: Layers, label: 'Admin', path: '/admin' }
+  ];
+
+  const navItems = profile?.role === 'admin' ? [...baseNavItems, ...adminItems] : baseNavItems;
 
   return (
     <>

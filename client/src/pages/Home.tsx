@@ -193,20 +193,20 @@ export default function Home() {
                         gap: '24px'
                     }}>
                         {/* Simplified steps */}
-                        <div style={{ flex: '1 1 200px', maxWidth: '300px', textAlign: 'center', opacity: 0.8 }}>
-                            <div style={{ margin: '0 auto 16px', color: '#BC36C2' }}><Upload size={32} /></div>
-                            <h3 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '8px' }}>1. Escolha a Foto</h3>
-                            <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.6)' }}>Qualquer imagem serve!Tire uma foto ou suba uma imagem que você queira dar vida. Pode ser um cartão, um rótulo ou quadro. </p>
+                        <div style={{ flex: '1 1 200px', maxWidth: '300px', textAlign: 'center', opacity: 0.9 }}>
+                            <div style={{ margin: '0 auto 16px', color: 'var(--neon-purple)' }}><Upload size={32} /></div>
+                            <h3 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '8px', color: 'var(--text)' }}>1. Escolha a Foto</h3>
+                            <p style={{ fontSize: '14px', color: 'var(--text-muted)' }}>Qualquer imagem serve! Tire uma foto ou suba uma imagem que você queira dar vida. Pode ser um cartão, um rótulo ou quadro. </p>
                         </div>
-                        <div style={{ flex: '1 1 200px', maxWidth: '300px', textAlign: 'center', opacity: 0.8 }}>
-                            <div style={{ margin: '0 auto 16px', color: '#3156F3' }}><Play size={32} /></div>
-                            <h3 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '8px' }}>2. Adicione o Conteúdo</h3>
-                            <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.6)' }}>Escolha o que vai acontecer: um vídeo que toca sobre a imagem, uma página da internet, um áudio ou até um objeto 3D flutuante.</p>
+                        <div style={{ flex: '1 1 200px', maxWidth: '300px', textAlign: 'center', opacity: 0.9 }}>
+                            <div style={{ margin: '0 auto 16px', color: 'var(--neon-blue)' }}><Play size={32} /></div>
+                            <h3 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '8px', color: 'var(--text)' }}>2. Adicione o Conteúdo</h3>
+                            <p style={{ fontSize: '14px', color: 'var(--text-muted)' }}>Escolha o que vai acontecer: um vídeo que toca sobre a imagem, uma página da internet, um áudio ou até um objeto 3D flutuante.</p>
                         </div>
-                         <div style={{ flex: '1 1 200px', maxWidth: '300px', textAlign: 'center', opacity: 0.8 }}>
-                            <div style={{ margin: '0 auto 16px', color: '#F5464A' }}><Share2 size={32} /></div>
-                            <h3 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '8px' }}>3. Compartilhe facilmente</h3>
-                            <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.6)' }}>Link direto para a magia.Use seu link exclusivo. Seu cliente só precisa apontar a câmera. Sem baixar apps!</p>
+                         <div style={{ flex: '1 1 200px', maxWidth: '300px', textAlign: 'center', opacity: 0.9 }}>
+                            <div style={{ margin: '0 auto 16px', color: 'var(--neon-red)' }}><Share2 size={32} /></div>
+                            <h3 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '8px', color: 'var(--text)' }}>3. Compartilhe facilmente</h3>
+                            <p style={{ fontSize: '14px', color: 'var(--text-muted)' }}>Link direto para a magia. Use seu link exclusivo. Seu cliente só precisa apontar a câmera. Sem baixar apps!</p>
                         </div>
                     </div>
                 </section>

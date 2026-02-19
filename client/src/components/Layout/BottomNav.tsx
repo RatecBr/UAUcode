@@ -1,11 +1,9 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Home, Plus, Layers, User, Camera } from 'lucide-react';
-import { useAuth } from '../../AuthContext';
+import { Plus, Layers, Camera } from 'lucide-react';
 
 export default function BottomNav() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useAuth();
 
   // Só mostra se for mobile (controle via CSS media query no layout pai ou aqui mesmo)
   // Mas vamos fazer responsive via CSS global ou inline media query
