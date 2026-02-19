@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import './styles/theme.css'
 import './styles.css'
+import './index.css'
 // import { register } from './serviceWorker' // Disabled for dev
 
 // Simple Error Boundary

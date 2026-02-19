@@ -1,8 +1,12 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './AuthContext';
+import { CreationProvider } from './contexts/CreationContext';
+import { ThemeProvider } from './contexts/ThemeContext';
+import MainLayout from './components/Layout/MainLayout';
+
 import Login from './pages/Login';
-import Landing from './pages/Landing';
-import Dashboard from './pages/Dashboard';
+import Home from './pages/Home';
+import MyLibrary from './pages/MyLibrary';
 import AdminPanel from './pages/AdminPanel';
 import Scanner from './pages/Scanner';
 import PublicScanner from './pages/PublicScanner';
@@ -23,10 +27,7 @@ const PrivateRoute = ({ children, adminOnly }: { children: React.ReactNode, admi
         justifyContent: 'center',
         background: '#0a0a0f'
       }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '24px', marginBottom: '8px' }}>⏳</div>
-          <div>Carregando...</div>
-        </div>
+        <div className="animate-spin">⏳</div>
       </div>
     );
   }
@@ -35,7 +36,7 @@ const PrivateRoute = ({ children, adminOnly }: { children: React.ReactNode, admi
 
   // Se é rota apenas para admin e usuário não é admin
   if (adminOnly && profile?.role !== 'admin') {
-    return <Navigate to="/dashboard" />;
+    return <Navigate to="/library" />;
   }
 
   return <>{children}</>;
@@ -44,41 +45,71 @@ const PrivateRoute = ({ children, adminOnly }: { children: React.ReactNode, admi
 export default function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <Routes>
-          {/* Rotas públicas */}
-          <Route path="/" element={<Landing />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/s/:userSlug" element={<PublicScanner />} />
-          <Route path="/s/:userSlug/:targetId" element={<PublicScanner />} />
-          <Route path="/terms" element={<Terms />} />
-          <Route path="/privacy" element={<Privacy />} />
+      <ThemeProvider>
+        <AuthProvider>
+          <CreationProvider>
+            <Routes>
+              {/* Rotas públicas */}
+              <Route path="/" element={
+                <MainLayout>
+                  <Home />
+                </MainLayout>
+              } />
+              
+              <Route path="/login" element={<Login />} />
+              
+              <Route path="/s/:userSlug" element={<PublicScanner />} />
+              <Route path="/s/:userSlug/:targetId" element={<PublicScanner />} />
+              
+              <Route path="/terms" element={
+                 <MainLayout>
+                   <Terms />
+                 </MainLayout>
+              } />
+              
+              <Route path="/privacy" element={
+                <MainLayout>
+                   <Privacy />
+                 </MainLayout>
+              } />
 
-          {/* Dashboard do usuário (qualquer logado) */}
-          <Route path="/dashboard" element={
-            <PrivateRoute>
-              <Dashboard />
-            </PrivateRoute>
-          } />
+              {/* My Library (Protegida) */}
+              <Route path="/library" element={
+                <PrivateRoute>
+                  <MainLayout>
+                    <MyLibrary />
+                  </MainLayout>
+                </PrivateRoute>
+              } />
 
-          {/* Scanner privado (para testes do usuário) */}
-          <Route path="/scanner" element={
-            <PrivateRoute>
-              <Scanner />
-            </PrivateRoute>
-          } />
+              {/* Legacy Dashboard Route -> Redirect to Library */}
+              <Route path="/dashboard" element={<Navigate to="/library" replace />} />
 
-          {/* Painel Admin (apenas admins) */}
-          <Route path="/admin" element={
-            <PrivateRoute adminOnly>
-              <AdminPanel />
-            </PrivateRoute>
-          } />
+              {/* Scanner privado (para testes do usuário) */}
+              {/* Ocultamos o BottomNav no Scanner para imersão total */}
+              <Route path="/scanner" element={
+                <PrivateRoute>
+                  <MainLayout showNav={true} overlayNav={true}> 
+                    <Scanner />
+                  </MainLayout>
+                </PrivateRoute>
+              } />
 
-          {/* Fallback */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </AuthProvider>
+              {/* Painel Admin (apenas admins) */}
+              <Route path="/admin" element={
+                <PrivateRoute adminOnly>
+                  <MainLayout>
+                    <AdminPanel />
+                  </MainLayout>
+                </PrivateRoute>
+              } />
+
+              {/* Fallback */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </CreationProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </BrowserRouter>
   );
 }

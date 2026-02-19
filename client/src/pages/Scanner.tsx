@@ -334,7 +334,7 @@ export default function Scanner() {
                     
                     {/* Botão Voltar (Circular Glass) */}
                     <button 
-                        onClick={() => { stopScan(); navigate('/dashboard'); }} 
+                        onClick={() => { stopScan(); navigate('/library'); }} 
                         style={{ 
                             pointerEvents: 'auto', 
                             width: '44px', height: '44px', 

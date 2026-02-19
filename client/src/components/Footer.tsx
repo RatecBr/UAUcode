@@ -87,7 +87,7 @@ export default function Footer() {
                 <div style={styles.column}>
                     <img src="/logo.png" alt="UAU Code" style={styles.logo} />
                     <p style={styles.description}>
-                        Ferramenta de inteligência artificial para reconhecer imagens e dar vida a objetos estáticos.
+                        Ferramenta de inteligência artificial para reconhecer imagens e revelar conteúdos relevantes.
                     </p>
                     <div style={styles.social}>
                         <a href="https://www.instagram.com/ra.tec.br/" target="_blank" rel="noopener noreferrer" style={styles.socialIcon}>
@@ -136,7 +136,7 @@ export default function Footer() {
                     Feito com <span style={styles.heart}>❤</span> para a comunidade brasileira
                 </div>
                 <div>
-                    © 2026 UAU Code. Todos os direitos reservados.
+                    © 2025 UAU Code. Todos os direitos reservados.
                 </div>
                 <div style={{ marginTop: '8px' }}>
                     Contato: <a href="https://api.whatsapp.com/send?phone=5562981173666" style={{ ...styles.link, color: '#25D366' }}>(62) 98117-3666</a> | <a href="mailto:ra.tec.brasil@gmail.com" style={styles.link}>ra.tec.brasil@gmail.com</a>

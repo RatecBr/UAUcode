@@ -85,6 +85,19 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+:root.light-mode {
+  --background: #f0f2f5;
+  --surface: #ffffff;
+  --text: #1a1a2e;
+  --text-muted: #6b7280;
+  --glass-bg: rgba(0, 0, 0, 0.05); /* Dark tint for light mode inputs */
+  --glass-border: rgba(0, 0, 0, 0.1);
+  --secondary: #ffffff;
+  
+  /* Keep neons but maybe adjust glows if needed, or keep them for brand identity */
+  color-scheme: light;
+}
+
 .neon-gradient-text {
   background: linear-gradient(
     135deg,
