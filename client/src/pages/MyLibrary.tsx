@@ -11,6 +11,7 @@ import {
   Link,
   Search,
   Plus,
+  Home,
   X
 } from "lucide-react";
 import { supabase, useAuth, getPlanName } from "../AuthContext";

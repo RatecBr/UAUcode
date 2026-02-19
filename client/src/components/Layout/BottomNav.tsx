@@ -1,4 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
+// Force Vercel rebuild
 import { Plus, Layers, Camera } from 'lucide-react';
 
 export default function BottomNav() {

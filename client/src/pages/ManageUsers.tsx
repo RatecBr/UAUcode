@@ -254,15 +254,16 @@ export default function ManageUsers() {
                                                 background: 'none', 
                                                 border: 'none', 
                                                 cursor: 'pointer', 
-                                                color: 'var(--text-muted)', 
-                                                opacity: 0.5,
-                                                padding: 0,
+                                                color: 'var(--neon-green)', 
+                                                padding: '4px',
                                                 display: 'flex',
-                                                alignItems: 'center'
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                borderRadius: '4px'
                                             }}
                                             title="Editar nome"
                                         >
-                                            <Edit2 size={14} />
+                                            <Edit2 size={18} />
                                         </button>
                                     </div>
                                 )}
@@ -280,15 +281,18 @@ export default function ManageUsers() {
                                 onClick={() => toggleRole(u)}
                                 className="glass-card"
                                 style={{
-                                    padding: 'var(--space-xs) var(--space-sm)',
+                                    padding: '8px 12px',
                                     display: 'flex',
                                     alignItems: 'center',
-                                    gap: 'var(--space-xs)',
+                                    gap: '8px',
                                     background: u.role === 'admin' ? 'rgba(0, 255, 157, 0.15)' : 'transparent',
                                     color: u.role === 'admin' ? 'var(--primary)' : 'var(--text)',
-                                    fontSize: 'var(--font-size-xs)',
+                                    fontSize: '12px',
                                     fontWeight: 600,
-                                    flexShrink: 0
+                                    flexShrink: 0,
+                                    border: '1px solid var(--glass-border)',
+                                    borderRadius: '8px',
+                                    cursor: 'pointer'
                                 }}
                             >
                                 {u.role === 'admin' ? <Shield size={14} /> : <User size={14} />}
