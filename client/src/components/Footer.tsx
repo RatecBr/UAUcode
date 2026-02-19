@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Instagram, Youtube, Mail } from 'lucide-react';
 
 export default function Footer() {
@@ -102,31 +102,32 @@ export default function Footer() {
                     </div>
                 </div>
 
-                {/* Resources Column */}
                 <div style={styles.column}>
                     <h3 style={styles.title}>Recursos</h3>
-                    <span onClick={() => {
+                    <Link to="/#how-it-works" onClick={(e: React.MouseEvent) => {
+                        e.preventDefault();
                         navigate('/');
                         setTimeout(() => {
                            const el = document.getElementById('how-it-works');
                            if(el) el.scrollIntoView({ behavior: 'smooth' });
                         }, 100);
-                    }} style={styles.link}>Como Funciona</span>
-                    <span onClick={() => {
+                    }} style={styles.link}>Como Funciona</Link>
+                    <Link to="/#about" onClick={(e: React.MouseEvent) => {
+                        e.preventDefault();
                         navigate('/');
                         setTimeout(() => {
                            const el = document.getElementById('about');
                            if(el) el.scrollIntoView({ behavior: 'smooth' });
                         }, 100);
-                    }} style={styles.link}>Sobre</span>
+                    }} style={styles.link}>Sobre</Link>
                 </div>
 
 
                 {/* Support Column */}
                 <div style={styles.column}>
                     <h3 style={styles.title}>Suporte</h3>
-                    <span onClick={() => navigate('/privacy')} style={styles.link}>Privacidade</span>
-                    <span onClick={() => navigate('/terms')} style={styles.link}>Termos</span>
+                    <Link to="/privacy" style={styles.link}>Privacidade</Link>
+                    <Link to="/terms" style={styles.link}>Termos</Link>
                 </div>
             </div>
 
