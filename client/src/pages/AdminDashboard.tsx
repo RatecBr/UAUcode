@@ -12,6 +12,10 @@ interface Target {
     target_url: string;
     content_url: string;
     content_type: string;
+    profiles?: {
+        email: string;
+        full_name?: string;
+    }
 }
 
 export default function AdminDashboard() {
@@ -30,8 +34,11 @@ export default function AdminDashboard() {
     useEffect(() => { fetchTargets(); }, []);
 
     const fetchTargets = async () => {
-        const { data, error } = await supabase.from('targets').select('*').order('id', { ascending: false });
-        if (!error) setTargets(data || []);
+        const { data, error } = await supabase
+            .from('targets')
+            .select('*, profiles(email, full_name)')
+            .order('id', { ascending: false });
+        if (!error) setTargets(data as any || []);
     };
 
     const uploadFile = async (file: File) => {
@@ -442,20 +449,24 @@ export default function AdminDashboard() {
                                     />
                                     <div style={styles.itemInfo}>
                                         <div style={styles.itemName}>{t.name}</div>
-                                        <div style={styles.itemType}>{t.content_type}</div>
+                                        <div style={styles.itemType}>
+                                            {t.content_type} • {t.profiles?.full_name?.split(' ')[0] || t.profiles?.email?.split('@')[0] || 'Anon'}
+                                        </div>
                                     </div>
                                     <div style={styles.itemActions}>
                                         <button
-                                            style={styles.actionButton}
+                                            style={{...styles.actionButton, flexShrink: 0}}
                                             onClick={() => startEdit(t)}
+                                            title="Editar"
                                         >
-                                            <Edit2 size={16} />
+                                            <Edit2 size={18} color="#4ade80" />
                                         </button>
                                         <button
-                                            style={styles.deleteButton}
+                                            style={{...styles.deleteButton, flexShrink: 0}}
                                             onClick={() => handleDelete(t.id)}
+                                            title="Excluir"
                                         >
-                                            <Trash2 size={16} />
+                                            <Trash2 size={18} color="#f87171" />
                                         </button>
                                     </div>
                                 </div>

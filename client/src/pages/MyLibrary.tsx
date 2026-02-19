@@ -437,8 +437,14 @@ export default function MyLibrary() {
                     </div>
                 </div>
                 <button 
+                    onClick={() => navigate('/')}
+                    style={{ width: "100%", padding: "12px", borderRadius: "12px", background: "rgba(255, 255, 255, 0.05)", color: "var(--text)", border: "1px solid rgba(255, 255, 255, 0.1)", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", marginBottom: "12px", cursor: 'pointer' }}
+                >
+                    <Home size={18} /> Voltar ao Início
+                </button>
+                <button 
                     onClick={() => { logout(); navigate('/'); }}
-                    style={{ width: "100%", padding: "12px", borderRadius: "12px", background: "rgba(255, 50, 50, 0.1)", color: "#ff5555", border: "1px solid rgba(255, 50, 50, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}
+                    style={{ width: "100%", padding: "12px", borderRadius: "12px", background: "rgba(255, 50, 50, 0.1)", color: "#ff5555", border: "1px solid rgba(255, 50, 50, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", cursor: 'pointer' }}
                 >
                     <LogOut size={18} /> Sair da conta
                 </button>
