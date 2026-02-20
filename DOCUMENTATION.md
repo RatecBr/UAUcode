@@ -1,4 +1,4 @@
-# UAUCode V.1.4.0 - Documentação Técnica Completa
+# UAUCode V.1.4.1 - Documentação Técnica Completa
 
 ## 📋 Índice
 
@@ -567,6 +567,10 @@ await waitForOpenCV();
 ---
 
 ## 🚀 Roadmap
+
+### v1.4.1 (Hotfix)
+
+- [x] Correção de build (propriedade duplicada no CSS)
 
 ### v1.4.0 (Atual - Lançado)
 

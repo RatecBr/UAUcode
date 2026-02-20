@@ -262,7 +262,7 @@ export default function MyLibrary() {
       background: "var(--surface)",
       border: "1px solid var(--glass-border)",
       borderRadius: "20px",
-      borderRadius: "20px",
+
       position: "relative" as const,
       transition: "transform 0.2s",
     },
