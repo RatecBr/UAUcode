@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Camera, Plus, X, Edit2, Trash2 } from 'lucide-react';
+import { LogOut, Camera, X, Edit2, Trash2 } from 'lucide-react';
 import { supabase } from '../AuthContext';
 import ManageUsers from './ManageUsers';
 import { optimizeImage } from '../utils/fileOptimizer';
@@ -430,9 +430,17 @@ export default function AdminDashboard() {
                     )}
 
                     {/* Experiences List */}
-                    <div style={styles.card}>
-                        <h3 style={styles.cardTitle}>
-                            Experiências ({targets.length})
+                    {/* Experiences List */}
+                    <div className="glass-card" style={{ padding: 'var(--space-lg)' }}>
+                        <h3 style={{ 
+                            fontSize: 'var(--font-size-lg)', 
+                            fontWeight: 700, 
+                            marginBottom: 'var(--space-md)', 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: 'var(--space-sm)' 
+                        }}>
+                             Lista de Experiências <span style={{ fontSize: 'var(--font-size-sm)', opacity: 0.5, fontWeight: 400 }}>({targets.length})</span>
                         </h3>
 
                         {targets.length === 0 ? (
@@ -440,49 +448,80 @@ export default function AdminDashboard() {
                                 Nenhuma experiência ainda. Toque + para criar.
                             </div>
                         ) : (
-                            targets.map(t => (
-                                <div key={t.id} style={styles.listItem}>
-                                    <img
-                                        src={t.target_url}
-                                        alt={t.name}
-                                        style={styles.thumbnail}
-                                    />
-                                    <div style={styles.itemInfo}>
-                                        <div style={styles.itemName}>{t.name}</div>
-                                        <div style={styles.itemType}>
-                                            {t.content_type} • {t.profiles?.full_name?.split(' ')[0] || t.profiles?.email?.split('@')[0] || 'Anon'}
+                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                {targets.map(t => (
+                                    <div key={t.id} style={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center',
+                                        padding: 'var(--space-md)',
+                                        borderBottom: '1px solid var(--glass-border)',
+                                        gap: 'var(--space-sm)'
+                                    }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)', flex: 1, minWidth: 0 }}>
+                                            <img
+                                                src={t.target_url}
+                                                alt={t.name}
+                                                style={{
+                                                    width: '48px',
+                                                    height: '48px',
+                                                    borderRadius: '8px',
+                                                    objectFit: 'cover',
+                                                    backgroundColor: 'rgba(255,255,255,0.1)',
+                                                    flexShrink: 0
+                                                }}
+                                            />
+                                            <div style={{ minWidth: 0 }}>
+                                                <div style={{ fontSize: 'var(--font-size-base)', fontWeight: 600, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t.name}</div>
+                                                <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--text-muted)', marginTop: '4px' }}>
+                                                    {t.content_type?.toUpperCase()} • {t.profiles?.full_name?.split(' ')[0] || t.profiles?.email?.split('@')[0] || 'Anon'}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div style={{ display: 'flex', gap: 'var(--space-sm)' }}>
+                                            <button
+                                                style={{
+                                                    background: 'rgba(255,255,255,0.05)',
+                                                    border: '1px solid rgba(255,255,255,0.1)',
+                                                    borderRadius: '8px',
+                                                    padding: '8px',
+                                                    cursor: 'pointer',
+                                                    color: '#4ade80',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center'
+                                                }}
+                                                onClick={() => startEdit(t)}
+                                                title="Editar"
+                                            >
+                                                <Edit2 size={18} />
+                                            </button>
+                                            <button
+                                                style={{
+                                                    background: 'rgba(255, 50, 50, 0.1)',
+                                                    border: '1px solid rgba(255, 50, 50, 0.2)',
+                                                    borderRadius: '8px',
+                                                    padding: '8px',
+                                                    cursor: 'pointer',
+                                                    color: '#f87171',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center'
+                                                }}
+                                                onClick={() => handleDelete(t.id)}
+                                                title="Excluir"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
                                         </div>
                                     </div>
-                                    <div style={styles.itemActions}>
-                                        <button
-                                            style={{...styles.actionButton, flexShrink: 0}}
-                                            onClick={() => startEdit(t)}
-                                            title="Editar"
-                                        >
-                                            <Edit2 size={18} color="#4ade80" />
-                                        </button>
-                                        <button
-                                            style={{...styles.deleteButton, flexShrink: 0}}
-                                            onClick={() => handleDelete(t.id)}
-                                            title="Excluir"
-                                        >
-                                            <Trash2 size={18} color="#f87171" />
-                                        </button>
-                                    </div>
-                                </div>
-                            ))
+                                ))}
+                            </div>
                         )}
                     </div>
 
-                    {/* FAB */}
-                    {!showForm && (
-                        <button
-                            style={styles.fab}
-                            onClick={() => setShowForm(true)}
-                        >
-                            <Plus size={24} color="#000" />
-                        </button>
-                    )}
+
                 </>
             ) : (
                 <ManageUsers />

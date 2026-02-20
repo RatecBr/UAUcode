@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { X, Circle, StopCircle, RefreshCw, Check, Video, Mic } from 'lucide-react';
-import { optimizeImage, getVideoConstraints, getVideoRecorderOptions, getAudioRecorderOptions } from '../utils/fileOptimizer';
+import { optimizeImage, getVideoRecorderOptions, getAudioRecorderOptions } from '../utils/fileOptimizer';
 
 interface MediaCaptureProps {
     mode: 'photo' | 'video' | 'audio';
@@ -28,11 +28,15 @@ export default function MediaCapture({ mode, onCapture, onClose }: MediaCaptureP
 
     const startStream = async () => {
         try {
-            stopStream();
+            // stopStream(); // Removed to avoid sync setState in useEffect
+            // Instead rely on useEffect cleanup or ensure logic handles existing stream
+            const isPortrait = window.innerHeight > window.innerWidth;
             const constraints: MediaStreamConstraints = {
                 video: mode === 'audio' ? false : {
                     facingMode,
-                    ...getVideoConstraints()
+                    width: { ideal: isPortrait ? 720 : 1280 },
+                    height: { ideal: isPortrait ? 1280 : 720 },
+                    aspectRatio: { ideal: isPortrait ? 0.5625 : 1.777 }
                 },
                 audio: mode !== 'photo'
             };

@@ -10,6 +10,9 @@ import { AudioOverlay } from '../overlayAudio';
 import { Overlay3D } from '../overlay3D';
 import { LinkOverlay } from '../overlayLink';
 
+// Global cache to persist across re-renders/remounts (Strict Mode fix)
+const GLOBAL_LOG_CACHE = new Map<number, number>();
+
 interface Target {
     id: number;
     name: string;
@@ -49,6 +52,7 @@ export default function Scanner() {
     const isInitializing = useRef(false);
     const hasInitialized = useRef(false);
     const assetsCacheRef = useRef<Map<number, HTMLVideoElement | HTMLAudioElement>>(new Map());
+    // lastLoggedTimeRef removed in favor of GLOBAL_LOG_CACHE
 
     const fetchUsers = useCallback(async () => {
         const { data } = await supabase.from('profiles').select('id, email, full_name');
@@ -77,12 +81,12 @@ export default function Scanner() {
         try {
             if (assetsCacheRef.current.has(attemptId)) {
                 const cachedEl = assetsCacheRef.current.get(attemptId);
-                return (cachedEl as any).src;
+                return (cachedEl as HTMLMediaElement).src;
             }
             const response = await fetch(url);
             const blob = await response.blob();
             const blobUrl = URL.createObjectURL(blob);
-            assetsCacheRef.current.set(attemptId, { src: blobUrl } as any);
+            assetsCacheRef.current.set(attemptId, { src: blobUrl } as unknown as HTMLVideoElement); 
             return blobUrl;
         } catch (e) {
             console.error("Asset fetch error:", e);
@@ -94,7 +98,6 @@ export default function Scanner() {
         const container = overlayContainerRef.current;
         if (!container) return;
         if (loadingRef.current || (activeTargetRef.current?.id === t.id && isDetectedRef.current)) return;
-
         // Tipo LINK: exibe a página dentro de um iframe overlay
         if (t.content_type === 'link') {
             resetOverlays();
@@ -102,7 +105,14 @@ export default function Scanner() {
             setActiveTarget(t);
             isDetectedRef.current = true;
             activeTargetRef.current = t;
-            try { supabase.from('scan_logs').insert({ target_id: t.id }).then(); } catch (_) { }
+            const now = Date.now();
+            const lastLog = GLOBAL_LOG_CACHE.get(t.id) || 0;
+            if (now - lastLog > 30000) {
+                GLOBAL_LOG_CACHE.set(t.id, now);
+                try { 
+                    supabase.from('scan_logs').insert({ target_id: t.id }).then(); 
+                } catch (error) { console.error("Log error:", error); }
+            }
             const lo = new LinkOverlay(() => resetOverlays());
             lo.setSource(t.content_url);
             lo.show();
@@ -129,6 +139,18 @@ export default function Scanner() {
         setActiveTarget(t);
         isDetectedRef.current = true;
         activeTargetRef.current = t;
+
+        const now = Date.now();
+        const lastLog = GLOBAL_LOG_CACHE.get(t.id) || 0;
+        
+        // Log count only if > 30s passed since last log for this target
+        if (now - lastLog > 30000) {
+            // Update timestamp IMMEDIATELY to prevent race conditions
+            GLOBAL_LOG_CACHE.set(t.id, now);
+            try { 
+                supabase.from('scan_logs').insert({ target_id: t.id }).then(); 
+            } catch (error) { console.error("Log error:", error); }
+        }
 
         if (t.content_type === 'video') {
             videoOverlayRef.current = new VideoOverlay(container);

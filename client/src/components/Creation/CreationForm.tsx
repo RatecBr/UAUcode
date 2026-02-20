@@ -15,7 +15,9 @@ export default function CreationForm({ onSuccess, isUploading = false }: Creatio
     contentFile, setContentFile, contentPreview, setContentPreview,
     contentType, setContentType,
     contentLink, setContentLink,
-    name, setName
+    name, setName,
+    isPublic, setIsPublic,
+    categories, setCategories
   } = useCreation();
 
   const [targetMode, setTargetMode] = useState<'camera' | 'file'>('camera');
@@ -195,7 +197,10 @@ export default function CreationForm({ onSuccess, isUploading = false }: Creatio
         gap: '8px',
         marginTop: '12px',
         textTransform: 'uppercase' as const,
-        letterSpacing: '0.05em'
+        letterSpacing: '0.05em',
+        touchAction: 'manipulation', // Melhora resposta ao toque no mobile
+        userSelect: 'none' as const,
+        WebkitTapHighlightColor: 'transparent'
     }
   };
 
@@ -209,15 +214,105 @@ export default function CreationForm({ onSuccess, isUploading = false }: Creatio
 
       <form onSubmit={handleSubmit}>
         
-        {/* Nome */}
+        {/* Nome e Categoria */}
         <div style={styles.sectionLabel}>NOME DA EXPERIÊNCIA</div>
-        <input 
-          type="text" 
-          placeholder="Ex: Cartão de Visitas"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          style={styles.input}
-        />
+        <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
+            <input 
+              type="text" 
+              placeholder="Ex: Cartão de Visitas"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              style={{ ...styles.input, marginBottom: 0, flex: 1 }}
+            />
+            
+            {/* Category Dropdown */}
+            <div style={{ position: 'relative', width: '200px' }}>
+                <button 
+                    type="button" 
+                    onClick={() => document.getElementById('category-dropdown')?.classList.toggle('show')}
+                    style={{
+                        width: '100%',
+                        height: '100%',
+                        padding: '0 12px',
+                        background: 'var(--glass-bg)',
+                        border: '1px solid var(--glass-border)',
+                        borderRadius: '12px',
+                        color: categories.length > 0 ? 'var(--text)' : 'var(--text-muted)',
+                        fontSize: '13px',
+                        textAlign: 'left',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between'
+                    }}
+                >
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {categories.length > 0 ? `${categories.length} Selecionado(s)` : 'Tipo (Vários)'}
+                    </span>
+                    <span style={{ fontSize: '10px' }}>▼</span>
+                </button>
+                
+                <div id="category-dropdown" style={{
+                    display: 'none',
+                    position: 'absolute',
+                    top: '110%',
+                    right: 0,
+                    width: '220px',
+                    background: '#1a1a2e',
+                    border: '1px solid var(--glass-border)',
+                    borderRadius: '12px',
+                    padding: '8px',
+                    zIndex: 100,
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
+                    maxHeight: '300px',
+                    overflowY: 'auto'
+                }}>
+                    {[
+                        'Acessibilidade', 'Rótulo', 'Gente', 'Animal', 
+                        'Natureza', 'Produto', 'Logomarca', 'Placa', 'Objeto', 'Outros'
+                    ].map(cat => (
+                        <label key={cat} style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            padding: '8px',
+                            cursor: 'pointer',
+                            fontSize: '13px',
+                            color: 'var(--text)',
+                            borderRadius: '6px',
+                        }}
+                        onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+                        onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                        >
+                            <input 
+                                type="checkbox"
+                                checked={categories.includes(cat)}
+                                onChange={(e) => {
+                                    if (e.target.checked) {
+                                        setCategories([...categories, cat]);
+                                    } else {
+                                        setCategories(categories.filter((c: string) => c !== cat));
+                                    }
+                                }}
+                                style={{ marginRight: '8px', accentColor: 'var(--neon-purple)' }}
+                            />
+                            {cat}
+                        </label>
+                    ))}
+                    <div 
+                        style={{ 
+                            position: 'fixed', inset: 0, zIndex: -1 
+                        }} 
+                        onClick={() => document.getElementById('category-dropdown')?.classList.remove('show')}
+                    />
+                </div>
+            </div>
+        </div>
+        
+        <style>{`
+            #category-dropdown.show { display: block !important; }
+        `}</style>
+        
+        {/* Autorização Galeria - MOVED DOWN */}
 
         {/* Passo 1: Imagem Alvo */}
         <div style={styles.sectionLabel}>IMAGEM ALVO (MARCADOR AR)</div>
@@ -261,101 +356,126 @@ export default function CreationForm({ onSuccess, isUploading = false }: Creatio
             </label>
         )}
 
-        {/* Passo 2: Tipo de Conteúdo */}
-        <div style={styles.sectionLabel}>TIPO DE CONTEÚDO</div>
-        <div style={styles.typeGrid}>
-            <button type="button" onClick={() => setContentType('video')} style={styles.typeBtn(contentType === 'video')}>VIDEO</button>
-            <button type="button" onClick={() => setContentType('audio')} style={styles.typeBtn(contentType === 'audio')}>AUDIO</button>
-            <button type="button" onClick={() => setContentType('3d')} style={styles.typeBtn(contentType === '3d')}>3D</button>
-            <button type="button" onClick={() => setContentType('link')} style={styles.typeBtn(contentType === 'link')}>LINK</button>
-        </div>
+        {/* Passo 2: Tipo de Conteúdo (Só aparece após definir Target) */}
+        {targetFile && (
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div style={styles.sectionLabel}>TIPO DE CONTEÚDO</div>
+                <div style={styles.typeGrid}>
+                    <button type="button" onClick={() => setContentType('video')} style={styles.typeBtn(contentType === 'video')}>VIDEO</button>
+                    <button type="button" onClick={() => setContentType('audio')} style={styles.typeBtn(contentType === 'audio')}>AUDIO</button>
+                    <button type="button" onClick={() => setContentType('3d')} style={styles.typeBtn(contentType === '3d')}>3D</button>
+                    <button type="button" onClick={() => setContentType('link')} style={styles.typeBtn(contentType === 'link')}>LINK</button>
+                </div>
 
-        {/* Content Source */}
-        {contentType !== 'link' && (
-             <div style={styles.sectionLabel}>CONTEÚDO AR (ARQUIVO OU GRAVAÇÃO)</div>
-        )}
+                {/* Content Source */}
+                {contentType !== 'link' && (
+                     <div style={styles.sectionLabel}>CONTEÚDO AR (ARQUIVO OU GRAVAÇÃO)</div>
+                )}
 
-        {contentType === 'link' ? (
-           <input 
-             type="url" 
-             placeholder="https://seu-link.com"
-             value={contentLink}
-             onChange={(e) => setContentLink(e.target.value)}
-             style={styles.input}
-             required
-           />
-        ) : (
-            <>
-                 {contentType !== '3d' && (
-                    <div style={styles.toggleContainer}>
-                        <button type="button" onClick={() => setContentMode('record')} style={styles.toggleBtn(contentMode === 'record')}>
-                            {contentType === 'audio' ? <Mic size={18} color={contentMode === 'record' ? '#00ff9d' : 'currentColor'} /> : <Video size={18} color={contentMode === 'record' ? '#00ff9d' : 'currentColor'} />}
-                            GRAVAR
-                        </button>
-                        <button type="button" onClick={() => setContentMode('file')} style={styles.toggleBtn(contentMode === 'file')}>
-                             <FileText size={18} color={contentMode === 'file' ? '#00ff9d' : 'currentColor'} /> ARQUIVO
-                        </button>
-                    </div>
-                 )}
-
-                 {(contentMode === 'record' && contentType !== '3d') ? (
-                      <div style={styles.uploadBox} onClick={() => openCamera('content')}>
-                           {contentPreview ? (
-                                contentType === 'video' ? <video src={contentPreview} controls style={styles.preview} /> : 
-                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}><Mic size={32} /> Audio Gravado</div>
-                           ) : (
-                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', color: 'var(--text-muted)' }}>
-                                    {contentType === 'audio' ? <Mic size={32} /> : <Video size={32} />}
-                                    <span style={{ fontSize: '12px', fontWeight: 600 }}>CLIQUE PARA GRAVAR</span>
-                                </div>
-                           )}
-                      </div>
-                 ) : (
-                    <label style={styles.uploadBox}>
-                        <input 
-                        type="file" 
-                        accept={
-                            contentType === 'video' ? 'video/*' :
-                            contentType === 'audio' ? 'audio/*' :
-                            '.glb,.gltf'
-                        } 
-                        onChange={(e) => handleFileChange(e.target.files?.[0] || null, 'content')}
-                        style={{ display: 'none' }}
-                        />
-                        
-                        {contentPreview ? (
-                        contentType === 'video' ? (
-                            <video src={contentPreview} style={styles.preview} controls />
-                        ) : contentType === 'audio' ? (
-                            <div style={{ padding: '20px', borderRadius: '12px', width: '100%' }}>
-                                <audio src={contentPreview} controls style={{ width: '100%' }} />
+                {contentType === 'link' ? (
+                   <input 
+                     type="url" 
+                     placeholder="https://seu-link.com"
+                     value={contentLink}
+                     onChange={(e) => setContentLink(e.target.value)}
+                     style={styles.input}
+                     required
+                   />
+                ) : (
+                    <>
+                         {contentType !== '3d' && (
+                            <div style={styles.toggleContainer}>
+                                <button type="button" onClick={() => setContentMode('record')} style={styles.toggleBtn(contentMode === 'record')}>
+                                    {contentType === 'audio' ? <Mic size={18} color={contentMode === 'record' ? '#00ff9d' : 'currentColor'} /> : <Video size={18} color={contentMode === 'record' ? '#00ff9d' : 'currentColor'} />}
+                                    GRAVAR
+                                </button>
+                                <button type="button" onClick={() => setContentMode('file')} style={styles.toggleBtn(contentMode === 'file')}>
+                                     <FileText size={18} color={contentMode === 'file' ? '#00ff9d' : 'currentColor'} /> ARQUIVO
+                                </button>
                             </div>
-                        ) : (
-                            <div style={{ textAlign: 'center', padding: 20 }}>{contentFile?.name}</div>
-                        )
-                        ) : (
-                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', color: 'var(--text-muted)' }}>
-                            <Upload size={32} />
-                            <span style={{ fontSize: '12px', fontWeight: 600 }}>CARREGAR {contentType.toUpperCase()}</span>
-                        </div>
-                        )}
-                    </label>
-                 )}
-            </>
+                         )}
+
+                         {(contentMode === 'record' && contentType !== '3d') ? (
+                              <div style={styles.uploadBox} onClick={() => openCamera('content')}>
+                                   {contentPreview ? (
+                                        contentType === 'video' ? <video src={contentPreview} controls style={styles.preview} /> : 
+                                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}><Mic size={32} /> Audio Gravado</div>
+                                   ) : (
+                                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', color: 'var(--text-muted)' }}>
+                                            {contentType === 'audio' ? <Mic size={32} /> : <Video size={32} />}
+                                            <span style={{ fontSize: '12px', fontWeight: 600 }}>CLIQUE PARA GRAVAR</span>
+                                        </div>
+                                   )}
+                              </div>
+                         ) : (
+                            <label style={styles.uploadBox}>
+                                <input 
+                                type="file" 
+                                accept={
+                                    contentType === 'video' ? 'video/*' :
+                                    contentType === 'audio' ? 'audio/*' :
+                                    '.glb,.gltf'
+                                } 
+                                onChange={(e) => handleFileChange(e.target.files?.[0] || null, 'content')}
+                                style={{ display: 'none' }}
+                                />
+                                
+                                {contentPreview ? (
+                                contentType === 'video' ? (
+                                    <video src={contentPreview} style={styles.preview} controls />
+                                ) : contentType === 'audio' ? (
+                                    <div style={{ padding: '20px', borderRadius: '12px', width: '100%' }}>
+                                        <audio src={contentPreview} controls style={{ width: '100%' }} />
+                                    </div>
+                                ) : (
+                                    <div style={{ textAlign: 'center', padding: 20 }}>{contentFile?.name}</div>
+                                )
+                                ) : (
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', color: 'var(--text-muted)' }}>
+                                    <Upload size={32} />
+                                    <span style={{ fontSize: '12px', fontWeight: 600 }}>CARREGAR {contentType.toUpperCase()}</span>
+                                </div>
+                                )}
+                            </label>
+                         )}
+                    </>
+                )}
+            </div>
         )}
 
-        <button 
-          type="submit" 
-          disabled={!targetFile || (!contentFile && !contentLink) || isUploading}
-          style={{
-              ...styles.submitBtn,
-              opacity: (!targetFile || (!contentFile && !contentLink) || isUploading) ? 0.5 : 1,
-              cursor: (!targetFile || (!contentFile && !contentLink) || isUploading) ? 'not-allowed' : 'pointer'
-          }}
-        >
-          {isUploading ? <Loader2 className="animate-spin" /> : null}
-          {isUploading ? 'CRIANDO...' : 'CRIAR AGORA'}
-        </button>
+        {/* Passo 3: Finalização (Só aparece se tiver conteúdo e target) */}
+        {(targetFile && (contentFile || (contentType === 'link' && contentLink))) && (
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                {/* Autorização Galeria - MOVED HERE */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px', marginTop: '24px', background: 'var(--glass-bg)', padding: '12px', borderRadius: '12px', border: '1px solid var(--glass-border)' }}>
+                    <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text)', marginBottom: '4px' }}>Exibir na Galeria Pública?</div>
+                        <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Sua criação aparecerá na Home para todos verem.</div>
+                    </div>
+                    <label className="switch">
+                        <input 
+                            type="checkbox" 
+                            checked={isPublic} 
+                            onChange={(e) => setIsPublic(e.target.checked)} 
+                        />
+                        <span className="slider round"></span>
+                    </label>
+                </div>
+
+                <button 
+                  type="submit" 
+                  disabled={isUploading}
+                  style={{
+                      ...styles.submitBtn,
+                      opacity: isUploading ? 0.8 : 1,
+                      cursor: isUploading ? 'wait' : 'pointer'
+                  }}
+                >
+                  {isUploading ? <Loader2 className="animate-spin" /> : null}
+                  {isUploading ? 'CRIANDO...' : 'CRIAR AGORA'}
+                </button>
+            </div>
+        )}
 
       </form>
       

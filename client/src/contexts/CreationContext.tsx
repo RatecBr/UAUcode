@@ -24,6 +24,12 @@ interface CreationContextType {
   isPendingAuth: boolean;
   setIsPendingAuth: (pending: boolean) => void;
 
+  isPublic: boolean;
+  setIsPublic: (isPublic: boolean) => void;
+
+  categories: string[];
+  setCategories: (categories: string[]) => void;
+
   resetCreation: () => void;
 }
 
@@ -41,6 +47,8 @@ export function CreationProvider({ children }: { children: ReactNode }) {
   
   const [name, setName] = useState('');
   const [isPendingAuth, setIsPendingAuth] = useState(false);
+  const [isPublic, setIsPublic] = useState(false);
+  const [categories, setCategories] = useState<string[]>([]);
 
   const resetCreation = () => {
     setTargetFile(null);
@@ -51,6 +59,8 @@ export function CreationProvider({ children }: { children: ReactNode }) {
     setContentLink('');
     setName('');
     setIsPendingAuth(false);
+    setIsPublic(false);
+    setCategories([]);
   };
 
   return (
@@ -63,6 +73,8 @@ export function CreationProvider({ children }: { children: ReactNode }) {
       contentLink, setContentLink,
       name, setName,
       isPendingAuth, setIsPendingAuth,
+      isPublic, setIsPublic,
+      categories, setCategories,
       resetCreation
     }}>
       {children}

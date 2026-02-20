@@ -1,4 +1,4 @@
-# UAUCode V.1.3.5 - Documentação Técnica Completa
+# UAUCode V.1.4.0 - Documentação Técnica Completa
 
 ## 📋 Índice
 
@@ -568,7 +568,14 @@ await waitForOpenCV();
 
 ## 🚀 Roadmap
 
-### v1.4.0 (Próximo)
+### v1.4.0 (Atual - Lançado)
+
+- [x] Filtros por Categoria na Galeria Pública (Gente, Animal, Natureza...)
+- [x] Fluxo de Criação Passo a Passo (Progressive Disclosure)
+- [x] Edição de Categorias na Biblioteca
+- [x] Melhorias de UI em Mobile (Abas de Filtro)
+
+### v1.5.0 (Próximo)
 
 - [ ] Analytics dashboard
 - [ ] Notificações push
@@ -584,4 +591,4 @@ await waitForOpenCV();
 
 ---
 
-_Última atualização: 18 de fevereiro de 2026_
+_Última atualização: 19 de fevereiro de 2026_
