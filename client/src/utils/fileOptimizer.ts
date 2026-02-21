@@ -19,10 +19,16 @@ export const optimizeImage = (
                 let width = img.width;
                 let height = img.height;
 
-                // Redimensiona mantendo o aspecto
-                if (width > maxWidth) {
-                    height = (maxWidth / width) * height;
-                    width = maxWidth;
+                // Redimensiona mantendo o aspecto, focando no eixo maior para mobile
+                const maxDimension = 800;
+                if (width > maxDimension || height > maxDimension) {
+                    if (width > height) {
+                        height = (maxDimension / width) * height;
+                        width = maxDimension;
+                    } else {
+                        width = (maxDimension / height) * width;
+                        height = maxDimension;
+                    }
                 }
 
                 canvas.width = width;
@@ -58,8 +64,8 @@ export const optimizeImage = (
  * Calcula o tamanho ideal para vídeos gravados em mobile.
  */
 export const getVideoConstraints = () => ({
-    width: { ideal: 854 },  // 480p (WVGA) - Muito leve e nítido o suficiente para mobile
-    height: { ideal: 480 },
+    width: { ideal: 480 },
+    height: { ideal: 854 },
     frameRate: { ideal: 20 } // 20fps economiza banda e mantém fluidez aceitável
 });
 

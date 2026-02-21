@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Home, Layers, Camera, LogOut, LogIn, Sun, Moon } from 'lucide-react';
+import { Home, Layers, Camera, LogOut, LogIn, Sun, Moon, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../../AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import LoginModal from '../Auth/LoginModal';
@@ -21,7 +21,7 @@ export default function Sidebar() {
   ];
 
   const adminItems = [
-    { icon: Layers, label: 'Admin', path: '/admin' }
+    { icon: ShieldCheck, label: 'Admin', path: '/admin' }
   ];
 
   const navItems = profile?.role === 'admin' ? [...baseNavItems, ...adminItems] : baseNavItems;

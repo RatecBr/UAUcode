@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Smartphone, Play, Box, Eye, Upload, Share2 } from 'lucide-react';
+import { Smartphone, Play, Box, Eye, Upload, Share2, Video, Mic, Link } from 'lucide-react';
 import Footer from '../components/Footer';
 import CreationForm from '../components/Creation/CreationForm';
 import LoginModal from '../components/Auth/LoginModal';
@@ -151,15 +151,18 @@ function PublicGallery() {
                                 position: 'absolute',
                                 top: '8px',
                                 right: '8px',
-                                background: 'rgba(0,0,0,0.6)',
-                                backdropFilter: 'blur(4px)',
-                                borderRadius: '50%',
-                                width: '24px', height: '24px',
+                                background: 'rgba(0,0,0,0.65)',
+                                backdropFilter: 'blur(8px)',
+                                borderRadius: '8px',
+                                width: '28px', height: '28px',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                color: 'white'
+                                color: 'white',
+                                border: '1px solid rgba(255,255,255,0.1)'
                             }}>
-                                {t.content_type === 'video' ? <Play size={12} fill="white" /> : 
-                                t.content_type === '3d' ? <Box size={12} /> : null}
+                                {t.content_type === 'video' ? <Video size={14} /> : 
+                                 t.content_type === 'audio' ? <Mic size={14} /> :
+                                 t.content_type === 'link' ? <Link size={14} /> :
+                                 t.content_type === '3d' ? <Box size={14} /> : null}
                             </div>
                         </div>
                     ))}

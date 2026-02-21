@@ -226,19 +226,19 @@ export default function CreationForm({ onSuccess, isUploading = false }: Creatio
             />
             
             {/* Category Dropdown */}
-            <div style={{ position: 'relative', width: '200px' }}>
+            <div style={{ position: 'relative', width: '135px', flexShrink: 0 }}>
                 <button 
                     type="button" 
                     onClick={() => document.getElementById('category-dropdown')?.classList.toggle('show')}
                     style={{
                         width: '100%',
                         height: '100%',
-                        padding: '0 12px',
+                        padding: '0 10px',
                         background: 'var(--glass-bg)',
                         border: '1px solid var(--glass-border)',
                         borderRadius: '12px',
                         color: categories.length > 0 ? 'var(--text)' : 'var(--text-muted)',
-                        fontSize: '13px',
+                        fontSize: '12px',
                         textAlign: 'left',
                         cursor: 'pointer',
                         display: 'flex',
@@ -247,9 +247,9 @@ export default function CreationForm({ onSuccess, isUploading = false }: Creatio
                     }}
                 >
                     <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {categories.length > 0 ? `${categories.length} Selecionado(s)` : 'Tipo (Vários)'}
+                        {categories.length > 0 ? `${categories.length} Sel.` : 'Tipo'}
                     </span>
-                    <span style={{ fontSize: '10px' }}>▼</span>
+                    <span style={{ fontSize: '9px', opacity: 0.6 }}>▼</span>
                 </button>
                 
                 <div id="category-dropdown" style={{

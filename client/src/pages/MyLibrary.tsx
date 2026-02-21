@@ -5,7 +5,6 @@ import {
   Trash2,
   Share2,
   Settings,
-  Play,
   Box,
   Mic,
   Link,
@@ -13,6 +12,8 @@ import {
   Plus,
   Home,
   X,
+  Video,
+  Eye,
 } from "lucide-react";
 import { supabase, useAuth, getPlanName } from "../AuthContext";
 import { useCreation } from "../contexts/CreationContext";
@@ -459,7 +460,7 @@ export default function MyLibrary() {
             <div key={target.id} style={styles.card}>
               <div style={styles.iconType}>
                 {target.content_type === "video" && (
-                  <Play size={18} fill="white" />
+                  <Video size={18} />
                 )}
                 {target.content_type === "audio" && <Mic size={18} />}
                 {target.content_type === "3d" && <Box size={18} />}
@@ -573,7 +574,7 @@ export default function MyLibrary() {
                   }}
                 >
                   <div style={styles.cardMeta}>
-                    <Share2 size={16} /> <span style={{ fontSize: '14px', fontWeight: 600 }}>{target.scan_count || 0}</span>
+                    <Eye size={16} /> <span style={{ fontSize: '14px', fontWeight: 600 }}>{target.scan_count || 0}</span>
                   </div>
                   <button
                     onClick={() => handleDelete(target.id)}

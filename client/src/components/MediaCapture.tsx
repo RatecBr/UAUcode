@@ -30,13 +30,13 @@ export default function MediaCapture({ mode, onCapture, onClose }: MediaCaptureP
         try {
             // stopStream(); // Removed to avoid sync setState in useEffect
             // Instead rely on useEffect cleanup or ensure logic handles existing stream
-            const isPortrait = window.innerHeight > window.innerWidth;
+            // Mobile First: Sempre solicita vertical (9:16) por padrão
             const constraints: MediaStreamConstraints = {
                 video: mode === 'audio' ? false : {
                     facingMode,
-                    width: { ideal: isPortrait ? 720 : 1280 },
-                    height: { ideal: isPortrait ? 1280 : 720 },
-                    aspectRatio: { ideal: isPortrait ? 0.5625 : 1.777 }
+                    width: { ideal: 720 },
+                    height: { ideal: 1280 },
+                    aspectRatio: { ideal: 0.5625 }
                 },
                 audio: mode !== 'photo'
             };
