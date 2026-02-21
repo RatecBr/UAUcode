@@ -5,7 +5,6 @@
 
 export const optimizeImage = (
     file: File,
-    maxWidth: number = 800,
     quality: number = 0.6
 ): Promise<File> => {
     return new Promise((resolve, reject) => {
