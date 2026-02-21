@@ -15,7 +15,7 @@ import {
   Video,
   Eye,
 } from "lucide-react";
-import { supabase, useAuth, getPlanName } from "../AuthContext";
+import { supabase, useAuth, getPlanName, getPlanLimit } from "../AuthContext";
 import { useCreation } from "../contexts/CreationContext";
 
 
@@ -70,12 +70,16 @@ export default function MyLibrary() {
 
   // Função de upload (reutilizada e adaptada)
   const performUpload = useCallback(async () => {
-    if (!targetFile || isUploadingRef.current) return;
-
-    isUploadingRef.current = true;
-    setUploading(true);
-
     try {
+      // Quota Check
+      const limit = getPlanLimit(profile);
+      if (targets.length >= limit) {
+        alert(`Você atingiu o limite do seu plano (${limit} experiências). Faça upgrade para continuar.`);
+        setUploading(false);
+        isUploadingRef.current = false;
+        return;
+      }
+
       const uploadFile = async (file: File, predefinedType?: string) => {
         const fileExt = file.name.split(".").pop()?.toLowerCase();
         const filePath = `${user?.id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
@@ -161,8 +165,45 @@ export default function MyLibrary() {
 
   const handleDelete = async (id: number) => {
     if (!confirm("Tem certeza que deseja excluir esta experiência?")) return;
-    await supabase.from("targets").delete().eq("id", id);
-    fetchTargets();
+    
+    try {
+      // 1. Buscar URLs para limpeza do storage
+      const { data: target, error: fetchError } = await supabase
+        .from("targets")
+        .select("target_url, content_url")
+        .eq("id", id)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      // 2. Extrair caminhos
+      const filesToDelete: string[] = [];
+      if (target.target_url) {
+        const path = target.target_url.split('/').pop();
+        if (path) filesToDelete.push(path);
+      }
+      if (target.content_url) {
+        const path = target.content_url.split('/').pop();
+        if (path) filesToDelete.push(path);
+      }
+
+      // 3. Limpar Storage
+      if (filesToDelete.length > 0) {
+        const { error: storageError } = await supabase.storage
+          .from("assets")
+          .remove(filesToDelete);
+        
+        if (storageError) console.error("Erro storage:", storageError);
+      }
+
+      // 4. Deletar do Banco
+      const { error: dbError } = await supabase.from("targets").delete().eq("id", id);
+      if (dbError) throw dbError;
+
+      fetchTargets();
+    } catch (e: any) {
+      alert("Erro ao excluir experiência: " + e.message);
+    }
   };
 
   const togglePublic = async (id: number, currentStatus: boolean) => {

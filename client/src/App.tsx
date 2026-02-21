@@ -58,8 +58,16 @@ export default function App() {
               
               <Route path="/login" element={<Login />} />
               
-              <Route path="/s/:userSlug" element={<PublicScanner />} />
-              <Route path="/s/:userSlug/:targetId" element={<PublicScanner />} />
+              <Route path="/s/:userSlug" element={
+                <MainLayout showNav={true} overlayNav={true}>
+                  <PublicScanner />
+                </MainLayout>
+              } />
+              <Route path="/s/:userSlug/:targetId" element={
+                <MainLayout showNav={true} overlayNav={true}>
+                  <PublicScanner />
+                </MainLayout>
+              } />
               
               <Route path="/terms" element={
                  <MainLayout>

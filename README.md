@@ -174,7 +174,7 @@ UAUcode/
 - id (uuid, PK)
 - email (text)
 - role (text: 'user' | 'admin')
-- plan (text: 'free' | 'pro')
+- plan (text: 'free' | 'basic' | 'pro' | 'enterprise')
 - slug (text, unique)
 - is_active (boolean)
 - created_at (timestamp)
@@ -279,11 +279,12 @@ OpenCV detecta → Mostra conteúdo
 
 ## 📊 Planos
 
-| Plano     | Experiências | Preço     |
-| --------- | ------------ | --------- |
-| **Free**  | 3            | Grátis    |
-| **Pro**   | Ilimitado    | R$ 29/mês |
-| **Admin** | 999999       | -         |
+| Plano             | Experiências | Preço  |
+| :---------------- | :----------- | :----- |
+| **Gratuito**      | 3            | Grátis |
+| **Básico**        | 20           | Padrão |
+| **Profissional**  | 50           | Pro    |
+| **Administrador** | Ilimitado    | -      |
 
 ---
 

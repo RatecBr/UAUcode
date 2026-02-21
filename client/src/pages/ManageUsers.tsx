@@ -7,6 +7,8 @@ interface Profile {
     email: string;
     full_name?: string;
     role: 'admin' | 'user';
+    plan: string;
+    target_limit?: number | null;
 }
 
 export default function ManageUsers() {
@@ -25,9 +27,12 @@ export default function ManageUsers() {
     }, []);
 
     const fetchUsers = async () => {
-        const { data, error } = await supabase.from('profiles').select('*, full_name').order('created_at', { ascending: false });
+        const { data, error } = await supabase
+            .from('profiles')
+            .select('*, full_name, plan, target_limit')
+            .order('email', { ascending: true });
         if (error) console.error("Error fetching profiles:", error);
-        else setUsers(data as any[] || []);
+        else setUsers(data as Profile[] || []);
     };
 
     const startEditing = (user: Profile) => {
@@ -81,7 +86,20 @@ export default function ManageUsers() {
     const toggleRole = async (user: Profile) => {
         const newRole = user.role === 'admin' ? 'user' : 'admin';
         const { error } = await supabase.from('profiles').update({ role: newRole }).eq('id', user.id);
-        if (error) alert("Failed to update role. (Are you admin?)");
+        if (error) alert("Failed to update role.");
+        else fetchUsers();
+    };
+
+    const updatePlan = async (userId: string, newPlan: string) => {
+        const { error } = await supabase.from('profiles').update({ plan: newPlan }).eq('id', userId);
+        if (error) alert("Failed to update plan.");
+        else fetchUsers();
+    };
+
+    const updateLimit = async (userId: string, newLimit: string) => {
+        const val = newLimit === '' ? null : parseInt(newLimit);
+        const { error } = await supabase.from('profiles').update({ target_limit: val }).eq('id', userId);
+        if (error) alert("Failed to update limit.");
         else fetchUsers();
     };
 
@@ -182,10 +200,20 @@ export default function ManageUsers() {
             )}
 
             {/* Users List */}
-            <div style={{
-                display: 'flex',
-                flexDirection: 'column'
-            }}>
+            <div className="users-list-container">
+                <style>{`
+                    @media (max-width: 800px) {
+                        .user-row {
+                            grid-template-columns: 1fr !important;
+                            gap: var(--space-md) !important;
+                            padding-bottom: var(--space-lg) !important;
+                        }
+                    }
+                    .user-row:hover {
+                        background: rgba(255,255,255,0.02);
+                    }
+                `}</style>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
                 {users.length === 0 ? (
                     <div style={{
                         padding: 'var(--space-xl)',
@@ -198,14 +226,15 @@ export default function ManageUsers() {
                     users.map(u => (
                         <div
                             key={u.id}
+                            className="user-row"
                             style={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
+                                display: 'grid',
+                                gridTemplateColumns: '1fr auto auto auto',
                                 alignItems: 'center',
                                 padding: 'var(--space-md)',
                                 borderBottom: '1px solid var(--glass-border)',
-                                gap: 'var(--space-sm)',
-                                flexWrap: 'wrap'
+                                gap: 'var(--space-lg)',
+                                transition: 'background 0.3s ease'
                             }}
                         >
                             <div style={{
@@ -271,37 +300,124 @@ export default function ManageUsers() {
                                 <span style={{
                                     fontSize: 'var(--font-size-xs)',
                                     color: 'var(--text-muted)',
-                                    marginTop: '2px'
+                                    marginTop: '2px',
+                                    fontFamily: 'monospace'
                                 }}>
                                     {u.email}
                                 </span>
                             </div>
 
+                            {/* Plan Selector */}
+                            <div style={{ position: 'relative' }}>
+                                <select 
+                                    value={u.plan || 'free'} 
+                                    onChange={(e) => updatePlan(u.id, e.target.value)}
+                                    aria-label="Selecionar plano"
+                                    style={{
+                                        background: 'rgba(255,255,255,0.03)',
+                                        border: `1px solid ${
+                                            u.plan === 'enterprise' ? 'var(--neon-blue)' : 
+                                            u.plan === 'pro' ? 'var(--neon-purple)' : 
+                                            u.plan === 'basic' ? 'var(--success)' : 'var(--glass-border)'
+                                        }`,
+                                        borderRadius: '8px',
+                                        padding: '8px 12px',
+                                        color: '#fff',
+                                        fontSize: '12px',
+                                        fontWeight: 600,
+                                        cursor: 'pointer',
+                                        appearance: 'none',
+                                        minWidth: '120px',
+                                        boxShadow: u.plan === 'pro' || u.plan === 'enterprise' ? '0 0 10px rgba(188, 54, 194, 0.1)' : 'none'
+                                    }}
+                                >
+                                    <option value="free" style={{ background: '#050508' }}>Gratuito</option>
+                                    <option value="basic" style={{ background: '#050508' }}>Básico</option>
+                                    <option value="pro" style={{ background: '#050508' }}>Profissional</option>
+                                    <option value="enterprise" style={{ background: '#050508' }}>Empresarial</option>
+                                </select>
+                            </div>
+
+                            {/* Limit Input / Cota Chip */}
+                            <div style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                gap: '8px',
+                                background: 'rgba(255,255,255,0.03)',
+                                padding: '6px 12px',
+                                borderRadius: '12px',
+                                border: u.target_limit ? '1px solid var(--primary)' : '1px solid var(--glass-border)',
+                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                boxShadow: u.target_limit ? '0 0 15px rgba(188, 54, 194, 0.2)' : 'none'
+                            }}>
+                                <span style={{ 
+                                    fontSize: '10px', 
+                                    color: u.target_limit ? 'var(--primary)' : 'var(--text-muted)', 
+                                    fontWeight: 700,
+                                    letterSpacing: '0.05em'
+                                }}>
+                                    COTA
+                                </span>
+                                <input 
+                                    type="number"
+                                    placeholder="Pad"
+                                    defaultValue={u.target_limit ?? ''}
+                                    onBlur={(e) => updateLimit(u.id, e.target.value)}
+                                    aria-label="Definir cota customizada"
+                                    style={{
+                                        width: '40px',
+                                        background: 'transparent',
+                                        border: 'none',
+                                        color: u.target_limit ? 'var(--primary)' : '#fff',
+                                        fontSize: '13px',
+                                        textAlign: 'center',
+                                        fontWeight: 700,
+                                        outline: 'none',
+                                        margin: 0,
+                                        padding: 0
+                                    }}
+                                />
+                                {u.target_limit && (
+                                    <div style={{ 
+                                        width: '6px', 
+                                        height: '6px', 
+                                        borderRadius: '50%', 
+                                        background: 'var(--primary)', 
+                                        boxShadow: '0 0 8px var(--primary)' 
+                                    }} />
+                                )}
+                            </div>
+
                             <button
                                 onClick={() => toggleRole(u)}
                                 className="glass-card"
+                                aria-label="Alternar função administrativa"
                                 style={{
-                                    padding: '8px 12px',
+                                    padding: '10px 16px',
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '8px',
-                                    background: u.role === 'admin' ? 'rgba(0, 255, 157, 0.15)' : 'transparent',
-                                    color: u.role === 'admin' ? 'var(--primary)' : 'var(--text)',
-                                    fontSize: '12px',
-                                    fontWeight: 600,
-                                    flexShrink: 0,
-                                    border: '1px solid var(--glass-border)',
-                                    borderRadius: '8px',
-                                    cursor: 'pointer'
+                                    background: u.role === 'admin' ? 'rgba(0, 255, 157, 0.1)' : 'rgba(255,255,255,0.03)',
+                                    color: u.role === 'admin' ? '#4ade80' : 'var(--text-muted)',
+                                    fontSize: '11px',
+                                    fontWeight: 700,
+                                    letterSpacing: '0.1em',
+                                    border: `1px solid ${u.role === 'admin' ? '#4ade80' : 'var(--glass-border)'}`,
+                                    borderRadius: '10px',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s ease'
                                 }}
                             >
                                 {u.role === 'admin' ? <Shield size={14} /> : <User size={14} />}
                                 {u.role.toUpperCase()}
                             </button>
+
                         </div>
                     ))
                 )}
+                </div>
             </div>
         </div>
     );
 }
+

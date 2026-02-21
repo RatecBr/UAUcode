@@ -16,9 +16,10 @@ export interface UserProfile {
   email: string;
   full_name?: string;
   role: "admin" | "user";
-  plan: "free" | "pro" | "enterprise";
+  plan: "free" | "basic" | "pro" | "enterprise";
   slug: string;
   is_active: boolean;
+  target_limit?: number | null;
 }
 
 interface AuthContextType {
@@ -195,19 +196,24 @@ export const useAuth = () => useContext(AuthContext);
 
 // Plan limits helper
 export const PLAN_LIMITS = {
-  free: 1,
-  pro: 20,
+  free: 3,
+  basic: 20,
+  pro: 50,
   enterprise: 999999,
 };
 
 export const getPlanLimit = (profile: UserProfile | null): number => {
   if (profile?.role === "admin") return 999999;
+  if (profile?.target_limit !== undefined && profile?.target_limit !== null) {
+    return profile.target_limit;
+  }
   return PLAN_LIMITS[profile?.plan as keyof typeof PLAN_LIMITS] || 1;
 };
 
 export const getPlanName = (plan: string): string => {
   const names: Record<string, string> = {
     free: "Gratuito",
+    basic: "Básico",
     pro: "Profissional",
     enterprise: "Empresarial",
   };

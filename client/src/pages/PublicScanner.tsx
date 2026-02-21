@@ -653,10 +653,12 @@ export default function PublicScanner() {
                         </div>
                     )}
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', alignItems: 'center' }}>
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', height: '100%', paddingBottom: '100px', pointerEvents: 'none' }}>
                         {loadingNewTarget && (
                             <div style={{
                                 ...styles.statusBadge,
+                                alignSelf: 'center',
+                                marginBottom: '20px',
                                 backgroundColor: 'rgba(188, 54, 194, 0.2)',
                                 border: '1px solid rgba(188, 54, 194, 0.3)',
                                 color: 'var(--neon-purple)',

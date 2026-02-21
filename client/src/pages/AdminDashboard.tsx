@@ -79,8 +79,53 @@ export default function AdminDashboard() {
 
     const handleDelete = async (id: number) => {
         if (!confirm("Deseja excluir esta experiência?")) return;
-        await supabase.from('targets').delete().eq('id', id);
-        fetchTargets();
+        
+        try {
+            // 1. Buscar as URLs atuais para limpeza do storage
+            const { data: target, error: fetchError } = await supabase
+                .from('targets')
+                .select('target_url, content_url')
+                .eq('id', id)
+                .single();
+
+            if (fetchError) throw fetchError;
+
+            // 2. Extrair caminhos dos arquivos (última parte da URL)
+            const filesToDelete: string[] = [];
+            if (target.target_url) {
+                const targetPath = target.target_url.split('/').pop();
+                if (targetPath) filesToDelete.push(targetPath);
+            }
+            if (target.content_url) {
+                const contentPath = target.content_url.split('/').pop();
+                if (contentPath) filesToDelete.push(contentPath);
+            }
+
+            // 3. Remover do Storage se houver arquivos
+            if (filesToDelete.length > 0) {
+                const { error: storageError } = await supabase.storage
+                    .from('assets')
+                    .remove(filesToDelete);
+                
+                if (storageError) {
+                    console.error("Erro ao limpar storage:", storageError);
+                    // Continuamos a deleção mesmo se o storage falhar (ex: arquivo já não existia)
+                }
+            }
+
+            // 4. Deletar do Banco de Dados
+            const { error: dbError } = await supabase
+                .from('targets')
+                .delete()
+                .eq('id', id);
+
+            if (dbError) throw dbError;
+
+            alert('Excluído com sucesso!');
+            fetchTargets();
+        } catch (e: any) {
+            alert('Erro ao excluir: ' + e.message);
+        }
     };
 
     const startEdit = (t: Target) => {

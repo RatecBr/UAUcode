@@ -8,9 +8,10 @@
 4. [Reconhecimento de Imagens](#reconhecimento-de-imagens)
 5. [Autenticação e Autorização](#autenticação-e-autorização)
 6. [Storage e Assets](#storage-e-assets)
-7. [Performance](#performance)
+7. [Performance e Limites](#performance-e-limites)
 8. [Deploy](#deploy)
-9. [Troubleshooting](#troubleshooting)
+9. [Documentos Auxiliares (docs/)](#documentos-auxiliares-docs)
+10. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -135,7 +136,7 @@ CREATE TABLE public.profiles (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     email TEXT NOT NULL,
     role TEXT DEFAULT 'user' CHECK (role IN ('user', 'admin')),
-    plan TEXT DEFAULT 'free' CHECK (plan IN ('free', 'pro')),
+    plan TEXT DEFAULT 'free' CHECK (plan IN ('free', 'basic', 'pro', 'enterprise')),
     slug TEXT UNIQUE NOT NULL,
     is_active BOOLEAN DEFAULT true,
     created_at TIMESTAMPTZ DEFAULT NOW()
@@ -353,6 +354,16 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 | **user**  | CRUD próprias experiências, scanner        |
 | **admin** | Tudo + gestão de usuários + global targets |
 
+### Limites de Planos (Cotas)
+
+| Plano             | Limite          | ID Interno   |
+| :---------------- | :-------------- | :----------- |
+| **Gratuito**      | 3 experiências  | `free`       |
+| **Básico**        | 20 experiências | `basic`      |
+| **Profissional**  | 50 experiências | `pro`        |
+| **Empresarial**   | Ilimitado       | `enterprise` |
+| **Administrador** | Ilimitado       | -            |
+
 ---
 
 ## 6. Storage e Assets
@@ -413,51 +424,24 @@ ON storage.objects FOR DELETE
 USING (bucket_id = 'assets' AND auth.role() = 'authenticated');
 ```
 
+### Exclusão Segura (Safe Delete)
+
+Implementado no v1.4.5, o sistema garante que ao excluir uma experiência da tabela `targets`, os arquivos físicos correspondentes no Storage (bucket `assets`) sejam removidos primeiro.
+
+- **Processo**: A aplicação busca as URLs -> extrai os nomes dos arquivos -> remove do Storage -> deleta o registro no DB.
+- **Manual**: [docs/PLAN_SAFE_DELETE.md](file:///d:/Dropbox/DOWNLOAD/RATec/_APLICATIVOS/UAU-CODE/docs/PLAN_SAFE_DELETE.md)
+
 ---
 
-## 7. Performance
+## 7. Performance e Limites
 
-### Otimizações Frontend
+### Limites de Escalabilidade do Scanner
 
-```typescript
-// Lazy loading de componentes
-const Dashboard = lazy(() => import('./pages/Dashboard'));
-const Scanner = lazy(() => import('./pages/Scanner'));
+O motor de reconhecimento (ORB/OpenCV) possui limites físicos baseados no hardware do usuário.
 
-// Suspense
-<Suspense fallback={<Loading />}>
-  <Dashboard />
-</Suspense>
-```
-
-### Otimizações OpenCV
-
-```typescript
-// Reduzir resolução
-const constraints = {
-  video: {
-    width: { ideal: 640 },
-    height: { ideal: 480 },
-    facingMode: "environment",
-  },
-};
-
-// Throttle de detecção
-const detectWithThrottle = throttle(detectTarget, 100); // 10 fps
-```
-
-### Caching
-
-```typescript
-// Service Worker (PWA)
-self.addEventListener("fetch", (event) => {
-  event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
-    }),
-  );
-});
-```
+- **Carga Máxima Sugerida**: Até 30 alvos por Slug para detecção instantânea.
+- **Impacto**: O custo de reconhecimento é linear O(N). Mais alvos = menor FPS.
+- **Análise Completa**: [docs/ANALISE_ESCALABILIDADE.md](file:///d:/Dropbox/DOWNLOAD/RATec/_APLICATIVOS/UAU-CODE/docs/ANALISE_ESCALABILIDADE.md)
 
 ---
 
@@ -497,7 +481,21 @@ VITE_SUPABASE_ANON_KEY=your-anon-key-here
 
 ---
 
-## 9. Troubleshooting
+## 9. Documentos Auxiliares (docs/)
+
+Para detalhes específicos de implementações recentes, consulte a pasta `/docs`:
+
+- [Análise de Escalabilidade do Scanner](file:///d:/Dropbox/DOWNLOAD/RATec/_APLICATIVOS/UAU-CODE/docs/ANALISE_ESCALABILIDADE.md)
+- [Análise de Infraestrutura e Limites](file:///d:/Dropbox/DOWNLOAD/RATec/_APLICATIVOS/UAU-CODE/docs/ANALISE_INFRAESTRUTURA.md)
+- [Changelog v1.4.7](file:///d:/Dropbox/DOWNLOAD/RATec/_APLICATIVOS/UAU-CODE/docs/CHANGELOG_V1_4_7.md)
+- [Walkthrough UI/UX Pro Max](file:///d:/Dropbox/DOWNLOAD/RATec/_APLICATIVOS/UAU-CODE/docs/WALKTHROUGH_UI_UX.md)
+- [Plano de Exclusão Segura](file:///d:/Dropbox/DOWNLOAD/RATec/_APLICATIVOS/UAU-CODE/docs/PLAN_SAFE_DELETE.md)
+- [Plano de Preview na Galeria](file:///d:/Dropbox/DOWNLOAD/RATec/_APLICATIVOS/UAU-CODE/docs/PLAN_PREVIEW_GALLERY.md)
+- [Changelog v1.4.5](file:///d:/Dropbox/DOWNLOAD/RATec/_APLICATIVOS/UAU-CODE/docs/CHANGELOG_V1_4_5.md)
+
+---
+
+## 10. Troubleshooting
 
 ### Câmera não funciona
 
@@ -595,4 +593,4 @@ await waitForOpenCV();
 
 ---
 
-_Última atualização: 19 de fevereiro de 2026_
+_Última atualização: 21 de fevereiro de 2026 (v1.4.5)_

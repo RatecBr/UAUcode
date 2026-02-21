@@ -1,10 +1,11 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-// Force Vercel rebuild
-import { Layers, Camera } from 'lucide-react';
+import { Layers, Camera, ShieldAlert } from 'lucide-react';
+import { useAuth } from '../../AuthContext';
 
 export default function BottomNav() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { isAdmin } = useAuth();
 
   // Só mostra se for mobile (controle via CSS media query no layout pai ou aqui mesmo)
   // Mas vamos fazer responsive via CSS global ou inline media query
@@ -74,6 +75,13 @@ export default function BottomNav() {
         <Camera size={24} color={isActive('/scanner') ? 'var(--neon-blue)' : 'currentColor'} />
         <span>Scanner</span>
       </button>
+
+      {isAdmin && (
+        <button onClick={() => navigate('/admin')} style={styles.navItem(isActive('/admin'))}>
+          <ShieldAlert size={24} color={isActive('/admin') ? 'var(--neon-red)' : 'currentColor'} />
+          <span>Admin</span>
+        </button>
+      )}
 
       <style>{`
         @media (min-width: 769px) {
