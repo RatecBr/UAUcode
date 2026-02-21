@@ -699,36 +699,62 @@ export default function PublicScanner() {
 
                         {isDetected && activeTarget && activeTarget.content_type !== 'link' && (
                             <div style={{
-                                alignSelf: 'center',
-                                backgroundColor: 'rgba(0,0,0,0.6)',
-                                backdropFilter: 'blur(20px)',
-                                borderRadius: '32px',
-                                padding: '16px 24px',
-                                textAlign: 'center' as const,
-                                maxWidth: '320px',
-                                width: '90%',
                                 pointerEvents: 'auto' as const,
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
-                                color: '#fff',
+                                width: '95%',
+                                alignSelf: 'center',
                                 display: 'flex',
-                                flexDirection: 'column',
-                                gap: '4px'
+                                alignItems: 'flex-end',
+                                justifyContent: 'space-between',
+                                padding: '12px 16px',
+                                background: 'linear-gradient(to top, rgba(0,0,0,0.4), transparent)',
+                                border: 'none',
+                                color: '#fff',
+                                gap: '12px'
                             }}>
-                                <div style={styles.detectedLabel}>EXPERIÊNCIA DETECTADA</div>
-                                <div style={styles.detectedName}>{activeTarget.name}</div>
-                                <div style={{ fontSize: '12px', opacity: 0.6, marginBottom: '12px' }}>
-                                    por {activeTarget.profiles?.full_name || activeTarget.profiles?.email?.split('@')[0] || 'UAU Code'}
+                                {/* Canto Esquerdo: Sair */}
+                                <button 
+                                    onClick={() => navigate('/')} 
+                                    style={{ 
+                                        padding: '10px 16px', 
+                                        borderRadius: '16px', 
+                                        background: 'rgba(255,255,255,0.1)', 
+                                        backdropFilter: 'blur(10px)',
+                                        color: '#fff', 
+                                        border: '1px solid rgba(255,255,255,0.1)',
+                                        fontSize: '12px',
+                                        fontWeight: 600,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '6px'
+                                    }}
+                                >
+                                    <ArrowLeft size={14} /> Sair
+                                </button>
+
+                                {/* Centro: Info */}
+                                <div style={{ textAlign: 'center', flex: 1, paddingBottom: '4px' }}>
+                                    <div style={{ fontWeight: 700, fontSize: '16px', color: '#fff', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>{activeTarget.name}</div>
+                                    <div style={{ fontSize: '11px', opacity: 0.7, color: '#fff' }}>
+                                        por {activeTarget.profiles?.full_name || activeTarget.profiles?.email?.split('@')[0] || 'UAU Code'}
+                                    </div>
                                 </div>
-                                
-                                <div style={{ display: 'flex', gap: '10px' }}>
-                                    <button onClick={() => navigate('/')} style={{ ...styles.closeBtn, flex: 1, marginTop: 0, padding: '8px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
-                                        <ArrowLeft size={14} /> Sair
-                                    </button>
-                                    <button onClick={resetOverlays} style={{ ...styles.closeBtn, flex: 1, marginTop: 0, padding: '8px', borderRadius: '12px', background: 'var(--neon-purple)', border: 'none', fontWeight: 600 }}>
-                                        Fechar
-                                    </button>
-                                </div>
+
+                                {/* Canto Direito: Fechar */}
+                                <button 
+                                    onClick={resetOverlays} 
+                                    style={{ 
+                                        padding: '10px 16px', 
+                                        borderRadius: '16px', 
+                                        background: 'var(--neon-purple)', 
+                                        color: '#fff', 
+                                        border: 'none',
+                                        fontSize: '12px',
+                                        fontWeight: 700,
+                                        boxShadow: '0 4px 12px rgba(188, 54, 194, 0.3)'
+                                    }}
+                                >
+                                    Fechar
+                                </button>
                             </div>
                         )}
                     </div>

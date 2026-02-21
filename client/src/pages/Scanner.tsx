@@ -429,41 +429,65 @@ export default function Scanner() {
                     </div>
                 )}
 
-                {/* Área de Detecção - Nova UI no Rodapé */}
+                {/* Área de Detecção - UI Minimalista no Rodapé */}
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', height: '100%', paddingBottom: '100px', pointerEvents: 'none' }}>
                     {isDetected && activeTarget && activeTarget.content_type !== 'link' && (
                         <div className="animate-enter" style={{ 
                             pointerEvents: 'auto', 
-                            alignSelf: 'center', 
-                            padding: '16px 24px', 
-                            textAlign: 'center', 
-                            maxWidth: '320px', 
-                            width: '90%', 
-                            borderRadius: '32px',
-                            background: 'rgba(0,0,0,0.6)', 
-                            backdropFilter: 'blur(20px)',
-                            border: '1px solid rgba(255,255,255,0.1)',
-                            boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
-                            color: '#fff',
+                            width: '95%',
+                            alignSelf: 'center',
                             display: 'flex',
-                            flexDirection: 'column',
-                            gap: '4px'
+                            alignItems: 'flex-end',
+                            justifyContent: 'space-between',
+                            padding: '12px 16px',
+                            background: 'linear-gradient(to top, rgba(0,0,0,0.4), transparent)',
+                            borderRadius: '24px',
+                            gap: '12px'
                         }}>
-                            <div style={{ fontSize: '10px', color: 'var(--neon-purple)', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.8 }}>EXPERIÊNCIA DETECTADA</div>
-                            <div style={{ fontWeight: 700, fontSize: '20px', color: '#fff' }}>{activeTarget.name}</div>
-                            
-                            <div style={{ fontSize: '12px', opacity: 0.6, marginBottom: '12px' }}>
-                                por {activeTarget.profiles?.full_name || activeTarget.profiles?.email?.split('@')[0] || 'UAU Code'}
+                            {/* Canto Esquerdo: Sair */}
+                            <button 
+                                onClick={() => { stopScan(); navigate('/library'); }} 
+                                style={{ 
+                                    padding: '10px 16px', 
+                                    borderRadius: '16px', 
+                                    background: 'rgba(255,255,255,0.1)', 
+                                    backdropFilter: 'blur(10px)',
+                                    color: '#fff', 
+                                    border: '1px solid rgba(255,255,255,0.1)',
+                                    fontSize: '12px',
+                                    fontWeight: 600,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '6px'
+                                }}
+                            >
+                                <ArrowLeft size={14} /> Sair
+                            </button>
+
+                            {/* Centro: Info */}
+                            <div style={{ textAlign: 'center', flex: 1, paddingBottom: '4px' }}>
+                                <div style={{ fontWeight: 700, fontSize: '16px', color: '#fff', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>{activeTarget.name}</div>
+                                <div style={{ fontSize: '11px', opacity: 0.7, color: '#fff' }}>
+                                    por {activeTarget.profiles?.full_name || activeTarget.profiles?.email?.split('@')[0] || 'UAU Code'}
+                                </div>
                             </div>
 
-                            <div style={{ display: 'flex', gap: '10px' }}>
-                                <button onClick={() => { stopScan(); navigate('/library'); }} className="btn-secondary" style={{ flex: 1, fontSize: '12px', padding: '8px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)' }}>
-                                    <ArrowLeft size={14} style={{ marginRight: '4px' }} /> Sair
-                                </button>
-                                <button onClick={() => { resetOverlays(); }} style={{ flex: 1, fontSize: '12px', padding: '8px', borderRadius: '12px', background: 'var(--neon-purple)', color: '#fff', border: 'none', fontWeight: 600 }}>
-                                    Fechar
-                                </button>
-                            </div>
+                            {/* Canto Direito: Fechar */}
+                            <button 
+                                onClick={() => { resetOverlays(); }} 
+                                style={{ 
+                                    padding: '10px 16px', 
+                                    borderRadius: '16px', 
+                                    background: 'var(--neon-purple)', 
+                                    color: '#fff', 
+                                    border: 'none',
+                                    fontSize: '12px',
+                                    fontWeight: 700,
+                                    boxShadow: '0 4px 12px rgba(188, 54, 194, 0.3)'
+                                }}
+                            >
+                                Fechar
+                            </button>
                         </div>
                     )}
                 </div>
