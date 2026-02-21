@@ -16,6 +16,7 @@ interface Target {
     target_url: string;
     content_url: string;
     content_type: 'video' | 'audio' | '3d' | 'link';
+    profiles?: { full_name?: string; email?: string };
 }
 
 interface UserProfile {
@@ -120,7 +121,7 @@ export default function PublicScanner() {
 
             let query = supabase
                 .from('targets')
-                .select('*')
+                .select('*, profiles(full_name, email)')
                 .or(`user_id.eq.${profile.id},is_global.eq.true`);
 
             if (targetId) {
@@ -628,27 +629,29 @@ export default function PublicScanner() {
 
             {!loading && !error && (
                 <div style={styles.ui}>
-                    <div style={styles.header}>
-                        <button style={styles.backBtn} onClick={() => navigate('/')}>
-                            <ArrowLeft size={18} />
-                            Sair
-                        </button>
+                    {!isDetected && (
+                        <div style={styles.header}>
+                            <button style={styles.backBtn} onClick={() => navigate('/')}>
+                                <ArrowLeft size={18} />
+                                Sair
+                            </button>
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-end' }}>
-                            {status && (
-                                <div style={styles.statusBadge}>
-                                    <Loader2 size={14} className="spin" />
-                                    {status}
-                                </div>
-                            )}
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-end' }}>
+                                {status && (
+                                    <div style={styles.statusBadge}>
+                                        <Loader2 size={14} className="spin" />
+                                        {status}
+                                    </div>
+                                )}
 
-                            {userProfile && (
-                                <div style={styles.userInfo}>
-                                    @{userProfile.slug}
-                                </div>
-                            )}
+                                {userProfile && (
+                                    <div style={styles.userInfo}>
+                                        @{userProfile.slug}
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', alignItems: 'center' }}>
                         {loadingNewTarget && (
@@ -695,12 +698,37 @@ export default function PublicScanner() {
                         )}
 
                         {isDetected && activeTarget && activeTarget.content_type !== 'link' && (
-                            <div style={styles.detectedCard}>
-                                <div style={styles.detectedLabel}>DETECTADO</div>
+                            <div style={{
+                                alignSelf: 'center',
+                                backgroundColor: 'rgba(0,0,0,0.6)',
+                                backdropFilter: 'blur(20px)',
+                                borderRadius: '32px',
+                                padding: '16px 24px',
+                                textAlign: 'center' as const,
+                                maxWidth: '320px',
+                                width: '90%',
+                                pointerEvents: 'auto' as const,
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+                                color: '#fff',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '4px'
+                            }}>
+                                <div style={styles.detectedLabel}>EXPERIÊNCIA DETECTADA</div>
                                 <div style={styles.detectedName}>{activeTarget.name}</div>
-                                <button style={styles.closeBtn} onClick={resetOverlays}>
-                                    Fechar Experiência
-                                </button>
+                                <div style={{ fontSize: '12px', opacity: 0.6, marginBottom: '12px' }}>
+                                    por {activeTarget.profiles?.full_name || activeTarget.profiles?.email?.split('@')[0] || 'UAU Code'}
+                                </div>
+                                
+                                <div style={{ display: 'flex', gap: '10px' }}>
+                                    <button onClick={() => navigate('/')} style={{ ...styles.closeBtn, flex: 1, marginTop: 0, padding: '8px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+                                        <ArrowLeft size={14} /> Sair
+                                    </button>
+                                    <button onClick={resetOverlays} style={{ ...styles.closeBtn, flex: 1, marginTop: 0, padding: '8px', borderRadius: '12px', background: 'var(--neon-purple)', border: 'none', fontWeight: 600 }}>
+                                        Fechar
+                                    </button>
+                                </div>
                             </div>
                         )}
                     </div>

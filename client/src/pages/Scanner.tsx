@@ -19,6 +19,7 @@ interface Target {
     target_url: string;
     content_url: string;
     content_type: 'video' | 'audio' | '3d' | 'link';
+    profiles?: { full_name?: string; email?: string };
 }
 
 export default function Scanner() {
@@ -276,7 +277,7 @@ export default function Scanner() {
             isInitializing.current = true;
             setStatus('Fetching experiences...');
             if (!user) return;
-            let query = supabase.from('targets').select('*');
+            let query = supabase.from('targets').select('*, profiles(full_name, email)');
             if (selectedUserId && selectedUserId !== 'none') {
                 query = query.or(`user_id.eq.${selectedUserId},is_global.eq.true`);
             } else query = query.eq('is_global', true);
@@ -351,88 +352,118 @@ export default function Scanner() {
             <div ref={overlayContainerRef} className="overlay-container" style={{ zIndex: 10 }}></div>
             <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 20, pointerEvents: 'none', padding: 'var(--space-md)', paddingTop: 'max(var(--space-md), env(safe-area-inset-top))' }}>
                 
-                {/* Header Container Check */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr auto', alignItems: 'start', gap: '12px' }}>
-                    
-                    {/* Botão Voltar (Circular Glass) */}
-                    <button 
-                        onClick={() => { stopScan(); navigate('/library'); }} 
-                        style={{ 
-                            pointerEvents: 'auto', 
-                            width: '44px', height: '44px', 
-                            borderRadius: '50%', 
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            background: 'rgba(0,0,0,0.4)', 
-                            backdropFilter: 'blur(10px)', 
-                            border: '1px solid rgba(255,255,255,0.1)',
-                            color: '#fff',
-                            boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
-                        }}
-                    >
-                        <ArrowLeft size={22} />
-                    </button>
+                {/* Header Container Check - Only visible when NOT detecting */}
+                {!isDetected && (
+                    <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr auto', alignItems: 'start', gap: '12px' }}>
+                        
+                        {/* Botão Voltar (Circular Glass) */}
+                        <button 
+                            onClick={() => { stopScan(); navigate('/library'); }} 
+                            style={{ 
+                                pointerEvents: 'auto', 
+                                width: '44px', height: '44px', 
+                                borderRadius: '50%', 
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                background: 'rgba(0,0,0,0.4)', 
+                                backdropFilter: 'blur(10px)', 
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                color: '#fff',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
+                            }}
+                        >
+                            <ArrowLeft size={22} />
+                        </button>
 
-                    {/* Seletor de Usuário (Centralizado) */}
-                    {isAdmin && allUsers.length > 0 ? (
-                        <div style={{ pointerEvents: 'auto', display: 'flex', justifyContent: 'center' }}>
-                            <select 
-                                value={selectedUserId} 
-                                onChange={(e) => setSelectedUserId(e.target.value)} 
-                                style={{ 
-                                    appearance: 'none',
-                                    maxWidth: '220px', 
-                                    width: '100%',
-                                    padding: '10px 16px', 
-                                    borderRadius: '24px', 
-                                    background: 'rgba(0,0,0,0.4)', 
-                                    backdropFilter: 'blur(10px)', 
-                                    color: 'white', 
-                                    border: '1px solid rgba(255,255,255,0.15)', 
-                                    fontSize: '13px', 
-                                    fontWeight: 500,
-                                    outline: 'none', 
-                                    textAlign: 'center',
-                                    cursor: 'pointer',
-                                    boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
-                                }}
-                            >
-                                <option value="" disabled style={{ color: '#000' }}>Selecionar Usuário...</option>
-                                <option value="none" style={{ color: '#000' }}>🌍 Apenas Globais (UAU Code)</option>
-                                {allUsers.map(u => (
-                                    <option key={u.id} value={u.id} style={{ color: '#000' }}>
-                                        👤 {u.full_name || u.email} {u.id === user?.id ? '(Você)' : ''}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    ) : <div />}
-
-                    {/* Status Loader (Canto Direito) */}
-                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                        {status && (
-                            <div style={{ 
-                                padding: '8px 12px', 
-                                borderRadius: '20px', 
-                                background: 'rgba(0,0,0,0.6)', 
-                                backdropFilter: 'blur(4px)', 
-                                display: 'flex', gap: '8px', alignItems: 'center', 
-                                fontSize: '12px', color: '#ccc',
-                                border: '1px solid rgba(255,255,255,0.05)'
-                            }}>
-                                <Loader2 className="spin" size={14} />
-                                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '80px' }}>{status}</span>
+                        {/* Seletor de Usuário (Centralizado) */}
+                        {isAdmin && allUsers.length > 0 ? (
+                            <div style={{ pointerEvents: 'auto', display: 'flex', justifyContent: 'center' }}>
+                                <select 
+                                    value={selectedUserId} 
+                                    onChange={(e) => setSelectedUserId(e.target.value)} 
+                                    style={{ 
+                                        appearance: 'none',
+                                        maxWidth: '220px', 
+                                        width: '100%',
+                                        padding: '10px 16px', 
+                                        borderRadius: '24px', 
+                                        background: 'rgba(0,0,0,0.4)', 
+                                        backdropFilter: 'blur(10px)', 
+                                        color: 'white', 
+                                        border: '1px solid rgba(0,255,157,0.3)', 
+                                        fontSize: '13px', 
+                                        fontWeight: 600,
+                                        outline: 'none', 
+                                        textAlign: 'center',
+                                        cursor: 'pointer',
+                                        boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
+                                    }}
+                                >
+                                    <option value="" disabled style={{ color: '#000' }}>Selecionar Usuário...</option>
+                                    <option value="none" style={{ color: '#000' }}>🌍 Apenas Globais (UAU Code)</option>
+                                    {allUsers.map(u => (
+                                        <option key={u.id} value={u.id} style={{ color: '#000' }}>
+                                            👤 {u.full_name || u.email} {u.id === user?.id ? '(Você)' : ''}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
-                        )}
-                    </div>
-                </div>
+                        ) : <div />}
 
-                {/* Área Flexível para empurrar o card para baixo */}
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', height: '100%', paddingBottom: '80px', pointerEvents: 'none' }}>
+                        {/* Status Loader (Canto Direito) */}
+                        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                            {status && (
+                                <div style={{ 
+                                    padding: '8px 12px', 
+                                    borderRadius: '20px', 
+                                    background: 'rgba(0,0,0,0.6)', 
+                                    backdropFilter: 'blur(4px)', 
+                                    display: 'flex', gap: '8px', alignItems: 'center', 
+                                    fontSize: '12px', color: '#ccc',
+                                    border: '1px solid rgba(255,255,255,0.05)'
+                                }}>
+                                    <Loader2 className="spin" size={14} />
+                                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '80px' }}>{status}</span>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
+
+                {/* Área de Detecção - Nova UI no Rodapé */}
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', height: '100%', paddingBottom: '100px', pointerEvents: 'none' }}>
                     {isDetected && activeTarget && activeTarget.content_type !== 'link' && (
-                        <div className="glass-card animate-enter" style={{ pointerEvents: 'auto', alignSelf: 'center', padding: '20px', textAlign: 'center', maxWidth: '300px', width: '100%', border: '1px solid var(--neon-purple)', boxShadow: '0 8px 32px rgba(0,0,0,0.5)', background: 'rgba(10,10,14,0.85)' }}>
-                            <div className="neon-flicker" style={{ fontSize: '10px', color: 'var(--neon-purple)', marginBottom: '8px', fontWeight: 800, letterSpacing: '0.2em', textTransform: 'uppercase' }}>DETECTADO</div>
-                            <div style={{ fontWeight: 700, fontSize: '18px', color: '#fff', marginBottom: '12px' }}>{activeTarget.name}</div>
-                            <button onClick={() => { resetOverlays(); }} className="btn-secondary" style={{ width: '100%', fontSize: '13px', padding: '10px' }}>Fechar Experiência</button>
+                        <div className="animate-enter" style={{ 
+                            pointerEvents: 'auto', 
+                            alignSelf: 'center', 
+                            padding: '16px 24px', 
+                            textAlign: 'center', 
+                            maxWidth: '320px', 
+                            width: '90%', 
+                            borderRadius: '32px',
+                            background: 'rgba(0,0,0,0.6)', 
+                            backdropFilter: 'blur(20px)',
+                            border: '1px solid rgba(255,255,255,0.1)',
+                            boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+                            color: '#fff',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '4px'
+                        }}>
+                            <div style={{ fontSize: '10px', color: 'var(--neon-purple)', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.8 }}>EXPERIÊNCIA DETECTADA</div>
+                            <div style={{ fontWeight: 700, fontSize: '20px', color: '#fff' }}>{activeTarget.name}</div>
+                            
+                            <div style={{ fontSize: '12px', opacity: 0.6, marginBottom: '12px' }}>
+                                por {activeTarget.profiles?.full_name || activeTarget.profiles?.email?.split('@')[0] || 'UAU Code'}
+                            </div>
+
+                            <div style={{ display: 'flex', gap: '10px' }}>
+                                <button onClick={() => { stopScan(); navigate('/library'); }} className="btn-secondary" style={{ flex: 1, fontSize: '12px', padding: '8px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)' }}>
+                                    <ArrowLeft size={14} style={{ marginRight: '4px' }} /> Sair
+                                </button>
+                                <button onClick={() => { resetOverlays(); }} style={{ flex: 1, fontSize: '12px', padding: '8px', borderRadius: '12px', background: 'var(--neon-purple)', color: '#fff', border: 'none', fontWeight: 600 }}>
+                                    Fechar
+                                </button>
+                            </div>
                         </div>
                     )}
                 </div>

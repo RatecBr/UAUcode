@@ -63,16 +63,39 @@ export default function MediaCapture({ mode, onCapture, onClose }: MediaCaptureP
 
     const takePhoto = () => {
         if (!videoRef.current) return;
+        const video = videoRef.current;
         const canvas = document.createElement('canvas');
-        canvas.width = videoRef.current.videoWidth;
-        canvas.height = videoRef.current.videoHeight;
+        
+        // Mobile First: Força aspecto vertical (ex: 9:16 = 0.5625)
+        const targetAspect = 0.5625; 
+        const videoAspect = video.videoWidth / video.videoHeight;
+        
+        let drawWidth = video.videoWidth;
+        let drawHeight = video.videoHeight;
+        let startX = 0;
+        let startY = 0;
+
+        if (videoAspect > targetAspect) {
+            // Vídeo é mais largo que o necessário (ex: 4:3 ou 16:9 landscape) -> Corta laterais
+            drawWidth = video.videoHeight * targetAspect;
+            startX = (video.videoWidth - drawWidth) / 2;
+        } else if (videoAspect < targetAspect) {
+            // Vídeo é mais alto que o necessário -> Corta topo/baixo
+            drawHeight = video.videoWidth / targetAspect;
+            startY = (video.videoHeight - drawHeight) / 2;
+        }
+
+        canvas.width = drawWidth;
+        canvas.height = drawHeight;
+        
         const ctx = canvas.getContext('2d');
         if (ctx) {
-            ctx.drawImage(videoRef.current, 0, 0);
+            // Desenha a parte central do vídeo no canvas vertical
+            ctx.drawImage(video, startX, startY, drawWidth, drawHeight, 0, 0, drawWidth, drawHeight);
+            
             canvas.toBlob(async (blob) => {
                 if (blob) {
                     const tempFile = new File([blob], 'temp.jpg', { type: 'image/jpeg' });
-                    // Aplica compressão extrema: o redimensionamento agora é interno na função
                     const optimized = await optimizeImage(tempFile, 0.6);
                     setCapturedBlob(optimized);
                     stopStream();

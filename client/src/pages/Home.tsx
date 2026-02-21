@@ -135,7 +135,12 @@ function PublicGallery() {
                         >
                             <img 
                                 src={t.target_url} 
-                                style={{ width: '100%', display: 'block', height: 'auto' }} 
+                                style={{ 
+                                    width: '100%', 
+                                    aspectRatio: '0.7',
+                                    display: 'block', 
+                                    objectFit: 'cover' 
+                                }} 
                                 loading="lazy"
                             />
                             <div className="masonry-overlay">

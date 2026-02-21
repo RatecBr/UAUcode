@@ -269,7 +269,7 @@ export default function MyLibrary() {
     },
     cardImage: {
       width: "100%",
-      aspectRatio: "1/1",
+      aspectRatio: "0.7",
       objectFit: "cover" as const,
       background: "#000",
       borderTopLeftRadius: "20px",
