@@ -72,8 +72,8 @@ export default function MediaCapture({ mode, onCapture, onClose }: MediaCaptureP
             canvas.toBlob(async (blob) => {
                 if (blob) {
                     const tempFile = new File([blob], 'temp.jpg', { type: 'image/jpeg' });
-                    // Aplica compressão extrema: 800px é o ideal para o motor OpenCV mobile
-                    const optimized = await optimizeImage(tempFile, 800, 0.6);
+                    // Aplica compressão extrema: o redimensionamento agora é interno na função
+                    const optimized = await optimizeImage(tempFile, 0.6);
                     setCapturedBlob(optimized);
                     stopStream();
                 }

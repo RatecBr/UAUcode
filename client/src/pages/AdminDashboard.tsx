@@ -96,8 +96,7 @@ export default function AdminDashboard() {
         let processedFile = file;
         if (type === 'target' || (type === 'content' && file.type.startsWith('image/'))) {
             try {
-                const maxWidth = type === 'target' ? 800 : 1280;
-                processedFile = await optimizeImage(file, maxWidth, 0.6);
+                processedFile = await optimizeImage(file, 0.6);
             } catch (e) { console.error('Erro ao otimizar:', e); }
         }
         if (type === 'target') setTargetFile(processedFile);
