@@ -34,9 +34,9 @@ export default function MediaCapture({ mode, onCapture, onClose }: MediaCaptureP
             const constraints: MediaStreamConstraints = {
                 video: mode === 'audio' ? false : {
                     facingMode,
-                    width: { ideal: 720 },
-                    height: { ideal: 1280 },
-                    aspectRatio: { ideal: 0.5625 }
+                    width: 720,
+                    height: 1280,
+                    aspectRatio: 0.5625
                 },
                 audio: mode !== 'photo'
             };

@@ -5,8 +5,9 @@ export class VideoOverlay {
     constructor(container: HTMLElement) {
         this.container = container;
         this.video = document.createElement('video');
-        this.video.style.maxWidth = '100%';
-        this.video.style.maxHeight = '100%';
+        this.video.style.width = '100%';
+        this.video.style.height = '100%';
+        this.video.style.objectFit = 'cover';
         this.video.style.borderRadius = '16px';
         this.video.style.boxShadow = '0 10px 30px rgba(0,0,0,0.5)';
         this.video.controls = true;

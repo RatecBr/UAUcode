@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 // Force Vercel rebuild
-import { Plus, Layers, Camera } from 'lucide-react';
+import { Layers, Camera } from 'lucide-react';
 
 export default function BottomNav() {
   const navigate = useNavigate();
@@ -65,9 +65,9 @@ export default function BottomNav() {
         <span>Biblioteca</span>
       </button>
 
-      {/* Central Create Button */}
+      {/* Central Logo Button */}
       <button onClick={() => navigate('/')} style={styles.fab}>
-        <Plus size={32} />
+        <img src="/logo.png" alt="Logo" style={{ width: '40px', height: '40px', objectFit: 'contain' }} />
       </button>
 
       <button onClick={() => navigate('/scanner')} style={styles.navItem(isActive('/scanner'))}>
