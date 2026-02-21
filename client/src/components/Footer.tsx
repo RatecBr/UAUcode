@@ -84,12 +84,12 @@ export default function Footer() {
         <footer style={styles.footer}>
             <div style={styles.container}>
                 {/* Brand Column */}
-                <div style={styles.column}>
-                    <img src="/logo.png" alt="UAU Code" style={styles.logo} />
+                <div style={styles.column} className="footer-column">
+                    <img src="/logo.png" alt="UAU Code" style={styles.logo} className="footer-logo" />
                     <p style={styles.description}>
                         Ferramenta de inteligência artificial para reconhecer imagens e revelar conteúdos relevantes.
                     </p>
-                    <div style={styles.social}>
+                    <div style={styles.social} className="footer-social">
                         <a href="https://www.instagram.com/ra.tec.br/" target="_blank" rel="noopener noreferrer" style={styles.socialIcon}>
                             <Instagram size={20} />
                         </a>
@@ -102,7 +102,7 @@ export default function Footer() {
                     </div>
                 </div>
 
-                <div style={styles.column}>
+                <div style={styles.column} className="footer-column">
                     <h3 style={styles.title}>Recursos</h3>
                     <Link to="/#how-it-works" onClick={(e: React.MouseEvent) => {
                         e.preventDefault();
@@ -124,7 +124,7 @@ export default function Footer() {
 
 
                 {/* Support Column */}
-                <div style={styles.column}>
+                <div style={styles.column} className="footer-column">
                     <h3 style={styles.title}>Suporte</h3>
                     <Link to="/privacy" style={styles.link}>Privacidade</Link>
                     <Link to="/terms" style={styles.link}>Termos</Link>
@@ -142,6 +142,26 @@ export default function Footer() {
                     Contato: <a href="https://api.whatsapp.com/send?phone=5562981173666" style={{ ...styles.link, color: '#25D366' }}>(62) 98117-3666</a> | <a href="mailto:ra.tec.brasil@gmail.com" style={styles.link}>ra.tec.brasil@gmail.com</a>
                 </div>
             </div>
+
+            <style>{`
+                @media (max-width: 768px) {
+                    .footer-column {
+                        align-items: center;
+                        text-align: center;
+                    }
+                    .footer-logo {
+                        margin-left: 0 !important;
+                    }
+                    .footer-social {
+                        justify-content: center;
+                    }
+                }
+                @media (min-width: 769px) {
+                    .footer-logo {
+                        margin-left: -15px; /* Ajuste fino para alinhar visualmente com o texto */
+                    }
+                }
+            `}</style>
         </footer>
     );
 }

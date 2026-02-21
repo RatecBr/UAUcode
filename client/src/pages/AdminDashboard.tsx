@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Camera, X, Edit2, Trash2 } from 'lucide-react';
+import { LogOut, Camera, X, Edit2, Trash2, UserCircle } from 'lucide-react';
 import { supabase } from '../AuthContext';
 import ManageUsers from './ManageUsers';
 import { optimizeImage } from '../utils/fileOptimizer';
@@ -381,6 +381,13 @@ export default function AdminDashboard() {
                 <div style={styles.topRow}>
                     <h1 style={styles.logo}>ADMIN</h1>
                     <div style={styles.headerButtons}>
+                        <button
+                            style={styles.iconButton}
+                            onClick={() => navigate('/profile')}
+                            title="Meu Perfil"
+                        >
+                            <UserCircle size={18} color="#fff" />
+                        </button>
                         <button
                             style={styles.iconButton}
                             onClick={() => navigate('/scanner')}

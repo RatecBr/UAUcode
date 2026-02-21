@@ -1,4 +1,4 @@
-# UAUCode V.1.4.1 - Documentação Técnica Completa
+# UAUCode V.1.5.0 - Documentação Técnica Completa
 
 ## 📋 Índice
 
@@ -487,6 +487,7 @@ Para detalhes específicos de implementações recentes, consulte a pasta `/docs
 
 - [Análise de Escalabilidade do Scanner](file:///d:/Dropbox/DOWNLOAD/RATec/_APLICATIVOS/UAU-CODE/docs/ANALISE_ESCALABILIDADE.md)
 - [Análise de Infraestrutura e Limites](file:///d:/Dropbox/DOWNLOAD/RATec/_APLICATIVOS/UAU-CODE/docs/ANALISE_INFRAESTRUTURA.md)
+- [Changelog v1.5.0](file:///d:/Dropbox/DOWNLOAD/RATec/_APLICATIVOS/UAU-CODE/docs/CHANGELOG_V1_5_0.md)
 - [Changelog v1.4.7](file:///d:/Dropbox/DOWNLOAD/RATec/_APLICATIVOS/UAU-CODE/docs/CHANGELOG_V1_4_7.md)
 - [Walkthrough UI/UX Pro Max](file:///d:/Dropbox/DOWNLOAD/RATec/_APLICATIVOS/UAU-CODE/docs/WALKTHROUGH_UI_UX.md)
 - [Plano de Exclusão Segura](file:///d:/Dropbox/DOWNLOAD/RATec/_APLICATIVOS/UAU-CODE/docs/PLAN_SAFE_DELETE.md)
@@ -577,7 +578,15 @@ await waitForOpenCV();
 - [x] Edição de Categorias na Biblioteca
 - [x] Melhorias de UI em Mobile (Abas de Filtro)
 
-### v1.5.0 (Próximo)
+### v1.5.0 (Atual - Lançado)
+
+- [x] Perfil do Usuário & Admin (Nome, Senha, Cotas)
+- [x] Redesign da Navegação (BottomNav e Sidebar sincronizados)
+- [x] Paginação Responsiva (6 Mobile / 12 Desktop)
+- [x] Alternância dinâmica Logo/Avatar
+- [x] Limpeza de Lints e otimização de build
+
+### v1.6.0 (Próximo)
 
 - [ ] Analytics dashboard
 - [ ] Notificações push
@@ -593,4 +602,4 @@ await waitForOpenCV();
 
 ---
 
-_Última atualização: 21 de fevereiro de 2026 (v1.4.5)_
+_Última atualização: 21 de fevereiro de 2026 (v1.5.0)_

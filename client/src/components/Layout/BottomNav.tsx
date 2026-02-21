@@ -1,15 +1,27 @@
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Layers, Camera, ShieldAlert } from 'lucide-react';
+import { Layers, Camera, Plus } from 'lucide-react';
 import { useAuth } from '../../AuthContext';
 
 export default function BottomNav() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAdmin } = useAuth();
+  const { user } = useAuth();
+  const [showLogo, setShowLogo] = useState(true);
 
-  // Só mostra se for mobile (controle via CSS media query no layout pai ou aqui mesmo)
-  // Mas vamos fazer responsive via CSS global ou inline media query
-  
+  // Alterna entre Logo e Avatar a cada 3 segundos se estiver logado
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+
+    const interval = setInterval(() => {
+      setShowLogo(prev => !prev);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [user]);
+
   const isActive = (path: string) => location.pathname === path;
 
   const styles = {
@@ -25,7 +37,7 @@ export default function BottomNav() {
       display: 'flex',
       justifyContent: 'space-around',
       alignItems: 'center',
-      padding: '0 16px',
+      padding: '0 12px',
       zIndex: 1000,
       paddingBottom: 'env(safe-area-inset-bottom, 16px)'
     },
@@ -40,48 +52,75 @@ export default function BottomNav() {
       fontSize: '10px',
       fontWeight: 600,
       cursor: 'pointer',
-      width: '60px'
+      width: '64px',
+      transition: 'all 0.2s'
     }),
-    fab: {
-      width: '56px',
-      height: '56px',
+    logoBtn: {
+      width: '48px',
+      height: '48px',
       borderRadius: '50%',
-      background: 'linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-purple) 100%)',
-      border: '2px solid rgba(255, 255, 255, 0.2)',
+      background: 'rgba(255,255,255,0.05)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      overflow: 'hidden',
+      border: '1px solid var(--glass-border)',
+      cursor: 'pointer',
+      transition: 'all 0.5s ease-in-out'
+    },
+    avatar: {
+      width: '100%',
+      height: '100%',
+      objectFit: 'cover' as const
+    },
+    avatarPlaceholder: {
+      width: '100%',
+      height: '100%',
+      background: 'linear-gradient(135deg, var(--neon-blue), var(--neon-purple))',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       color: '#fff',
-      boxShadow: '0 0 20px rgba(188, 54, 194, 0.5)',
-      transform: 'translateY(-20px)',
-      cursor: 'pointer'
+      fontWeight: 800,
+      fontSize: '18px'
     }
   };
 
   return (
     <nav style={styles.nav} className="mobile-nav">
       
+      {/* 1. Logo/Avatar (Far Left) */}
+      <div onClick={() => navigate('/profile')} style={styles.logoBtn}>
+        {(!user || showLogo) ? (
+          <img src="/logo.png" alt="UAU" style={{ width: '32px', height: '32px', objectFit: 'contain' }} />
+        ) : (
+          <div style={styles.avatarPlaceholder}>
+            {user.user_metadata?.avatar_url || user.user_metadata?.picture ? (
+              <img src={user.user_metadata.avatar_url || user.user_metadata.picture} alt="Perfil" style={styles.avatar} />
+            ) : (
+              <span>{user.email?.charAt(0).toUpperCase()}</span>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* 2. Criar (Home) */}
+      <button onClick={() => navigate('/')} style={styles.navItem(isActive('/'))}>
+        <Plus size={22} color={isActive('/') ? 'var(--neon-purple)' : 'currentColor'} />
+        <span>Criar</span>
+      </button>
+
+      {/* 3. Biblioteca */}
       <button onClick={() => navigate('/library')} style={styles.navItem(isActive('/library'))}>
-        <Layers size={24} color={isActive('/library') ? 'var(--neon-purple)' : 'currentColor'} />
+        <Layers size={22} color={isActive('/library') ? 'var(--neon-purple)' : 'currentColor'} />
         <span>Biblioteca</span>
       </button>
 
-      {/* Central Logo Button */}
-      <button onClick={() => navigate('/')} style={styles.fab}>
-        <img src="/logo.png" alt="Logo" style={{ width: '40px', height: '40px', objectFit: 'contain' }} />
-      </button>
-
+      {/* 4. Scanner */}
       <button onClick={() => navigate('/scanner')} style={styles.navItem(isActive('/scanner'))}>
-        <Camera size={24} color={isActive('/scanner') ? 'var(--neon-blue)' : 'currentColor'} />
+        <Camera size={22} color={isActive('/scanner') ? 'var(--neon-blue)' : 'currentColor'} />
         <span>Scanner</span>
       </button>
-
-      {isAdmin && (
-        <button onClick={() => navigate('/admin')} style={styles.navItem(isActive('/admin'))}>
-          <ShieldAlert size={24} color={isActive('/admin') ? 'var(--neon-red)' : 'currentColor'} />
-          <span>Admin</span>
-        </button>
-      )}
 
       <style>{`
         @media (min-width: 769px) {

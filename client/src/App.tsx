@@ -12,6 +12,7 @@ import Scanner from './pages/Scanner';
 import PublicScanner from './pages/PublicScanner';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
+import Profile from './pages/Profile';
 
 // Rota privada (requer login)
 const PrivateRoute = ({ children, adminOnly }: { children: React.ReactNode, adminOnly?: boolean }) => {
@@ -79,6 +80,14 @@ export default function App() {
                 <MainLayout>
                    <Privacy />
                  </MainLayout>
+              } />
+
+              <Route path="/profile" element={
+                <PrivateRoute>
+                  <MainLayout>
+                    <Profile />
+                  </MainLayout>
+                </PrivateRoute>
               } />
 
               {/* My Library (Protegida) */}

@@ -15,13 +15,28 @@ const CATEGORIES = [
 function PublicGallery() {
     const [publicTargets, setPublicTargets] = useState<any[]>([]);
     const [selectedCategory, setSelectedCategory] = useState('Todos');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(window.innerWidth <= 768 ? 6 : 12);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setItemsPerPage(window.innerWidth <= 768 ? 6 : 12);
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    // Voltar para página 1 ao trocar categoria
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [selectedCategory]);
 
     useEffect(() => {
         let query = supabase.from('targets')
             .select('*, profiles(full_name, slug)')
             .eq('is_public', true)
             .order('created_at', { ascending: false })
-            .limit(20);
+            .limit(100); // Aumentado para permitir paginação local simples
 
         if (selectedCategory !== 'Todos') {
             // Filter where category array contains the selected category
@@ -127,8 +142,9 @@ function PublicGallery() {
             `}</style>
             
             {(publicTargets.length > 0) ? (
+                <>
                 <div className="masonry-grid">
-                    {publicTargets.map(t => (
+                    {publicTargets.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map(t => (
                         <div key={t.id} 
                             className="masonry-item"
                             onClick={() => window.location.href = `/s/${t.profiles?.slug || 'uau'}?target=${t.id}`}
@@ -172,6 +188,54 @@ function PublicGallery() {
                         </div>
                     ))}
                 </div>
+
+                {/* Paginação */}
+                {publicTargets.length > itemsPerPage && (
+                    <div style={{ 
+                        display: 'flex', 
+                        justifyContent: 'center', 
+                        alignItems: 'center', 
+                        gap: '20px', 
+                        marginTop: '32px'
+                    }}>
+                        <button 
+                            disabled={currentPage === 1}
+                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                            style={{
+                                background: 'rgba(255,255,255,0.05)',
+                                border: '1px solid var(--glass-border)',
+                                borderRadius: '12px',
+                                padding: '8px 16px',
+                                color: currentPage === 1 ? 'var(--text-muted)' : 'var(--text)',
+                                cursor: currentPage === 1 ? 'default' : 'pointer',
+                                fontSize: '14px',
+                                fontWeight: 600
+                            }}
+                        >
+                            Anterior
+                        </button>
+                        <span style={{ fontSize: '14px', fontWeight: 600, opacity: 0.7 }}>
+                            {currentPage} / {Math.ceil(publicTargets.length / itemsPerPage)}
+                        </span>
+                        <button 
+                            disabled={currentPage === Math.ceil(publicTargets.length / itemsPerPage)}
+                            onClick={() => setCurrentPage(p => Math.min(Math.ceil(publicTargets.length / itemsPerPage), p + 1))}
+                            style={{
+                                background: 'rgba(255,255,255,0.05)',
+                                border: '1px solid var(--glass-border)',
+                                borderRadius: '12px',
+                                padding: '8px 16px',
+                                color: currentPage === Math.ceil(publicTargets.length / itemsPerPage) ? 'var(--text-muted)' : 'var(--text)',
+                                cursor: currentPage === Math.ceil(publicTargets.length / itemsPerPage) ? 'default' : 'pointer',
+                                fontSize: '14px',
+                                fontWeight: 600
+                            }}
+                        >
+                            Próxima
+                        </button>
+                    </div>
+                )}
+                </>
             ) : (
                 <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
                     Nenhuma experiência encontrada nesta categoria.

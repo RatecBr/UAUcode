@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Home, Layers, Camera, LogOut, LogIn, Sun, Moon, ShieldCheck } from 'lucide-react';
+import { Home, Layers, Camera, LogOut, LogIn, Sun, Moon, ShieldCheck, User } from 'lucide-react';
 import { useAuth } from '../../AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import LoginModal from '../Auth/LoginModal';
@@ -8,23 +8,22 @@ import LoginModal from '../Auth/LoginModal';
 export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { logout, user, profile } = useAuth();
+  const { logout, user, isAdmin } = useAuth();
   const { theme, toggleTheme } = useTheme(); // Theme Hook
   const [showLoginModal, setShowLoginModal] = useState(false);
   
   const isActive = (path: string) => location.pathname === path;
 
-  const baseNavItems = [
-    { icon: Home, label: 'Início', path: '/' },
+  const navItems = [
+    { icon: Home, label: 'Criar', path: '/' },
     { icon: Layers, label: 'Biblioteca', path: '/library' },
     { icon: Camera, label: 'Scanner', path: '/scanner' },
+    { icon: User, label: 'Perfil', path: '/profile' }
   ];
 
-  const adminItems = [
-    { icon: ShieldCheck, label: 'Admin', path: '/admin' }
-  ];
-
-  const navItems = profile?.role === 'admin' ? [...baseNavItems, ...adminItems] : baseNavItems;
+  if (isAdmin) {
+    navItems.push({ icon: ShieldCheck, label: 'Painel', path: '/admin' });
+  }
 
   return (
     <>

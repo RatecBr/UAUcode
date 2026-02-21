@@ -40,6 +40,21 @@ export default function MyLibrary() {
   const [searchTerm, setSearchTerm] = useState("");
   const [uploading, setUploading] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(window.innerWidth <= 768 ? 6 : 12);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setItemsPerPage(window.innerWidth <= 768 ? 6 : 12);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Voltar para página 1 ao buscar
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   const [newSlug, setNewSlug] = useState("");
 
@@ -237,6 +252,12 @@ export default function MyLibrary() {
     t.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
+  const totalPages = Math.ceil(filteredTargets.length / itemsPerPage);
+  const currentTargets = filteredTargets.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   const updateSlug = async () => {
     if (!newSlug.trim()) {
       alert("Slug não pode estar vazio");
@@ -403,16 +424,6 @@ export default function MyLibrary() {
             {isAdmin ? "Admin" : getPlanName(profile?.plan || "free")}
           </div>
         </div>
-        <button
-          onClick={() => setShowSettings(true)}
-          style={{
-            background: "transparent",
-            border: "none",
-            color: "var(--text)",
-          }}
-        >
-          <Settings size={24} />
-        </button>
       </header>
 
       {/* Stats Card Simplificado */}
@@ -443,19 +454,36 @@ export default function MyLibrary() {
             uaucode.com/s/{profile?.slug}
           </div>
         </div>
-        <button
-          onClick={copyLink}
-          style={{
-            background: "rgba(255,255,255,0.1)",
-            borderRadius: "10px",
-            padding: "8px",
-            border: "none",
-            color: "var(--text)",
-            cursor: "pointer",
-          }}
-        >
-          <Share2 size={18} />
-        </button>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button
+            onClick={() => setShowSettings(true)}
+            style={{
+              background: "rgba(255,255,255,0.1)",
+              borderRadius: "10px",
+              padding: "8px",
+              border: "none",
+              color: "var(--text)",
+              cursor: "pointer",
+            }}
+            title="Ajustar Link"
+          >
+            <Settings size={18} />
+          </button>
+          <button
+            onClick={copyLink}
+            style={{
+              background: "rgba(255,255,255,0.1)",
+              borderRadius: "10px",
+              padding: "8px",
+              border: "none",
+              color: "var(--text)",
+              cursor: "pointer",
+            }}
+            title="Copiar Link"
+          >
+            <Share2 size={18} />
+          </button>
+        </div>
       </div>
 
       {/* Search */}
@@ -502,8 +530,9 @@ export default function MyLibrary() {
           </button>
         </div>
       ) : (
+        <>
         <div style={styles.grid}>
-          {filteredTargets.map((target) => (
+          {currentTargets.map((target) => (
             <div key={target.id} style={styles.card}>
               <div style={styles.iconType}>
                 {target.content_type === "video" && (
@@ -652,6 +681,55 @@ export default function MyLibrary() {
             </div>
           ))}
         </div>
+
+        {/* Paginação */}
+        {totalPages > 1 && (
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center', 
+            gap: '20px', 
+            marginTop: '32px',
+            marginBottom: '16px'
+          }}>
+            <button 
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              style={{
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid var(--glass-border)',
+                borderRadius: '12px',
+                padding: '8px 16px',
+                color: currentPage === 1 ? 'var(--text-muted)' : 'var(--text)',
+                cursor: currentPage === 1 ? 'default' : 'pointer',
+                fontSize: '14px',
+                fontWeight: 600
+              }}
+            >
+              Anterior
+            </button>
+            <span style={{ fontSize: '14px', fontWeight: 600, opacity: 0.7 }}>
+              {currentPage} / {totalPages}
+            </span>
+            <button 
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              style={{
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid var(--glass-border)',
+                borderRadius: '12px',
+                padding: '8px 16px',
+                color: currentPage === totalPages ? 'var(--text-muted)' : 'var(--text)',
+                cursor: currentPage === totalPages ? 'default' : 'pointer',
+                fontSize: '14px',
+                fontWeight: 600
+              }}
+            >
+              Próxima
+            </button>
+          </div>
+        )}
+        </>
       )}
 
       {/* FAB para criar nova - Redireciona para Home */}
