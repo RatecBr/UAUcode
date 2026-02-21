@@ -22,7 +22,7 @@ export default function Sidebar() {
   ];
 
   if (isAdmin) {
-    navItems.push({ icon: ShieldCheck, label: 'Painel', path: '/admin' });
+    navItems.push({ icon: ShieldCheck, label: 'Admin', path: '/admin' });
   }
 
   return (

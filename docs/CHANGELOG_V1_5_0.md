@@ -18,15 +18,15 @@ Todos os usuários, incluindo administradores, agora têm controle total sobre s
 A navegação mobile foi simplificada e focada:
 
 - **Logo/Avatar Inteligente**: O avatar agora é o ponto de entrada direto para o seu perfil pessoal.
-- **Botão "Criar"**: Novo botão (ícone de `Plus`) posicionado estrategicamente ao lado do avatar, levando à página inicial (fluxo de criação).
-- **Remoção do Redundante**: O botão "Painel" foi removido para evitar duplicidade de funções e limpar a interface.
-- **Acesso Admin**: Mantido de forma inteligente via Perfil ou Dashboard Desktop.
+- **Botão "Criar"**: Novo botão (ícone de `Plus`) posicionado estrategicamente ao lado do avatar.
+- **Acesso Admin**: Restaurado botão "**Admin**" (ícone de `ShieldCheck`) no `BottomNav` exclusivamente para administradores.
+- **Remoção de Redundâncias**: Interface limpa e intuitiva, removendo nomes e botões desnecessários.
 
 ### 🖥️ Sincronização Desktop
 
-A barra lateral (Sidebar) agora reflete exatamente as capacidades do mobile:
-
-- **Perfil e Dashboard**: Itens separados na Sidebar para permitir que admins acessem tanto o perfil pessoal quanto a área de gestão.
+- **Sidebar**: Agora exibe "Perfil" para todos e "**Admin**" (em vez de Painel) exclusivamente para administradores.
+- **Admin Dashboard**: Botão de perfil integrado diretamente no cabeçalho.
+  permitindo que admins acessem tanto o perfil pessoal quanto a área de gestão.
 - **Botão Painel Mobile**: O BottomNav mobile agora leva ao perfil ou admin dependendo da role.
 
 ### 🔢 Paginação Inteligente

@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Layers, Camera, Plus } from 'lucide-react';
+import { Layers, Camera, Plus, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../../AuthContext';
 
 export default function BottomNav() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const [showLogo, setShowLogo] = useState(true);
 
   // Alterna entre Logo e Avatar a cada 3 segundos se estiver logado
@@ -121,6 +121,14 @@ export default function BottomNav() {
         <Camera size={22} color={isActive('/scanner') ? 'var(--neon-blue)' : 'currentColor'} />
         <span>Scanner</span>
       </button>
+
+      {/* 5. Admin (Far Right - Only if Admin) */}
+      {isAdmin && (
+        <button onClick={() => navigate('/admin')} style={styles.navItem(isActive('/admin'))}>
+          <ShieldCheck size={22} color={isActive('/admin') ? 'var(--neon-red)' : 'currentColor'} />
+          <span>Admin</span>
+        </button>
+      )}
 
       <style>{`
         @media (min-width: 769px) {
