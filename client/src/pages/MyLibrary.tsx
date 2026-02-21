@@ -80,6 +80,12 @@ export default function MyLibrary() {
         return;
       }
 
+      if (!targetFile) {
+        setUploading(false);
+        isUploadingRef.current = false;
+        return;
+      }
+
       const uploadFile = async (file: File, predefinedType?: string) => {
         const fileExt = file.name.split(".").pop()?.toLowerCase();
         const filePath = `${user?.id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
